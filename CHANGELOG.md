@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.15 (based on 1.4.15-cdb branch)
+
+ - To use this release you have to specify the **dependency with URL in package.json**, as in:
+    ```js
+        "carto": "https://github.com/CartoDB/node-mapnik/tarball/1.4.15-cdb"
+    ```
+   and build from source with: `--build-from-source`
+ - Use `agg_renderer` constructor without `mapnik::request` to keep getting buffer size from map instead of options.
 ## 1.4.15
 
  - Upgraded to mapnik-vector-tile@0.5.5 for faster raster rendering

@@ -1749,11 +1749,7 @@ void Map::EIO_RenderImage(uv_work_t* req)
 
     try
     {
-        mapnik::Map const& map = *closure->m->map_;
-        mapnik::request m_req(map.width(),map.height(),map.get_current_extent());
-        m_req.set_buffer_size(closure->buffer_size);
-        mapnik::agg_renderer<mapnik::image_32> ren(map,
-                                                   m_req,
+        mapnik::agg_renderer<mapnik::image_32> ren(*closure->m->map_,
 #if MAPNIK_VERSION >= 300000
                                                    closure->variables,
 #endif
@@ -1968,11 +1964,7 @@ void Map::EIO_RenderFile(uv_work_t* req)
         else
         {
             mapnik::image_32 im(closure->m->map_->width(),closure->m->map_->height());
-            mapnik::Map const& map = *closure->m->map_;
-            mapnik::request m_req(map.width(),map.height(),map.get_current_extent());
-            m_req.set_buffer_size(closure->buffer_size);
-            mapnik::agg_renderer<mapnik::image_32> ren(map,
-                                                   m_req,
+            mapnik::agg_renderer<mapnik::image_32> ren(*closure->m->map_,
 #if MAPNIK_VERSION >= 300000
                                                    closure->variables,
 #endif
@@ -2127,11 +2119,7 @@ NAN_METHOD(Map::renderSync)
     try
     {
         mapnik::image_32 im(m->map_->width(),m->map_->height());
-        mapnik::Map const& map = *m->map_;
-        mapnik::request m_req(map.width(),map.height(),map.get_current_extent());
-        m_req.set_buffer_size(buffer_size);
-        mapnik::agg_renderer<mapnik::image_32> ren(map,
-                                                   m_req,
+        mapnik::agg_renderer<mapnik::image_32> ren(*m->map_,
 #if MAPNIK_VERSION >= 300000
                                                    mapnik::attributes(),
 #endif
@@ -2272,11 +2260,7 @@ NAN_METHOD(Map::renderFileSync)
         else
         {
             mapnik::image_32 im(m->map_->width(),m->map_->height());
-            mapnik::Map const& map = *m->map_;
-            mapnik::request m_req(map.width(),map.height(),map.get_current_extent());
-            m_req.set_buffer_size(buffer_size);
-            mapnik::agg_renderer<mapnik::image_32> ren(map,
-                                                   m_req,
+            mapnik::agg_renderer<mapnik::image_32> ren(*m->map_,
 #if MAPNIK_VERSION >= 300000
                                                    mapnik::attributes(),
 #endif
