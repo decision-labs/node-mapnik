@@ -9,7 +9,7 @@
   "binary": {
       "module_name" : "mapnik",
       "module_path" : "./lib/binding/{node_abi}-{platform}-{arch}",
-      "host"        : "https://mapbox-node-binary.s3.amazonaws.com",
+      "host"        : "https://cartodb-node-binary.s3.amazonaws.com",
       "remote_path" : "./{module_name}/v{version}/",
       "package_name": "{node_abi}-{platform}-{arch}.tar.gz"
   },
