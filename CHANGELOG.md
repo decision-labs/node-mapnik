@@ -8,6 +8,8 @@
     ```
    and build from source with: `--build-from-source`
  - Use `agg_renderer` constructor without `mapnik::request` to keep getting buffer size from map instead of options.
+ - Don't rely on process.env.hasOwnProperty as in Node <0.9.0 versions it doesn't work like a proper JS object.
+
 ## 1.4.15
 
  - Upgraded to mapnik-vector-tile@0.5.5 for faster raster rendering
