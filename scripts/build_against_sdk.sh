@@ -90,7 +90,7 @@ function upgrade_gcc {
 }
 
 COMPRESSION="tar.bz2"
-SDK_URI="http://mapnik.s3.amazonaws.com/dist/dev"
+SDK_URI="https://cartodb-node-binary.s3.amazonaws.com/dist/dev"
 platform=$(echo $UNAME | sed "y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/")
 
 if [[ "${CXX11:-false}" != false ]]; then
