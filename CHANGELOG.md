@@ -3,7 +3,7 @@
 ## 1.4.15 (based on 1.4.15-cdb branch)
 
  - Uses mapnik binaries from CartoDB AWS S3 bucket
- - Publishes to cartodb AWS S3 bucket. ONLY Linux binary for now.
+ - Publishes to cartodb AWS S3 bucket.
  - To use this release you have to specify the **dependency with URL in package.json**, as in:
     ```js
         "carto": "https://github.com/CartoDB/node-mapnik/tarball/1.4.15-cdb"
