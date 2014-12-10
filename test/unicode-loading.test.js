@@ -32,7 +32,7 @@ describe('Handling unicode paths, filenames, and data', function(){
             console.log('skipping due to lack of csv plugin');
             return done();
         }
-        var filepath = './test/data/ünicode_symbols.xml';
+        var filepath = './test/data/unicode_symbols.xml';
         assert.ok(existsSync(filepath));
         var svg = './test/data/dir-区县级行政区划/你好-ellipses.svg';
         assert.ok(existsSync(svg));
