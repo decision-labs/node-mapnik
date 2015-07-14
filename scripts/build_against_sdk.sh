@@ -98,7 +98,7 @@ if [[ "${CXX11:-false}" != false ]]; then
     HASH="1702-g65bd9e6"
 else
     # mapnik 2.3.x / c++11 not enabled
-    HASH="624-g82df66e"
+    HASH="676-g065214e"
 fi
 
 if [[ ${platform} == 'linux' ]]; then
