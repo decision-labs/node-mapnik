@@ -1,10 +1,10 @@
 {
-  "name"          : "mapnik",
+  "name"          : "mapnik-cartodb",
   "description"   : "Tile rendering library for node",
   "url"           : "http://github.com/mapnik/node-mapnik",
   "homepage"      : "http://mapnik.org",
   "author"        : "Dane Springmeyer <dane@dbsgeo.com> (mapnik.org)",
-  "version"       : "1.4.15-cdb8",
+  "version"       : "1.4.15-cdb9",
   "main"          : "./lib/mapnik.js",
   "binary": {
       "module_name" : "mapnik",
