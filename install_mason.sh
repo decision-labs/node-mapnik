@@ -12,7 +12,7 @@ ICU_VERSION="57.1"
 
 if [ ! -f ./mason/mason.sh ]; then
     mkdir -p ./mason
-    curl -sSfL https://github.com/mapbox/mason/archive/c1948184d9430226e36f1bc1f8f081268b6bc2ba.tar.gz | tar --gunzip --extract --strip-components=1 --exclude="*md" --exclude="test*" --directory=./mason
+    curl -sSfL https://github.com/CartoDB/mason/archive/master.tar.gz | tar --gunzip --extract --strip-components=1 --exclude="*md" --exclude="test*" --directory=./mason
 fi
 
 if [ ! -f ./mason_packages/.link/bin/mapnik-config ]; then
@@ -38,5 +38,6 @@ if [ ! -f ./mason_packages/.link/bin/mapnik-config ]; then
     # NOTE: sync this version with the `mapnik_version` in package.json (which is used for windows builds)
     # In the future we could pull from that version automatically if mason were to support knowing the right dep
     # versions to install automatically. Until then there is not much point since the deps are still hardcoded here.
-    install mapnik 3.0.15
+    MAPNIK_VERSION=$(node -e "console.log(require('./package.json').mapnik_version)")
+    MASON_CARTO_VERSION=${MAPNIK_VERSION//v} install mapnik 3.0.15-carto
 fi

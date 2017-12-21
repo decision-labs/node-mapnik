@@ -4,19 +4,18 @@
   "url": "http://github.com/mapnik/node-mapnik",
   "homepage": "http://mapnik.org",
   "author": "Dane Springmeyer <dane@mapbox.com> (mapnik.org)",
-  "version": "3.6.2",
-  "mapnik_version":"v3.0.15",
+  "version": "3.6.2.0",
+  "mapnik_version":"v3.0.15.0",
   "main": "./lib/mapnik.js",
   "binary": {
     "module_name": "mapnik",
     "module_path": "./lib/binding/",
-    "host": "https://mapbox-node-binary.s3.amazonaws.com",
+    "host": "https://mapnik-carto.s3.amazonaws.com",
     "remote_path": "./{module_name}/v{version}/",
     "package_name": "{node_abi}-{platform}-{arch}-{configuration}{toolset}.tar.gz"
   },
   "bugs": {
-    "email": "dane@mapbox.com",
-    "url": "http://github.com/mapnik/node-mapnik/issues"
+    "url": "http://github.com/CartoDB/node-mapnik/issues"
   },
   "keywords": [
     "map",
@@ -28,7 +27,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/mapnik/node-mapnik.git"
+    "url": "git://github.com/CartoDB/node-mapnik.git"
   },
   "contributors": [
     "Konstantin Käfer",
