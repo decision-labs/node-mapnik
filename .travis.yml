@@ -44,18 +44,6 @@ script:
 # run your tests and build binaries
 matrix:
   include:
-    # linux publishable node v0.10/release
-    - os: linux
-      env: BUILDTYPE=release
-      node_js: "0.10"
-    # linux publishable node v4/release
-    - os: linux
-      env: BUILDTYPE=release
-      node_js: 4
-    # linux publishable node v4/debug
-    - os: linux
-      env: BUILDTYPE=debug
-      node_js: 4
     # linux publishable node v6
     - os: linux
       env: BUILDTYPE=release
@@ -64,43 +52,24 @@ matrix:
     - os: linux
       env: BUILDTYPE=debug
       node_js: 6
-    # linux publishable node v7
-    - os: linux
-      env: BUILDTYPE=release
-      node_js: 7
     # linux publishable node v8
     - os: linux
       env: BUILDTYPE=release
       node_js: 8
-    # osx publishable node v0.10
-    - os: osx
-      osx_image: xcode8.3
-      env: BUILDTYPE=release
-      node_js: "0.10"
-    # osx publishable node v4
-    - os: osx
-      osx_image: xcode8.3
-      env: BUILDTYPE=release
-      node_js: 4
     # osx publishable node v6
     - os: osx
       osx_image: xcode8.3
       env: BUILDTYPE=release
       node_js: 6
-    # osx publishable node v7
-    - os: osx
-      osx_image: xcode8.2
-      env: BUILDTYPE=release
-      node_js: 7
     # osx publishable node v8
     - os: osx
       osx_image: xcode8.2
       env: BUILDTYPE=release
       node_js: 8
-    # Sanitizer build node v4/Debug
+    # Sanitizer build node v6/Debug
     - os: linux
       env: BUILDTYPE=debug TOOLSET=-asan
-      node_js: 4
+      node_js: 6
       # Overrides `install` to set up custom asan flags
       install:
         - ./scripts/setup.sh --config local.env
@@ -123,7 +92,7 @@ matrix:
     # g++ build (default builds all use clang++)
     - os: linux
       env: BUILDTYPE=debug CXX="g++-6" CC="gcc-6"
-      node_js: 4
+      node_js: 6
       addons:
         apt:
           sources:
@@ -140,7 +109,7 @@ matrix:
     # Coverage build
     - os: linux
       env: BUILDTYPE=debug CXXFLAGS="--coverage" LDFLAGS="--coverage"
-      node_js: 4
+      node_js: 6
       # Overrides `script` to publish coverage data to codecov
       before_script:
         - npm test
@@ -150,7 +119,3 @@ matrix:
         - curl -S -f https://codecov.io/bash -o codecov
         - chmod +x codecov
         - ./codecov -x "llvm-cov gcov" -Z
-
-notifications:
-  slack:
-    secure: wLpScQaDoEsVe0Bu28b62FGZBfmX3s/NK8DWcuSxEFx80k8RKPNgnMg8htamG0zRSf5htF+X6jy2P0IeUvbeupIaJwqtXvHaJYtlMTmemG/xuXLTpLp6k6giT2mWm/lp+ykuaF/PvUcZWUhSf1zhS6vwIekrMYIcDYvNXjO8DNw=
