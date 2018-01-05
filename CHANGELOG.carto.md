@@ -2,10 +2,14 @@
 
 ## 3.6.2-carto.1
 
-**Release date**: TBD
+**Release date**: 2018-01-05
 
-Changes (planned):
+Changes:
  - Add this very changelog
+ - Pass variables into grid_renderer [#6](https://github.com/CartoDB/node-mapnik/pull/6)
+ - Upgrade mapnik to v3.0.15.2 and mapnik-vector-tile to v1.5.0 [#9](https://github.com/CartoDB/node-mapnik/pull/9)
+ - Pass variables to replace tokens in queries for MVT rendering [#809](https://github.com/mapnik/node-mapnik/pull/809) backported to [#10](https://github.com/CartoDB/node-mapnik/pull/10)
+ - Add mapnik metrics [#8](https://github.com/CartoDB/node-mapnik/pull/8)
 
 
 ## 3.6.2-carto.0
