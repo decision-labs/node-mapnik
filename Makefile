@@ -8,7 +8,7 @@ deps/geometry/include/mapbox/geometry.hpp:
 node_modules:
 	npm install --ignore-scripts --clang
 
-mason_packages/.link/bin/mapnik-config:
+mason_packages/.link/bin/mapnik-config: deps/geometry/include/mapbox/geometry.hpp
 	./install_mason.sh
 
 pre_build_check:
