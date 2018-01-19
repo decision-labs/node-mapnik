@@ -32,7 +32,7 @@ if [ ! -f ./mason_packages/.link/bin/mapnik-config ]; then
     install boost_libfilesystem 1.63.0
     install boost_libregex_icu57 1.63.0
     install freetype 2.7.1
-    install harfbuzz 1.4.2-ft
+    install harfbuzz 1.3.0
 
     # mapnik
     # NOTE: sync this version with the `mapnik_version` in package.json (which is used for windows builds)
