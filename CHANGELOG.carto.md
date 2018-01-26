@@ -2,10 +2,12 @@
 
 ## 3.6.2-carto.2
 
-**Release date**: 2018-XX-XX
+**Release date**: 2018-01-26
 
 Changes:
- - Make sure the submodules are included
+ - Make sure the submodules are included [#11](https://github.com/CartoDB/node-mapnik/pull/11)
+ - Change harfbuzz dep to v1.3.0 [#12](https://github.com/CartoDB/node-mapnik/pull/12)
+
 
 ## 3.6.2-carto.1
 
