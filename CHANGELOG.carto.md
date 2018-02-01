@@ -1,5 +1,13 @@
 # CARTO node-mapnik changelog
 
+## 3.6.2-carto.3
+
+**Release date**: 2018-XX-XX
+
+Changes:
+ - Build also for Node9. [Upstream](https://github.com/mapnik/node-mapnik/commit/690f351c20cb5d08e57df5033d70d13417625da7)
+
+
 ## 3.6.2-carto.2
 
 **Release date**: 2018-01-26
