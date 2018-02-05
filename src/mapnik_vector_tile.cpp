@@ -1396,8 +1396,9 @@ NAN_METHOD(VectorTile::layer)
         }
     }
     v8::Local<v8::Value> ext = Nan::New<v8::External>(v);
-    v8::Local<v8::Object> vt_obj = Nan::New(constructor)->GetFunction()->NewInstance(1, &ext);
-    info.GetReturnValue().Set(vt_obj);
+    Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::New(constructor)->GetFunction(), 1, &ext);
+    if (maybe_local.IsEmpty()) Nan::ThrowError("Could not create new Layer instance");
+    else info.GetReturnValue().Set(maybe_local.ToLocalChecked());
     return;
 }
 
@@ -5143,20 +5144,17 @@ void VectorTile::EIO_RenderTile(uv_work_t* req)
     try
     {
         mapnik::Map const& map_in = *closure->m->get();
-        mapnik::vector_tile_impl::spherical_mercator merc(closure->d->tile_size());
-        double minx,miny,maxx,maxy;
+        mapnik::box2d<double> map_extent;
         if (closure->zxy_override)
         {
-            merc.xyz(closure->x,closure->y,closure->z,minx,miny,maxx,maxy);
+            map_extent = mapnik::vector_tile_impl::tile_mercator_bbox(closure->x,closure->y,closure->z);
         } 
         else 
         {
-            merc.xyz(closure->d->get_tile()->x(),
-                     closure->d->get_tile()->y(),
-                     closure->d->get_tile()->z(),
-                     minx,miny,maxx,maxy);
+            map_extent = mapnik::vector_tile_impl::tile_mercator_bbox(closure->d->get_tile()->x(),
+                                                                      closure->d->get_tile()->y(),
+                                                                      closure->d->get_tile()->z());
         }
-        mapnik::box2d<double> map_extent(minx,miny,maxx,maxy);
         mapnik::request m_req(closure->width, closure->height, map_extent);
         m_req.set_buffer_size(closure->buffer_size);
         mapnik::projection map_proj(map_in.srs(),true);
