@@ -1,5 +1,12 @@
 # CARTO node-mapnik changelog
 
+## 3.6.2-carto.4
+
+**Release date**: 2018-mm-dd
+
+Changes:
+ - Update mapnik to [v3.0.15.6](https://github.com/CartoDB/mapnik/blob/v3.0.15-carto/CHANGELOG.carto.md#30156), which includes fixes and improvements for raster markers cache.
+
 ## 3.6.2-carto.3
 
 **Release date**: 2018-02-26
