@@ -2,7 +2,7 @@
 
 ## 3.6.2-carto.5
 
-**Release date**: 2018-XX-XX
+**Release date**: 2018-03-19
 
 Changes:
  - [Upstream] move to prepublishOnly
