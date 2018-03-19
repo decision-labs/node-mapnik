@@ -1,5 +1,14 @@
 # CARTO node-mapnik changelog
 
+## 3.6.2-carto.5
+
+**Release date**: 2018-XX-XX
+
+Changes:
+ - [Upstream] move to prepublishOnly
+ - [Upstream] Add mapnik-index command in 'bin' so it gets installed by npm
+ - Allow switching the default build with an environment variable
+
 ## 3.6.2-carto.4
 
 **Release date**: 2018-03-14
