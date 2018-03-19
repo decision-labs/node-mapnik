@@ -1,5 +1,12 @@
 # CARTO node-mapnik changelog
 
+## 3.6.2-carto.6
+
+**Release date**: 2018-03-19
+
+Changes:
+  - Replublish npm package including git submodules
+
 ## 3.6.2-carto.5
 
 **Release date**: 2018-03-19
