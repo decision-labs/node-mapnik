@@ -1,5 +1,18 @@
 # CARTO node-mapnik changelog
 
+## 3.6.2-carto.7
+
+**Release date**: 2018-04-02
+
+Changes:
+  - Upgrade mapnik to [v3.0.15.7](https://github.com/CartoDB/mapnik/blob/345a9670e14ab898b8abe44f240be0fb6c37cb98/CHANGELOG.carto.md#30157), which brings a number of changes:
+    - Metrics: Add metrics to the grid renderer
+    - Metrics: Internal rework (no mutex, no tree) to improve performance
+    - Metrics: Add counters for feature types
+    - Metrics: Add counters for cache misses
+    - Markers Symbolizer Caches: Add a map extra parameter markers_symbolizer_caches_disabled that can be set to true to disable them.
+    - Markers Symbolizer Caches: Use pointer to cached attributes as part of the key. Fix for a double free. Performance improvements in cached items keys lookup.
+
 ## 3.6.2-carto.6
 
 **Release date**: 2018-03-19
