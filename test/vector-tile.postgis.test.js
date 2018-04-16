@@ -84,31 +84,24 @@ describe('mapnik.VectorTile postgis.input', function() {
             });
     });
 
-    it('Correctly handles bool values', function(done) {
+    it('Correctly handles same value but different type properties', function(done) {
         if (!hasPostgisAvailable) {
             this.skip('postgis not available');
         }
 
-        spawn('psql', ['-q', '-f', './test/data/postgis-create-db-and-tables.sql', dbname])
-            .on('exit', function(code, signal) {
-                assert.equal(code, 0, 'could not load data in postgis');
-                var map = new mapnik.Map(256, 256);
-                map.loadSync('./test/data/postgis_datasource_bool_query.xml');
+        var map = new mapnik.Map(256, 256);
+        map.loadSync('./test/data/postgis_datasource_bool_query.xml');
 
-                var opts = {};
-                opts.variables = { "fieldid": 2 };
-                map.render(new mapnik.VectorTile(0, 0, 0), opts, function(err, vtile) {
-                    assert.ok(!err,err);
-                    assert(!vtile.empty());
-                    var out = JSON.parse(vtile.toGeoJSON(0));
-                    assert.equal(out.type,'FeatureCollection');
-                    assert.equal(out.features.length,1);
-                    assert.strictEqual(out.features[0].properties.data, 0);
-                    assert.strictEqual(out.features[0].properties.status2, false);
-                    done();
-                });
-            });
-
+        map.render(new mapnik.VectorTile(0, 0, 0), {}, function(err, vtile) {
+            assert.ok(!err,err);
+            assert(!vtile.empty());
+            var out = JSON.parse(vtile.toGeoJSON(0));
+            assert.equal(out.type,'FeatureCollection');
+            assert.equal(out.features.length,1);
+            assert.strictEqual(out.features[0].properties.data, 0);
+            assert.strictEqual(out.features[0].properties.status2, false);
+            done();
+        });
     });
 
 });
