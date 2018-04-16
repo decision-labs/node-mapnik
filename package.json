@@ -4,7 +4,7 @@
   "url": "http://github.com/mapnik/node-mapnik",
   "homepage": "http://mapnik.org",
   "author": "Dane Springmeyer <dane@mapbox.com> (mapnik.org)",
-  "version": "3.6.2-carto.7",
+  "version": "3.6.2-carto.8",
   "mapnik_version": "v3.0.15.7",
   "main": "./lib/mapnik.js",
   "binary": {
@@ -38,7 +38,7 @@
     "mapnik-vector-tile": "cartodb/mapnik-vector-tile#v1.6.1-carto.1",
     "nan": "2.10.0",
     "node-pre-gyp": "0.7.0",
-    "protozero": "^1.5.1"
+    "protozero": "1.5.1"
   },
   "bundledDependencies": [
     "node-pre-gyp"
