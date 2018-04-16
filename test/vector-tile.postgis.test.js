@@ -84,7 +84,7 @@ describe('mapnik.VectorTile postgis.input', function() {
             });
     });
 
-    it.skip('Correctly handles bool values', function(done) {
+    it('Correctly handles bool values', function(done) {
         if (!hasPostgisAvailable) {
             this.skip('postgis not available');
         }
