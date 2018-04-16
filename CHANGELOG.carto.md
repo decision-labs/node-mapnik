@@ -1,5 +1,13 @@
 # CARTO node-mapnik changelog
 
+## 3.6.2-carto.8
+
+**Release date**: 2018-04-16
+
+Changes:
+ - Upgrade nan to "2.10.0" and node-pre-gyp to "0.7.0" for node 9 and 10 compatibility.
+ - Use Carto's fork for mapnik-vector-tile. Uses `v1.6.1-carto.1` which is vanilla `1.6.1` plus a fix to avoid features with the same value but different type being stored together.
+
 ## 3.6.2-carto.7
 
 **Release date**: 2018-04-02
