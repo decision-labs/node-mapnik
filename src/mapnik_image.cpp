@@ -2712,7 +2712,7 @@ v8::Local<v8::Value> Image::_fromSVGSync(bool fromFile, Nan::NAN_METHOD_ARGS_TYP
         mtx.translate(0.5 * im.width(), 0.5 * im.height());
 
         mapnik::svg::svg_renderer_agg<mapnik::svg::svg_path_adapter,
-            agg::pod_bvector<mapnik::svg::path_attributes>,
+            mapnik::svg_attribute_type,
             renderer_solid,
             agg::pixfmt_rgba32_pre > svg_renderer_this(svg_path,
                                                        marker_path->attributes());
@@ -2926,7 +2926,7 @@ void Image::EIO_FromSVG(uv_work_t* req)
         mtx.translate(0.5 * im.width(), 0.5 * im.height());
 
         mapnik::svg::svg_renderer_agg<mapnik::svg::svg_path_adapter,
-            agg::pod_bvector<mapnik::svg::path_attributes>,
+            mapnik::svg_attribute_type,
             renderer_solid,
             agg::pixfmt_rgba32_pre > svg_renderer_this(svg_path,
                                                        marker_path->attributes());
@@ -3141,7 +3141,7 @@ void Image::EIO_FromSVGBytes(uv_work_t* req)
         mtx.translate(0.5 * im.width(), 0.5 * im.height());
 
         mapnik::svg::svg_renderer_agg<mapnik::svg::svg_path_adapter,
-            agg::pod_bvector<mapnik::svg::path_attributes>,
+            mapnik::svg_attribute_type,
             renderer_solid,
             agg::pixfmt_rgba32_pre > svg_renderer_this(svg_path,
                                                        marker_path->attributes());
