@@ -1,5 +1,17 @@
 # CARTO node-mapnik changelog
 
+## 3.6.2-carto.9
+
+**Release date**: 2018-XX-XX
+
+Changes:
+ - Update mapnik to [XX.XX.XX]() which brings:
+   - Moved marker cache to per map instead of global.
+   - Compatibility improvements.
+   - Avoid building the collision tree when possible, also when using load_map_string().
+ - Update node-pre-gyp to 0.10.0.
+ - Node 10 compatibility
+
 ## 3.6.2-carto.8
 
 **Release date**: 2018-04-16
