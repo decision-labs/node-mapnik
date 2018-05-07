@@ -2,7 +2,7 @@
 
 ## 3.6.2-carto.9
 
-**Release date**: 2018-XX-XX
+**Release date**: 2018-05-07
 
 Changes:
  - Update mapnik to [v3.0.15.8](https://github.com/CartoDB/mapnik/blob/v3.0.15.8/CHANGELOG.carto.md#30158) which brings:
