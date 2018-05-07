@@ -1456,7 +1456,9 @@ NAN_METHOD(Map::clone)
     Map* m2 = new Map();
     m2->map_ = std::make_shared<mapnik::Map>(*m->map_);
     v8::Local<v8::Value> ext = Nan::New<v8::External>(m2);
-    info.GetReturnValue().Set(Nan::New(constructor)->GetFunction()->NewInstance(1, &ext));
+    v8::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::New(constructor)->GetFunction(), 1, &ext);
+    if (maybe_local.IsEmpty()) Nan::ThrowError("Could not create new Map instance");
+    else info.GetReturnValue().Set(maybe_local.ToLocalChecked());
 }
 
 /**
