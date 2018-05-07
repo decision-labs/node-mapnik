@@ -5,11 +5,11 @@
 **Release date**: 2018-XX-XX
 
 Changes:
- - Update mapnik to [XX.XX.XX]() which brings:
-   - Moved marker cache to per map instead of global.
-   - Compatibility improvements.
-   - Avoid building the collision tree when possible, also when using load_map_string().
- - Update node-pre-gyp to 0.10.0.
+ - Update mapnik to [v3.0.15.8](https://github.com/CartoDB/mapnik/blob/v3.0.15.8/CHANGELOG.carto.md#30158) which brings:
+   - Move marker cache to be used per map instead of globally
+   - Compatibility improvements (ICU 61, FreeType2 2.9.1)
+   - Avoid building the collision tree when possible, also when using load_map_string()
+ - Update node-pre-gyp to 0.10.0
  - Node 10 compatibility
 
 ## 3.6.2-carto.8
