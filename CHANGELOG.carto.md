@@ -1,5 +1,12 @@
 # CARTO node-mapnik changelog
 
+## 3.6.2-carto.10
+
+**Release date**: 2018-05-14
+
+Changes:
+ - Update mapnik to [v3.0.15.9](https://github.com/CartoDB/mapnik/blob/v3.0.15.9/CHANGELOG.carto.md#30159) which fixes a bug when rendering zero lenght lines using the marker symbolizer.
+
 ## 3.6.2-carto.9
 
 **Release date**: 2018-05-07
