@@ -2,7 +2,7 @@
 
 ## 3.6.2-carto.12
 
-**Release date**: 2019-XX-XX
+**Release date**: 2019-04-10
 
 Changes:
  - Update mapnik to [v3.0.15.12](https://github.com/CartoDB/mapnik/blob/v3.0.15.12/CHANGELOG.carto.md#301512) which brings fixes from upstream (3.0.22), improves clip calculation when using offsets, updates some dependencies and addresses multiple undefined behaviour bugs.
