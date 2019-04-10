@@ -1,5 +1,12 @@
 # CARTO node-mapnik changelog
 
+## 3.6.2-carto.13
+
+**Release date**: 2019-04-10
+
+Changes:
+ - Also strip binaries and .input files from mapnik.
+
 ## 3.6.2-carto.12
 
 **Release date**: 2019-04-10
