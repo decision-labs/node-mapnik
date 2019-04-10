@@ -39,6 +39,8 @@ strip:
 	(find lib -type f \( -iname \*.so    \) | xargs strip -s) 2>/dev/null || true
 	(find lib -type f \( -iname \*.node  \) | xargs strip -s) 2>/dev/null || true
 	(find lib -type f \( -iname \*.dylib \) | xargs strip -s) 2>/dev/null || true
+	(find lib -type f \( -iname \*.input \) | xargs strip -s) 2>/dev/null || true
+	(find ./lib/binding/bin/* | xargs strip -s) 2>/dev/null || true
 
 coverage:
 	./scripts/coverage.sh
