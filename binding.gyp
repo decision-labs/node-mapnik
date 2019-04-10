@@ -1,32 +1,12 @@
 {
   'includes': [ 'common.gypi' ],
+  'variables': {
+      'ENABLE_GLIBC_WORKAROUND%':'false', # can be overriden by a command line variable because of the % sign
+      'enable_sse%':'true' 
+  },
   'targets': [
     {
-      'target_name': 'make_vector_tile',
-      'hard_dependency': 1,
-      'type': 'none',
-      'actions': [
-        {
-          'action_name': 'generate_setting',
-          'inputs': [
-            'gen_settings.py'
-          ],
-          'outputs': [
-            '<(SHARED_INTERMEDIATE_DIR)/mapnik_settings.js'
-          ],
-          'action': ['python', 'gen_settings.py', '<(SHARED_INTERMEDIATE_DIR)/mapnik_settings.js']
-        }
-      ],
-      'copies': [
-        {
-          'files': [ '<(SHARED_INTERMEDIATE_DIR)/mapnik_settings.js' ],
-          'destination': '<(module_path)'
-        }
-      ]
-    },
-    {
       'target_name': '<(module_name)',
-      'dependencies': [ 'make_vector_tile' ],
       'product_dir': '<(module_path)',
       'sources': [
         "src/mapnik_logger.cpp",
@@ -70,6 +50,11 @@
           'MAPNIK_GIT_REVISION="<!@(mapnik-config --git-describe)"',
       ],
       'conditions': [
+        ['ENABLE_GLIBC_WORKAROUND != "false"', {
+            'sources': [
+              "src/glibc_workaround.cpp"
+            ]
+        }],
         ['OS=="win"',
           {
             'include_dirs':[
@@ -128,7 +113,10 @@
               'GCC_VERSION': 'com.apple.compilers.llvm.clang.1_0'
             }
           },
-        ]
+        ],
+        ['enable_sse == "true"', {
+          'defines' : [ 'SSE_MATH' ]
+        }]
       ]
     },
     {
