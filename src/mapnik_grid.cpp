@@ -95,7 +95,7 @@ NAN_METHOD(Grid::New)
             }
             v8::Local<v8::Object> options = info[2].As<v8::Object>();
 
-            if (options->Has(Nan::New("key").ToLocalChecked())) {
+            if (options->Has(Nan::GetCurrentContext(), Nan::New("key").ToLocalChecked()).ToChecked()) {
                 v8::Local<v8::Value> bind_opt = options->Get(Nan::New("key").ToLocalChecked());
                 if (!bind_opt->IsString())
                 {
@@ -107,7 +107,7 @@ NAN_METHOD(Grid::New)
             }
         }
 
-        Grid* g = new Grid(info[0]->IntegerValue(), info[1]->IntegerValue(), key);
+        Grid* g = new Grid(info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked(), info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked(), key);
         g->Wrap(info.This());
         info.GetReturnValue().Set(info.This());
         return;
@@ -327,10 +327,10 @@ NAN_METHOD(Grid::view)
         return;
     }
 
-    unsigned x = info[0]->IntegerValue();
-    unsigned y = info[1]->IntegerValue();
-    unsigned w = info[2]->IntegerValue();
-    unsigned h = info[3]->IntegerValue();
+    unsigned x = info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+    unsigned y = info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+    unsigned w = info[2]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+    unsigned h = info[3]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
 
     Grid* g = Nan::ObjectWrap::Unwrap<Grid>(info.Holder());
     info.GetReturnValue().Set(GridView::NewInstance(g,x,y,w,h));
@@ -362,7 +362,7 @@ NAN_METHOD(Grid::encodeSync)
 
         v8::Local<v8::Object> options = info[0].As<v8::Object>();
 
-        if (options->Has(Nan::New("resolution").ToLocalChecked()))
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("resolution").ToLocalChecked()).ToChecked())
         {
             v8::Local<v8::Value> bind_opt = options->Get(Nan::New("resolution").ToLocalChecked());
             if (!bind_opt->IsNumber())
@@ -371,7 +371,7 @@ NAN_METHOD(Grid::encodeSync)
                 return;
             }
 
-            resolution = bind_opt->IntegerValue();
+            resolution = bind_opt->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             if (resolution == 0)
             {
                 Nan::ThrowTypeError("'resolution' can not be zero");
@@ -379,7 +379,7 @@ NAN_METHOD(Grid::encodeSync)
             }
         }
 
-        if (options->Has(Nan::New("features").ToLocalChecked()))
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("features").ToLocalChecked()).ToChecked())
         {
             v8::Local<v8::Value> bind_opt = options->Get(Nan::New("features").ToLocalChecked());
             if (!bind_opt->IsBoolean())
@@ -388,7 +388,7 @@ NAN_METHOD(Grid::encodeSync)
                 return;
             }
 
-            add_features = bind_opt->BooleanValue();
+            add_features = bind_opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
         }
     }
 
@@ -473,7 +473,7 @@ NAN_METHOD(Grid::encode)
 
         v8::Local<v8::Object> options = info[0].As<v8::Object>();
 
-        if (options->Has(Nan::New("resolution").ToLocalChecked()))
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("resolution").ToLocalChecked()).ToChecked())
         {
             v8::Local<v8::Value> bind_opt = options->Get(Nan::New("resolution").ToLocalChecked());
             if (!bind_opt->IsNumber())
@@ -482,7 +482,7 @@ NAN_METHOD(Grid::encode)
                 return;
             }
 
-            resolution = bind_opt->IntegerValue();
+            resolution = bind_opt->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             if (resolution == 0)
             {
                 Nan::ThrowTypeError("'resolution' can not be zero");
@@ -490,7 +490,7 @@ NAN_METHOD(Grid::encode)
             }
         }
 
-        if (options->Has(Nan::New("features").ToLocalChecked()))
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("features").ToLocalChecked()).ToChecked())
         {
             v8::Local<v8::Value> bind_opt = options->Get(Nan::New("features").ToLocalChecked());
             if (!bind_opt->IsBoolean())
@@ -499,7 +499,7 @@ NAN_METHOD(Grid::encode)
                 return;
             }
 
-            add_features = bind_opt->BooleanValue();
+            add_features = bind_opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
         }
     }
 
@@ -626,7 +626,7 @@ NAN_SETTER(Grid::set_metrics_enabled)
     }
     else
     {
-        bool val = value->BooleanValue();
+        bool val = value->BooleanValue(Nan::GetCurrentContext()).ToChecked();
         g->this_->metrics_.enabled_ = val;
     }
 #endif

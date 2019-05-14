@@ -83,15 +83,15 @@ NAN_METHOD(MemoryDatasource::New)
         v8::Local<v8::Value> value = options->Get(name);
         if (value->IsUint32() || value->IsInt32())
         {
-            params[TOSTR(name)] = value->IntegerValue();
+            params[TOSTR(name)] = value->IntegerValue(Nan::GetCurrentContext()).ToChecked();
         }
         else if (value->IsNumber())
         {
-            params[TOSTR(name)] = value->NumberValue();
+            params[TOSTR(name)] = value->NumberValue(Nan::GetCurrentContext()).ToChecked();
         }
         else if (value->IsBoolean())
         {
-            params[TOSTR(name)] = value->BooleanValue();
+            params[TOSTR(name)] = value->BooleanValue(Nan::GetCurrentContext()).ToChecked();
         }
         else
         {
@@ -158,7 +158,7 @@ NAN_METHOD(MemoryDatasource::featureset)
                 return;
             }
             v8::Local<v8::Object> options = info[0]->ToObject();
-            if (options->Has(Nan::New("extent").ToLocalChecked()))
+            if (options->Has(Nan::GetCurrentContext(), Nan::New("extent").ToLocalChecked()).ToChecked())
             {
                 v8::Local<v8::Value> extent_opt = options->Get(Nan::New("extent").ToLocalChecked());
                 if (!extent_opt->IsArray())
@@ -182,8 +182,8 @@ NAN_METHOD(MemoryDatasource::featureset)
                     Nan::ThrowError("max_extent [minx,miny,maxx,maxy] must be numbers");
                     return;
                 }
-                extent = mapnik::box2d<double>(minx->NumberValue(),miny->NumberValue(),
-                                               maxx->NumberValue(),maxy->NumberValue());
+                extent = mapnik::box2d<double>(minx->NumberValue(Nan::GetCurrentContext()).ToChecked(),miny->NumberValue(Nan::GetCurrentContext()).ToChecked(),
+                                               maxx->NumberValue(Nan::GetCurrentContext()).ToChecked(),maxy->NumberValue(Nan::GetCurrentContext()).ToChecked());
             }
         }
 
@@ -225,9 +225,11 @@ NAN_METHOD(MemoryDatasource::add)
 
     v8::Local<v8::Object> obj = info[0].As<v8::Object>();
 
-    if (obj->Has(Nan::New("wkt").ToLocalChecked()) || (obj->Has(Nan::New("x").ToLocalChecked()) && obj->Has(Nan::New("y").ToLocalChecked())))
+    if (obj->Has(Nan::GetCurrentContext(), Nan::New("wkt").ToLocalChecked()).ToChecked() ||
+			(obj->Has(Nan::GetCurrentContext(), Nan::New("x").ToLocalChecked()).ToChecked() &&
+			 obj->Has(Nan::GetCurrentContext(), Nan::New("y").ToLocalChecked()).ToChecked()))
     {
-        if (obj->Has(Nan::New("wkt").ToLocalChecked()))
+        if (obj->Has(Nan::GetCurrentContext(), Nan::New("wkt").ToLocalChecked()).ToChecked())
         {
             Nan::ThrowError("wkt not yet supported");
             return;
@@ -240,8 +242,8 @@ NAN_METHOD(MemoryDatasource::add)
             mapnik::context_ptr ctx = std::make_shared<mapnik::context_type>();
             mapnik::feature_ptr feature(mapnik::feature_factory::create(ctx,d->feature_id_));
             ++(d->feature_id_);
-            feature->set_geometry(mapnik::geometry::point<double>(x->NumberValue(),y->NumberValue()));
-            if (obj->Has(Nan::New("properties").ToLocalChecked()))
+            feature->set_geometry(mapnik::geometry::point<double>(x->NumberValue(Nan::GetCurrentContext()).ToChecked(),y->NumberValue(Nan::GetCurrentContext()).ToChecked()));
+            if (obj->Has(Nan::GetCurrentContext(), Nan::New("properties").ToLocalChecked()).ToChecked())
             {
                 v8::Local<v8::Value> props = obj->Get(Nan::New("properties").ToLocalChecked());
                 if (props->IsObject())
@@ -259,12 +261,12 @@ NAN_METHOD(MemoryDatasource::add)
                             mapnik::value_unicode_string ustr = d->tr_.transcode(TOSTR(value));
                             feature->put_new(TOSTR(name),ustr);
                         } else if (value->IsNumber()) {
-                            double num = value->NumberValue();
+                            double num = value->NumberValue(Nan::GetCurrentContext()).ToChecked();
                             // todo - round
-                            if (num == value->IntegerValue()) {
-                                feature->put_new(TOSTR(name),static_cast<node_mapnik::value_integer>(value->IntegerValue()));
+                            if (num == value->IntegerValue(Nan::GetCurrentContext()).ToChecked()) {
+                                feature->put_new(TOSTR(name),static_cast<node_mapnik::value_integer>(value->IntegerValue(Nan::GetCurrentContext()).ToChecked()));
                             } else {
-                                double dub_val = value->NumberValue();
+                                double dub_val = value->NumberValue(Nan::GetCurrentContext()).ToChecked();
                                 feature->put_new(TOSTR(name),dub_val);
                             }
                         } else if (value->IsNull()) {

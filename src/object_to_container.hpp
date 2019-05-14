@@ -20,9 +20,9 @@ static inline void object_to_container(mapnik::attributes & cont, v8::Local<v8::
         } else if (value->IsString()) {
             cont[TOSTR(name)] = tr.transcode(TOSTR(value));
         } else if (value->IsNumber()) {
-            mapnik::value_double num = value->NumberValue();
-            if (num == value->IntegerValue()) {
-                cont[TOSTR(name)] = static_cast<node_mapnik::value_integer>(value->IntegerValue());
+            mapnik::value_double num = value->NumberValue(Nan::GetCurrentContext()).ToChecked();
+            if (num == value->IntegerValue(Nan::GetCurrentContext()).ToChecked()) {
+                cont[TOSTR(name)] = static_cast<node_mapnik::value_integer>(value->IntegerValue(Nan::GetCurrentContext()).ToChecked());
             } else {
                 cont[TOSTR(name)] = num;
             }

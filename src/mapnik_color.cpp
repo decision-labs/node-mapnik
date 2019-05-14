@@ -90,16 +90,16 @@ NAN_METHOD(Color::New)
                  info[0]->IsString() &&
                  info[1]->IsBoolean())
         {
-            c_p = std::make_shared<mapnik::color>(TOSTR(info[0]),info[1]->BooleanValue());
+            c_p = std::make_shared<mapnik::color>(TOSTR(info[0]),info[1]->BooleanValue(Nan::GetCurrentContext()).ToChecked());
         }
         else if (info.Length() == 3 &&
                  info[0]->IsNumber() &&
                  info[1]->IsNumber() &&
                  info[2]->IsNumber())
         {
-            int r = info[0]->IntegerValue();
-            int g = info[1]->IntegerValue();
-            int b = info[2]->IntegerValue();
+            int r = info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+            int g = info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+            int b = info[2]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255)
             {
                 Nan::ThrowTypeError("color value out of range");
@@ -113,15 +113,15 @@ NAN_METHOD(Color::New)
                  info[2]->IsNumber() &&
                  info[3]->IsBoolean())
         {
-            int r = info[0]->IntegerValue();
-            int g = info[1]->IntegerValue();
-            int b = info[2]->IntegerValue();
+            int r = info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+            int g = info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+            int b = info[2]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255)
             {
                 Nan::ThrowTypeError("color value out of range");
                 return;
             }
-            c_p = std::make_shared<mapnik::color>(r,g,b,255,info[3]->BooleanValue());
+            c_p = std::make_shared<mapnik::color>(r,g,b,255,info[3]->BooleanValue(Nan::GetCurrentContext()).ToChecked());
         }
         else if (info.Length() == 4 &&
                  info[0]->IsNumber() &&
@@ -129,10 +129,10 @@ NAN_METHOD(Color::New)
                  info[2]->IsNumber() &&
                  info[3]->IsNumber())
         {
-            int r = info[0]->IntegerValue();
-            int g = info[1]->IntegerValue();
-            int b = info[2]->IntegerValue();
-            int a = info[3]->IntegerValue();
+            int r = info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+            int g = info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+            int b = info[2]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+            int a = info[3]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255 || a < 0 || a > 255)
             {
                 Nan::ThrowTypeError("color value out of range");
@@ -147,16 +147,16 @@ NAN_METHOD(Color::New)
                  info[3]->IsNumber() &&
                  info[4]->IsBoolean())
         {
-            int r = info[0]->IntegerValue();
-            int g = info[1]->IntegerValue();
-            int b = info[2]->IntegerValue();
-            int a = info[3]->IntegerValue();
+            int r = info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+            int g = info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+            int b = info[2]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+            int a = info[3]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255 || a < 0 || a > 255)
             {
                 Nan::ThrowTypeError("color value out of range");
                 return;
             }
-            c_p = std::make_shared<mapnik::color>(r,g,b,a,info[4]->BooleanValue());
+            c_p = std::make_shared<mapnik::color>(r,g,b,a,info[4]->BooleanValue(Nan::GetCurrentContext()).ToChecked());
         }
         else
         {
@@ -211,7 +211,7 @@ NAN_SETTER(Color::set_prop)
         Nan::ThrowTypeError("color channel value must be an integer");
         return;
     }
-    int val = value->IntegerValue();
+    int val = value->IntegerValue(Nan::GetCurrentContext()).ToChecked();
     if (val < 0 || val > 255)
     {
         Nan::ThrowTypeError("Value out of range for color channel");
@@ -264,7 +264,7 @@ NAN_SETTER(Color::set_premultiplied)
         Nan::ThrowTypeError("Value set to premultiplied must be a boolean");
         return;
     }
-    c->get()->set_premultiplied(value->BooleanValue());
+    c->get()->set_premultiplied(value->BooleanValue(Nan::GetCurrentContext()).ToChecked());
 }
 
 /**

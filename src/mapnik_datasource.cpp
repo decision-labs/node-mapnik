@@ -264,7 +264,7 @@ NAN_METHOD(Datasource::featureset)
             return;
         }
         v8::Local<v8::Object> options = info[0]->ToObject();
-        if (options->Has(Nan::New("extent").ToLocalChecked()))
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("extent").ToLocalChecked()).ToChecked())
         {
             v8::Local<v8::Value> extent_opt = options->Get(Nan::New("extent").ToLocalChecked());
             if (!extent_opt->IsArray())
@@ -288,8 +288,8 @@ NAN_METHOD(Datasource::featureset)
                 Nan::ThrowError("max_extent [minx,miny,maxx,maxy] must be numbers");
                 return;
             }
-            extent = mapnik::box2d<double>(minx->NumberValue(),miny->NumberValue(),
-                                           maxx->NumberValue(),maxy->NumberValue());
+            extent = mapnik::box2d<double>(minx->NumberValue(Nan::GetCurrentContext()).ToChecked(),miny->NumberValue(Nan::GetCurrentContext()).ToChecked(),
+                                           maxx->NumberValue(Nan::GetCurrentContext()).ToChecked(),maxy->NumberValue(Nan::GetCurrentContext()).ToChecked());
         }
     }
 

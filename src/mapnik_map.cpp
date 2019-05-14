@@ -222,7 +222,7 @@ NAN_METHOD(Map::New)
             Nan::ThrowTypeError("'width' and 'height' must be integers");
             return;
         }
-        Map* m = new Map(info[0]->IntegerValue(),info[1]->IntegerValue());
+        Map* m = new Map(info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked(),info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked());
         m->Wrap(info.This());
         info.GetReturnValue().Set(info.This());
         return;
@@ -239,7 +239,7 @@ NAN_METHOD(Map::New)
             Nan::ThrowError("'srs' value must be a string");
             return;
         }
-        Map* m = new Map(info[0]->IntegerValue(), info[1]->IntegerValue(), TOSTR(info[2]));
+        Map* m = new Map(info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked(), info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked(), TOSTR(info[2]));
         m->Wrap(info.This());
         info.GetReturnValue().Set(info.This());
         return;
@@ -330,10 +330,10 @@ NAN_SETTER(Map::set_prop)
                 Nan::ThrowError("Must provide an array of: [minx,miny,maxx,maxy]");
                 return;
             } else {
-                double minx = arr->Get(0)->NumberValue();
-                double miny = arr->Get(1)->NumberValue();
-                double maxx = arr->Get(2)->NumberValue();
-                double maxy = arr->Get(3)->NumberValue();
+                double minx = arr->Get(0)->NumberValue(Nan::GetCurrentContext()).ToChecked();
+                double miny = arr->Get(1)->NumberValue(Nan::GetCurrentContext()).ToChecked();
+                double maxx = arr->Get(2)->NumberValue(Nan::GetCurrentContext()).ToChecked();
+                double maxy = arr->Get(3)->NumberValue(Nan::GetCurrentContext()).ToChecked();
                 mapnik::box2d<double> box(minx,miny,maxx,maxy);
                 if(a == "extent")
                     m->map_->zoom_to_box(box);
@@ -348,7 +348,7 @@ NAN_SETTER(Map::set_prop)
             Nan::ThrowError("'aspect_fix_mode' must be a constant (number)");
             return;
         } else {
-            int val = value->IntegerValue();
+            int val = value->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             if (val < mapnik::Map::aspect_fix_mode_MAX && val >= 0) {
                 m->map_->set_aspect_fix_mode(static_cast<mapnik::Map::aspect_fix_mode>(val));
             } else {
@@ -371,7 +371,7 @@ NAN_SETTER(Map::set_prop)
             Nan::ThrowTypeError("Must provide an integer bufferSize");
             return;
         } else {
-            m->map_->set_buffer_size(value->IntegerValue());
+            m->map_->set_buffer_size(value->IntegerValue(Nan::GetCurrentContext()).ToChecked());
         }
     }
     else if (a == "width") {
@@ -379,7 +379,7 @@ NAN_SETTER(Map::set_prop)
             Nan::ThrowTypeError("Must provide an integer width");
             return;
         } else {
-            m->map_->set_width(value->IntegerValue());
+            m->map_->set_width(value->IntegerValue(Nan::GetCurrentContext()).ToChecked());
         }
     }
     else if (a == "height") {
@@ -387,7 +387,7 @@ NAN_SETTER(Map::set_prop)
             Nan::ThrowTypeError("Must provide an integer height");
             return;
         } else {
-            m->map_->set_height(value->IntegerValue());
+            m->map_->set_height(value->IntegerValue(Nan::GetCurrentContext()).ToChecked());
         }
     }
     else if (a == "background") {
@@ -421,16 +421,16 @@ NAN_SETTER(Map::set_prop)
             if (a_value->IsString()) {
                 params[TOSTR(name)] = const_cast<char const*>(TOSTR(a_value));
             } else if (a_value->IsNumber()) {
-                double num = a_value->NumberValue();
+                double num = a_value->NumberValue(Nan::GetCurrentContext()).ToChecked();
                 // todo - round
-                if (num == a_value->IntegerValue()) {
-                    params[TOSTR(name)] = static_cast<node_mapnik::value_integer>(a_value->IntegerValue());
+                if (num == a_value->IntegerValue(Nan::GetCurrentContext()).ToChecked()) {
+                    params[TOSTR(name)] = static_cast<node_mapnik::value_integer>(a_value->IntegerValue(Nan::GetCurrentContext()).ToChecked());
                 } else {
-                    double dub_val = a_value->NumberValue();
+                    double dub_val = a_value->NumberValue(Nan::GetCurrentContext()).ToChecked();
                     params[TOSTR(name)] = dub_val;
                 }
             } else if (a_value->IsBoolean()) {
-                params[TOSTR(name)] = static_cast<mapnik::value_bool>(a_value->BooleanValue());
+                params[TOSTR(name)] = static_cast<mapnik::value_bool>(a_value->BooleanValue(Nan::GetCurrentContext()).ToChecked());
             }
             i++;
         }
@@ -484,7 +484,7 @@ NAN_METHOD(Map::registerFonts)
             return;
         }
         v8::Local<v8::Object> options = info[1].As<v8::Object>();
-        if (options->Has(Nan::New("recurse").ToLocalChecked()))
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("recurse").ToLocalChecked()).ToChecked())
         {
             v8::Local<v8::Value> recurse_opt = options->Get(Nan::New("recurse").ToLocalChecked());
             if (!recurse_opt->IsBoolean())
@@ -492,7 +492,7 @@ NAN_METHOD(Map::registerFonts)
                 Nan::ThrowTypeError("'recurse' must be a Boolean");
                 return;
             }
-            recurse = recurse_opt->BooleanValue();
+            recurse = recurse_opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
         }
     }
     std::string path = TOSTR(info[0]);
@@ -687,8 +687,8 @@ v8::Local<v8::Value> Map::abstractQueryPoint(Nan::NAN_METHOD_ARGS_TYPE info, boo
     }
     else
     {
-        x = info[0]->NumberValue();
-        y = info[1]->NumberValue();
+        x = info[0]->NumberValue(Nan::GetCurrentContext()).ToChecked();
+        y = info[1]->NumberValue(Nan::GetCurrentContext()).ToChecked();
     }
 
     Map* m = Nan::ObjectWrap::Unwrap<Map>(info.Holder());
@@ -706,7 +706,7 @@ v8::Local<v8::Value> Map::abstractQueryPoint(Nan::NAN_METHOD_ARGS_TYPE info, boo
 
         options = info[2]->ToObject();
 
-        if (options->Has(Nan::New("layer").ToLocalChecked()))
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("layer").ToLocalChecked()).ToChecked())
         {
             std::vector<mapnik::layer> const& layers = m->map_->layers();
             v8::Local<v8::Value> layer_id = options->Get(Nan::New("layer").ToLocalChecked());
@@ -739,7 +739,7 @@ v8::Local<v8::Value> Map::abstractQueryPoint(Nan::NAN_METHOD_ARGS_TYPE info, boo
             }
             else if (layer_id->IsNumber())
             {
-                layer_idx = layer_id->IntegerValue();
+                layer_idx = layer_id->IntegerValue(Nan::GetCurrentContext()).ToChecked();
                 std::size_t layer_num = layers.size();
 
                 if (layer_idx < 0) {
@@ -959,7 +959,7 @@ NAN_METHOD(Map::get_layer)
     v8::Local<v8::Value> layer = info[0];
     if (layer->IsNumber())
     {
-        unsigned int index = info[0]->IntegerValue();
+        unsigned int index = info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
 
         if (index < layers.size())
         {
@@ -1036,7 +1036,7 @@ NAN_METHOD(Map::resize)
     }
 
     Map* m = Nan::ObjectWrap::Unwrap<Map>(info.Holder());
-    m->map_->resize(info[0]->IntegerValue(),info[1]->IntegerValue());
+    m->map_->resize(info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked(),info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked());
     return;
 }
 
@@ -1095,14 +1095,14 @@ NAN_METHOD(Map::load)
 
     bool strict = false;
     v8::Local<v8::String> param = Nan::New("strict").ToLocalChecked();
-    if (options->Has(param))
+    if (options->Has(Nan::GetCurrentContext(), param).ToChecked())
     {
         v8::Local<v8::Value> param_val = options->Get(param);
         if (!param_val->IsBoolean()) {
             Nan::ThrowTypeError("'strict' must be a Boolean");
             return;
         }
-        strict = param_val->BooleanValue();
+        strict = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
     }
 
     Map* m = Nan::ObjectWrap::Unwrap<Map>(info.Holder());
@@ -1111,7 +1111,7 @@ NAN_METHOD(Map::load)
     closure->request.data = closure;
 
     param = Nan::New("base").ToLocalChecked();
-    if (options->Has(param))
+    if (options->Has(Nan::GetCurrentContext(), param).ToChecked())
     {
         v8::Local<v8::Value> param_val = options->Get(param);
         if (!param_val->IsString()) {
@@ -1206,7 +1206,7 @@ NAN_METHOD(Map::loadSync)
         v8::Local<v8::Object> options = info[1].As<v8::Object>();
 
         v8::Local<v8::String> param = Nan::New("strict").ToLocalChecked();
-        if (options->Has(param))
+        if (options->Has(Nan::GetCurrentContext(), param).ToChecked())
         {
             v8::Local<v8::Value> param_val = options->Get(param);
             if (!param_val->IsBoolean())
@@ -1214,11 +1214,11 @@ NAN_METHOD(Map::loadSync)
                 Nan::ThrowTypeError("'strict' must be a Boolean");
                 return;
             }
-            strict = param_val->BooleanValue();
+            strict = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
         }
 
         param = Nan::New("base").ToLocalChecked();
-        if (options->Has(param))
+        if (options->Has(Nan::GetCurrentContext(), param).ToChecked())
         {
             v8::Local<v8::Value> param_val = options->Get(param);
             if (!param_val->IsString())
@@ -1282,18 +1282,18 @@ NAN_METHOD(Map::fromStringSync)
         v8::Local<v8::Object> options = info[1].As<v8::Object>();
 
         v8::Local<v8::String> param = Nan::New("strict").ToLocalChecked();
-        if (options->Has(param))
+        if (options->Has(Nan::GetCurrentContext(), param).ToChecked())
         {
             v8::Local<v8::Value> param_val = options->Get(param);
             if (!param_val->IsBoolean()) {
                 Nan::ThrowTypeError("'strict' must be a Boolean");
                 return;
             }
-            strict = param_val->BooleanValue();
+            strict = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
         }
 
         param = Nan::New("base").ToLocalChecked();
-        if (options->Has(param))
+        if (options->Has(Nan::GetCurrentContext(), param).ToChecked())
         {
             v8::Local<v8::Value> param_val = options->Get(param);
             if (!param_val->IsString()) {
@@ -1371,7 +1371,7 @@ NAN_METHOD(Map::fromString)
 
     bool strict = false;
     v8::Local<v8::String> param = Nan::New("strict").ToLocalChecked();
-    if (options->Has(param))
+    if (options->Has(Nan::GetCurrentContext(), param).ToChecked())
     {
         v8::Local<v8::Value> param_val = options->Get(param);
         if (!param_val->IsBoolean())
@@ -1379,7 +1379,7 @@ NAN_METHOD(Map::fromString)
             Nan::ThrowTypeError("'strict' must be a Boolean");
             return;
         }
-        strict = param_val->BooleanValue();
+        strict = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
     }
 
     Map* m = Nan::ObjectWrap::Unwrap<Map>(info.Holder());
@@ -1388,7 +1388,7 @@ NAN_METHOD(Map::fromString)
     closure->request.data = closure;
 
     param = Nan::New("base").ToLocalChecked();
-    if (options->Has(param))
+    if (options->Has(Nan::GetCurrentContext(), param).ToChecked())
     {
         v8::Local<v8::Value> param_val = options->Get(param);
         if (!param_val->IsString())
@@ -1536,10 +1536,10 @@ NAN_METHOD(Map::zoomToBox)
             return;
         }
         v8::Local<v8::Array> a = info[0].As<v8::Array>();
-        minx = a->Get(0)->NumberValue();
-        miny = a->Get(1)->NumberValue();
-        maxx = a->Get(2)->NumberValue();
-        maxy = a->Get(3)->NumberValue();
+        minx = a->Get(0)->NumberValue(Nan::GetCurrentContext()).ToChecked();
+        miny = a->Get(1)->NumberValue(Nan::GetCurrentContext()).ToChecked();
+        maxx = a->Get(2)->NumberValue(Nan::GetCurrentContext()).ToChecked();
+        maxy = a->Get(3)->NumberValue(Nan::GetCurrentContext()).ToChecked();
 
     }
     else if (info.Length() != 4)
@@ -1552,10 +1552,10 @@ NAN_METHOD(Map::zoomToBox)
                info[2]->IsNumber() &&
                info[3]->IsNumber())
     {
-        minx = info[0]->NumberValue();
-        miny = info[1]->NumberValue();
-        maxx = info[2]->NumberValue();
-        maxy = info[3]->NumberValue();
+        minx = info[0]->NumberValue(Nan::GetCurrentContext()).ToChecked();
+        miny = info[1]->NumberValue(Nan::GetCurrentContext()).ToChecked();
+        maxx = info[2]->NumberValue(Nan::GetCurrentContext()).ToChecked();
+        maxy = info[3]->NumberValue(Nan::GetCurrentContext()).ToChecked();
     }
     else
     {
@@ -1764,53 +1764,53 @@ NAN_METHOD(Map::render)
 
             options = info[1]->ToObject();
 
-            if (options->Has(Nan::New("buffer_size").ToLocalChecked())) {
+            if (options->Has(Nan::GetCurrentContext(), Nan::New("buffer_size").ToLocalChecked()).ToChecked()) {
                 v8::Local<v8::Value> bind_opt = options->Get(Nan::New("buffer_size").ToLocalChecked());
                 if (!bind_opt->IsNumber()) {
                     Nan::ThrowTypeError("optional arg 'buffer_size' must be a number");
                     return;
                 }
-                buffer_size = bind_opt->IntegerValue();
+                buffer_size = bind_opt->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             }
 
-            if (options->Has(Nan::New("scale").ToLocalChecked())) {
+            if (options->Has(Nan::GetCurrentContext(), Nan::New("scale").ToLocalChecked()).ToChecked()) {
                 v8::Local<v8::Value> bind_opt = options->Get(Nan::New("scale").ToLocalChecked());
                 if (!bind_opt->IsNumber()) {
                     Nan::ThrowTypeError("optional arg 'scale' must be a number");
                     return;
                 }
 
-                scale_factor = bind_opt->NumberValue();
+                scale_factor = bind_opt->NumberValue(Nan::GetCurrentContext()).ToChecked();
             }
 
-            if (options->Has(Nan::New("scale_denominator").ToLocalChecked())) {
+            if (options->Has(Nan::GetCurrentContext(), Nan::New("scale_denominator").ToLocalChecked()).ToChecked()) {
                 v8::Local<v8::Value> bind_opt = options->Get(Nan::New("scale_denominator").ToLocalChecked());
                 if (!bind_opt->IsNumber()) {
                     Nan::ThrowTypeError("optional arg 'scale_denominator' must be a number");
                     return;
                 }
 
-                scale_denominator = bind_opt->NumberValue();
+                scale_denominator = bind_opt->NumberValue(Nan::GetCurrentContext()).ToChecked();
             }
 
-            if (options->Has(Nan::New("offset_x").ToLocalChecked())) {
+            if (options->Has(Nan::GetCurrentContext(), Nan::New("offset_x").ToLocalChecked()).ToChecked()) {
                 v8::Local<v8::Value> bind_opt = options->Get(Nan::New("offset_x").ToLocalChecked());
                 if (!bind_opt->IsNumber()) {
                     Nan::ThrowTypeError("optional arg 'offset_x' must be a number");
                     return;
                 }
 
-                offset_x = bind_opt->IntegerValue();
+                offset_x = bind_opt->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             }
 
-            if (options->Has(Nan::New("offset_y").ToLocalChecked())) {
+            if (options->Has(Nan::GetCurrentContext(), Nan::New("offset_y").ToLocalChecked()).ToChecked()) {
                 v8::Local<v8::Value> bind_opt = options->Get(Nan::New("offset_y").ToLocalChecked());
                 if (!bind_opt->IsNumber()) {
                     Nan::ThrowTypeError("optional arg 'offset_y' must be a number");
                     return;
                 }
 
-                offset_y = bind_opt->IntegerValue();
+                offset_y = bind_opt->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             }
         }
 
@@ -1830,7 +1830,7 @@ NAN_METHOD(Map::render)
             closure->offset_y = offset_y;
             closure->error = false;
 
-            if (options->Has(Nan::New("variables").ToLocalChecked()))
+            if (options->Has(Nan::GetCurrentContext(), Nan::New("variables").ToLocalChecked()).ToChecked())
             {
                 v8::Local<v8::Value> bind_opt = options->Get(Nan::New("variables").ToLocalChecked());
                 if (!bind_opt->IsObject())
@@ -1859,7 +1859,7 @@ NAN_METHOD(Map::render)
             std::size_t layer_idx = 0;
 
             // grid requires special options for now
-            if (!options->Has(Nan::New("layer").ToLocalChecked())) {
+            if (!options->Has(Nan::GetCurrentContext(), Nan::New("layer").ToLocalChecked()).ToChecked()) {
                 Nan::ThrowTypeError("'layer' option required for grid rendering and must be either a layer name(string) or layer index (integer)");
                 return;
             } else {
@@ -1894,7 +1894,7 @@ NAN_METHOD(Map::render)
                         return;
                     }
                 } else { // IS NUMBER
-                    layer_idx = layer_id->IntegerValue();
+                    layer_idx = layer_id->IntegerValue(Nan::GetCurrentContext()).ToChecked();
                     std::size_t layer_num = layers.size();
 
                     if (layer_idx >= layer_num) {
@@ -1914,7 +1914,7 @@ NAN_METHOD(Map::render)
                 }
             }
 
-            if (options->Has(Nan::New("fields").ToLocalChecked())) {
+            if (options->Has(Nan::GetCurrentContext(), Nan::New("fields").ToLocalChecked()).ToChecked()) {
 
                 v8::Local<v8::Value> param_val = options->Get(Nan::New("fields").ToLocalChecked());
                 if (!param_val->IsArray()) {
@@ -1935,7 +1935,7 @@ NAN_METHOD(Map::render)
 
             grid_baton_t *closure = new grid_baton_t();
 
-            if (options->Has(Nan::New("variables").ToLocalChecked()))
+            if (options->Has(Nan::GetCurrentContext(), Nan::New("variables").ToLocalChecked()).ToChecked())
             {
                 v8::Local<v8::Value> bind_opt = options->Get(Nan::New("variables").ToLocalChecked());
                 if (!bind_opt->IsObject())
@@ -1973,7 +1973,7 @@ NAN_METHOD(Map::render)
 
             vector_tile_baton_t *closure = new vector_tile_baton_t();
 
-            if (options->Has(Nan::New("image_scaling").ToLocalChecked()))
+            if (options->Has(Nan::GetCurrentContext(), Nan::New("image_scaling").ToLocalChecked()).ToChecked())
             {
                 v8::Local<v8::Value> param_val = options->Get(Nan::New("image_scaling").ToLocalChecked());
                 if (!param_val->IsString())
@@ -1993,7 +1993,7 @@ NAN_METHOD(Map::render)
                 closure->scaling_method = *method;
             }
 
-            if (options->Has(Nan::New("image_format").ToLocalChecked()))
+            if (options->Has(Nan::GetCurrentContext(), Nan::New("image_format").ToLocalChecked()).ToChecked())
             {
                 v8::Local<v8::Value> param_val = options->Get(Nan::New("image_format").ToLocalChecked());
                 if (!param_val->IsString())
@@ -2005,7 +2005,7 @@ NAN_METHOD(Map::render)
                 closure->image_format = TOSTR(param_val);
             }
 
-            if (options->Has(Nan::New("area_threshold").ToLocalChecked()))
+            if (options->Has(Nan::GetCurrentContext(), Nan::New("area_threshold").ToLocalChecked()).ToChecked())
             {
                 v8::Local<v8::Value> param_val = options->Get(Nan::New("area_threshold").ToLocalChecked());
                 if (!param_val->IsNumber())
@@ -2014,7 +2014,7 @@ NAN_METHOD(Map::render)
                     Nan::ThrowTypeError("option 'area_threshold' must be a number");
                     return;
                 }
-                closure->area_threshold = param_val->NumberValue();
+                closure->area_threshold = param_val->NumberValue(Nan::GetCurrentContext()).ToChecked();
                 if (closure->area_threshold < 0.0)
                 {
                     delete closure;
@@ -2023,7 +2023,7 @@ NAN_METHOD(Map::render)
                 }
             }
 
-            if (options->Has(Nan::New("strictly_simple").ToLocalChecked()))
+            if (options->Has(Nan::GetCurrentContext(), Nan::New("strictly_simple").ToLocalChecked()).ToChecked())
             {
                 v8::Local<v8::Value> param_val = options->Get(Nan::New("strictly_simple").ToLocalChecked());
                 if (!param_val->IsBoolean())
@@ -2032,10 +2032,10 @@ NAN_METHOD(Map::render)
                     Nan::ThrowTypeError("option 'strictly_simple' must be a boolean");
                     return;
                 }
-                closure->strictly_simple = param_val->BooleanValue();
+                closure->strictly_simple = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
             }
 
-            if (options->Has(Nan::New("multi_polygon_union").ToLocalChecked()))
+            if (options->Has(Nan::GetCurrentContext(), Nan::New("multi_polygon_union").ToLocalChecked()).ToChecked())
             {
                 v8::Local<v8::Value> param_val = options->Get(Nan::New("multi_polygon_union").ToLocalChecked());
                 if (!param_val->IsBoolean())
@@ -2044,10 +2044,10 @@ NAN_METHOD(Map::render)
                     Nan::ThrowTypeError("option 'multi_polygon_union' must be a boolean");
                     return;
                 }
-                closure->multi_polygon_union = param_val->BooleanValue();
+                closure->multi_polygon_union = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
             }
 
-            if (options->Has(Nan::New("fill_type").ToLocalChecked()))
+            if (options->Has(Nan::GetCurrentContext(), Nan::New("fill_type").ToLocalChecked()).ToChecked())
             {
                 v8::Local<v8::Value> param_val = options->Get(Nan::New("fill_type").ToLocalChecked());
                 if (!param_val->IsNumber())
@@ -2056,7 +2056,7 @@ NAN_METHOD(Map::render)
                     Nan::ThrowTypeError("option 'fill_type' must be an unsigned integer");
                     return;
                 }
-                closure->fill_type = static_cast<mapnik::vector_tile_impl::polygon_fill_type>(param_val->IntegerValue());
+                closure->fill_type = static_cast<mapnik::vector_tile_impl::polygon_fill_type>(param_val->IntegerValue(Nan::GetCurrentContext()).ToChecked());
                 if (closure->fill_type >= mapnik::vector_tile_impl::polygon_fill_type_max)
                 {
                     delete closure;
@@ -2065,7 +2065,7 @@ NAN_METHOD(Map::render)
                 }
             }
 
-            if (options->Has(Nan::New("threading_mode").ToLocalChecked()))
+            if (options->Has(Nan::GetCurrentContext(), Nan::New("threading_mode").ToLocalChecked()).ToChecked())
             {
                 v8::Local<v8::Value> param_val = options->Get(Nan::New("threading_mode").ToLocalChecked());
                 if (!param_val->IsNumber())
@@ -2074,7 +2074,7 @@ NAN_METHOD(Map::render)
                     Nan::ThrowTypeError("option 'threading_mode' must be an unsigned integer");
                     return;
                 }
-                closure->threading_mode = static_cast<std::launch>(param_val->IntegerValue());
+                closure->threading_mode = static_cast<std::launch>(param_val->IntegerValue(Nan::GetCurrentContext()).ToChecked());
                 if (closure->threading_mode != std::launch::async &&
                     closure->threading_mode != std::launch::deferred &&
                     closure->threading_mode != (std::launch::async | std::launch::deferred))
@@ -2085,7 +2085,7 @@ NAN_METHOD(Map::render)
                 }
             }
 
-            if (options->Has(Nan::New("simplify_distance").ToLocalChecked()))
+            if (options->Has(Nan::GetCurrentContext(), Nan::New("simplify_distance").ToLocalChecked()).ToChecked())
             {
                 v8::Local<v8::Value> param_val = options->Get(Nan::New("simplify_distance").ToLocalChecked());
                 if (!param_val->IsNumber())
@@ -2094,7 +2094,7 @@ NAN_METHOD(Map::render)
                     Nan::ThrowTypeError("option 'simplify_distance' must be an floating point number");
                     return;
                 }
-                closure->simplify_distance = param_val->NumberValue();
+                closure->simplify_distance = param_val->NumberValue(Nan::GetCurrentContext()).ToChecked();
                 if (closure->simplify_distance < 0)
                 {
                     delete closure;
@@ -2103,7 +2103,7 @@ NAN_METHOD(Map::render)
                 }
             }
 
-            if (options->Has(Nan::New("variables").ToLocalChecked()))
+            if (options->Has(Nan::GetCurrentContext(), Nan::New("variables").ToLocalChecked()).ToChecked())
             {
                 v8::Local<v8::Value> bind_opt = options->Get(Nan::New("variables").ToLocalChecked());
                 if (!bind_opt->IsObject())
@@ -2115,7 +2115,7 @@ NAN_METHOD(Map::render)
                 object_to_container(closure->variables,bind_opt->ToObject());
             }
 
-            if (options->Has(Nan::New("process_all_rings").ToLocalChecked()))
+            if (options->Has(Nan::GetCurrentContext(), Nan::New("process_all_rings").ToLocalChecked()).ToChecked())
             {
                 v8::Local<v8::Value> param_val = options->Get(Nan::New("process_all_rings").ToLocalChecked());
                 if (!param_val->IsBoolean())
@@ -2124,7 +2124,7 @@ NAN_METHOD(Map::render)
                     Nan::ThrowTypeError("option 'process_all_rings' must be a boolean");
                     return;
                 }
-                closure->process_all_rings = param_val->BooleanValue();
+                closure->process_all_rings = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
             }
 
             closure->request.data = closure;
@@ -2377,7 +2377,7 @@ NAN_METHOD(Map::renderFile)
 
     if (!info[1]->IsFunction() && info[1]->IsObject()) {
         options = info[1]->ToObject();
-        if (options->Has(Nan::New("format").ToLocalChecked()))
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("format").ToLocalChecked()).ToChecked())
         {
             v8::Local<v8::Value> format_opt = options->Get(Nan::New("format").ToLocalChecked());
             if (!format_opt->IsString()) {
@@ -2388,7 +2388,7 @@ NAN_METHOD(Map::renderFile)
             format = TOSTR(format_opt);
         }
 
-        if (options->Has(Nan::New("palette").ToLocalChecked()))
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("palette").ToLocalChecked()).ToChecked())
         {
             v8::Local<v8::Value> format_opt = options->Get(Nan::New("palette").ToLocalChecked());
             if (!format_opt->IsObject()) {
@@ -2404,34 +2404,34 @@ NAN_METHOD(Map::renderFile)
 
             palette = Nan::ObjectWrap::Unwrap<Palette>(obj)->palette();
         }
-        if (options->Has(Nan::New("scale").ToLocalChecked())) {
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("scale").ToLocalChecked()).ToChecked()) {
             v8::Local<v8::Value> bind_opt = options->Get(Nan::New("scale").ToLocalChecked());
             if (!bind_opt->IsNumber()) {
                 Nan::ThrowTypeError("optional arg 'scale' must be a number");
                 return;
             }
 
-            scale_factor = bind_opt->NumberValue();
+            scale_factor = bind_opt->NumberValue(Nan::GetCurrentContext()).ToChecked();
         }
 
-        if (options->Has(Nan::New("scale_denominator").ToLocalChecked())) {
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("scale_denominator").ToLocalChecked()).ToChecked()) {
             v8::Local<v8::Value> bind_opt = options->Get(Nan::New("scale_denominator").ToLocalChecked());
             if (!bind_opt->IsNumber()) {
                 Nan::ThrowTypeError("optional arg 'scale_denominator' must be a number");
                 return;
             }
 
-            scale_denominator = bind_opt->NumberValue();
+            scale_denominator = bind_opt->NumberValue(Nan::GetCurrentContext()).ToChecked();
         }
 
-        if (options->Has(Nan::New("buffer_size").ToLocalChecked())) {
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("buffer_size").ToLocalChecked()).ToChecked()) {
             v8::Local<v8::Value> bind_opt = options->Get(Nan::New("buffer_size").ToLocalChecked());
             if (!bind_opt->IsNumber()) {
                 Nan::ThrowTypeError("optional arg 'buffer_size' must be a number");
                 return;
             }
 
-            buffer_size = bind_opt->IntegerValue();
+            buffer_size = bind_opt->IntegerValue(Nan::GetCurrentContext()).ToChecked();
         }
 
     } else if (!info[1]->IsFunction()) {
@@ -2455,7 +2455,7 @@ NAN_METHOD(Map::renderFile)
 
     render_file_baton_t *closure = new render_file_baton_t();
 
-    if (options->Has(Nan::New("variables").ToLocalChecked()))
+    if (options->Has(Nan::GetCurrentContext(), Nan::New("variables").ToLocalChecked()).ToChecked())
     {
         v8::Local<v8::Value> bind_opt = options->Get(Nan::New("variables").ToLocalChecked());
         if (!bind_opt->IsObject())
@@ -2586,7 +2586,7 @@ NAN_METHOD(Map::renderSync)
         }
 
         v8::Local<v8::Object> options = info[0]->ToObject();
-        if (options->Has(Nan::New("format").ToLocalChecked()))
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("format").ToLocalChecked()).ToChecked())
         {
             v8::Local<v8::Value> format_opt = options->Get(Nan::New("format").ToLocalChecked());
             if (!format_opt->IsString()) {
@@ -2597,7 +2597,7 @@ NAN_METHOD(Map::renderSync)
             format = TOSTR(format_opt);
         }
 
-        if (options->Has(Nan::New("palette").ToLocalChecked()))
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("palette").ToLocalChecked()).ToChecked())
         {
             v8::Local<v8::Value> format_opt = options->Get(Nan::New("palette").ToLocalChecked());
             if (!format_opt->IsObject()) {
@@ -2613,32 +2613,32 @@ NAN_METHOD(Map::renderSync)
 
             palette = Nan::ObjectWrap::Unwrap<Palette>(obj)->palette();
         }
-        if (options->Has(Nan::New("scale").ToLocalChecked())) {
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("scale").ToLocalChecked()).ToChecked()) {
             v8::Local<v8::Value> bind_opt = options->Get(Nan::New("scale").ToLocalChecked());
             if (!bind_opt->IsNumber()) {
                 Nan::ThrowTypeError("optional arg 'scale' must be a number");
                 return;
             }
 
-            scale_factor = bind_opt->NumberValue();
+            scale_factor = bind_opt->NumberValue(Nan::GetCurrentContext()).ToChecked();
         }
-        if (options->Has(Nan::New("scale_denominator").ToLocalChecked())) {
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("scale_denominator").ToLocalChecked()).ToChecked()) {
             v8::Local<v8::Value> bind_opt = options->Get(Nan::New("scale_denominator").ToLocalChecked());
             if (!bind_opt->IsNumber()) {
                 Nan::ThrowTypeError("optional arg 'scale_denominator' must be a number");
                 return;
             }
 
-            scale_denominator = bind_opt->NumberValue();
+            scale_denominator = bind_opt->NumberValue(Nan::GetCurrentContext()).ToChecked();
         }
-        if (options->Has(Nan::New("buffer_size").ToLocalChecked())) {
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("buffer_size").ToLocalChecked()).ToChecked()) {
             v8::Local<v8::Value> bind_opt = options->Get(Nan::New("buffer_size").ToLocalChecked());
             if (!bind_opt->IsNumber()) {
                 Nan::ThrowTypeError("optional arg 'buffer_size' must be a number");
                 return;
             }
 
-            buffer_size = bind_opt->IntegerValue();
+            buffer_size = bind_opt->IntegerValue(Nan::GetCurrentContext()).ToChecked();
         }
     }
 
@@ -2706,7 +2706,7 @@ NAN_METHOD(Map::renderFileSync)
         }
 
         v8::Local<v8::Object> options = info[1].As<v8::Object>();
-        if (options->Has(Nan::New("format").ToLocalChecked()))
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("format").ToLocalChecked()).ToChecked())
         {
             v8::Local<v8::Value> format_opt = options->Get(Nan::New("format").ToLocalChecked());
             if (!format_opt->IsString()) {
@@ -2717,7 +2717,7 @@ NAN_METHOD(Map::renderFileSync)
             format = TOSTR(format_opt);
         }
 
-        if (options->Has(Nan::New("palette").ToLocalChecked()))
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("palette").ToLocalChecked()).ToChecked())
         {
             v8::Local<v8::Value> format_opt = options->Get(Nan::New("palette").ToLocalChecked());
             if (!format_opt->IsObject()) {
@@ -2733,32 +2733,32 @@ NAN_METHOD(Map::renderFileSync)
 
             palette = Nan::ObjectWrap::Unwrap<Palette>(obj)->palette();
         }
-        if (options->Has(Nan::New("scale").ToLocalChecked())) {
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("scale").ToLocalChecked()).ToChecked()) {
             v8::Local<v8::Value> bind_opt = options->Get(Nan::New("scale").ToLocalChecked());
             if (!bind_opt->IsNumber()) {
                 Nan::ThrowTypeError("optional arg 'scale' must be a number");
                 return;
             }
 
-            scale_factor = bind_opt->NumberValue();
+            scale_factor = bind_opt->NumberValue(Nan::GetCurrentContext()).ToChecked();
         }
-        if (options->Has(Nan::New("scale_denominator").ToLocalChecked())) {
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("scale_denominator").ToLocalChecked()).ToChecked()) {
             v8::Local<v8::Value> bind_opt = options->Get(Nan::New("scale_denominator").ToLocalChecked());
             if (!bind_opt->IsNumber()) {
                 Nan::ThrowTypeError("optional arg 'scale_denominator' must be a number");
                 return;
             }
 
-            scale_denominator = bind_opt->NumberValue();
+            scale_denominator = bind_opt->NumberValue(Nan::GetCurrentContext()).ToChecked();
         }
-        if (options->Has(Nan::New("buffer_size").ToLocalChecked())) {
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("buffer_size").ToLocalChecked()).ToChecked()) {
             v8::Local<v8::Value> bind_opt = options->Get(Nan::New("buffer_size").ToLocalChecked());
             if (!bind_opt->IsNumber()) {
                 Nan::ThrowTypeError("optional arg 'buffer_size' must be a number");
                 return;
             }
 
-            buffer_size = bind_opt->IntegerValue();
+            buffer_size = bind_opt->IntegerValue(Nan::GetCurrentContext()).ToChecked();
         }
     }
 

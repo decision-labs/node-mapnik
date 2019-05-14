@@ -316,13 +316,13 @@ NAN_METHOD(ImageView::getPixel)
 
         v8::Local<v8::Object> options = info[2]->ToObject();
 
-        if (options->Has(Nan::New("get_color").ToLocalChecked())) {
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("get_color").ToLocalChecked()).ToChecked()) {
             v8::Local<v8::Value> bind_opt = options->Get(Nan::New("get_color").ToLocalChecked());
             if (!bind_opt->IsBoolean()) {
                 Nan::ThrowTypeError("optional arg 'color' must be a boolean");
                 return;
             }
-            get_color = bind_opt->BooleanValue();
+            get_color = bind_opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
         }
 
     }
@@ -336,8 +336,8 @@ NAN_METHOD(ImageView::getPixel)
             Nan::ThrowTypeError("second arg, 'y' must be an integer");
             return;
         }
-        x = info[0]->IntegerValue();
-        y = info[1]->IntegerValue();
+        x = info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+        y = info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
     } else {
         Nan::ThrowTypeError("must supply x,y to query pixel color");
         return;
@@ -398,7 +398,7 @@ NAN_METHOD(ImageView::encodeSync)
 
         v8::Local<v8::Object> options = info[1].As<v8::Object>();
 
-        if (options->Has(Nan::New("palette").ToLocalChecked()))
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("palette").ToLocalChecked()).ToChecked())
         {
             v8::Local<v8::Value> format_opt = options->Get(Nan::New("palette").ToLocalChecked());
             if (!format_opt->IsObject()) {
@@ -471,7 +471,7 @@ NAN_METHOD(ImageView::encode)
 
         v8::Local<v8::Object> options = info[1].As<v8::Object>();
 
-        if (options->Has(Nan::New("palette").ToLocalChecked()))
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("palette").ToLocalChecked()).ToChecked())
         {
             v8::Local<v8::Value> format_opt = options->Get(Nan::New("palette").ToLocalChecked());
             if (!format_opt->IsObject()) {

@@ -258,8 +258,8 @@ NAN_METHOD(GridView::getPixel)
             Nan::ThrowTypeError("second arg, 'y' must be an integer");
             return;
         }
-        x = info[0]->IntegerValue();
-        y = info[1]->IntegerValue();
+        x = info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+        y = info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
     } else {
         Nan::ThrowTypeError("must supply x,y to query pixel color");
         return;
@@ -293,7 +293,7 @@ NAN_METHOD(GridView::encodeSync)
 
         v8::Local<v8::Object> options = info[0].As<v8::Object>();
 
-        if (options->Has(Nan::New("resolution").ToLocalChecked()))
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("resolution").ToLocalChecked()).ToChecked())
         {
             v8::Local<v8::Value> bind_opt = options->Get(Nan::New("resolution").ToLocalChecked());
             if (!bind_opt->IsNumber())
@@ -302,7 +302,7 @@ NAN_METHOD(GridView::encodeSync)
                 return;
             }
 
-            resolution = bind_opt->IntegerValue();
+            resolution = bind_opt->IntegerValue(Nan::GetCurrentContext()).ToChecked();
 
             if (resolution == 0)
             {
@@ -311,7 +311,7 @@ NAN_METHOD(GridView::encodeSync)
             }
         }
 
-        if (options->Has(Nan::New("features").ToLocalChecked()))
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("features").ToLocalChecked()).ToChecked())
         {
             v8::Local<v8::Value> bind_opt = options->Get(Nan::New("features").ToLocalChecked());
             if (!bind_opt->IsBoolean())
@@ -320,7 +320,7 @@ NAN_METHOD(GridView::encodeSync)
                 return;
             }
 
-            add_features = bind_opt->BooleanValue();
+            add_features = bind_opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
         }
     }
 
@@ -407,7 +407,7 @@ NAN_METHOD(GridView::encode)
 
         v8::Local<v8::Object> options = info[0].As<v8::Object>();
 
-        if (options->Has(Nan::New("resolution").ToLocalChecked()))
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("resolution").ToLocalChecked()).ToChecked())
         {
             v8::Local<v8::Value> bind_opt = options->Get(Nan::New("resolution").ToLocalChecked());
             if (!bind_opt->IsNumber())
@@ -416,7 +416,7 @@ NAN_METHOD(GridView::encode)
                 return;
             }
 
-            resolution = bind_opt->IntegerValue();
+            resolution = bind_opt->IntegerValue(Nan::GetCurrentContext()).ToChecked();
 
             if (resolution == 0)
             {
@@ -425,7 +425,7 @@ NAN_METHOD(GridView::encode)
             }
         }
 
-        if (options->Has(Nan::New("features").ToLocalChecked()))
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("features").ToLocalChecked()).ToChecked())
         {
             v8::Local<v8::Value> bind_opt = options->Get(Nan::New("features").ToLocalChecked());
             if (!bind_opt->IsBoolean())
@@ -434,7 +434,7 @@ NAN_METHOD(GridView::encode)
                 return;
             }
 
-            add_features = bind_opt->BooleanValue();
+            add_features = bind_opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
         }
     }
 

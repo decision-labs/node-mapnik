@@ -99,7 +99,7 @@ NAN_METHOD(Expression::evaluate)
         }
 
         v8::Local<v8::Object> options = info[1].As<v8::Object>();
-        if (options->Has(Nan::New("variables").ToLocalChecked()))
+        if (options->Has(Nan::GetCurrentContext(), Nan::New("variables").ToLocalChecked()).ToChecked())
         {
             v8::Local<v8::Value> bind_opt = options->Get(Nan::New("variables").ToLocalChecked());
             if (!bind_opt->IsObject())

@@ -64,7 +64,9 @@ NAN_METHOD(CairoSurface::New)
             Nan::ThrowTypeError("CairoSurface 'width' and 'height' must be a integers");
             return;
         }
-        CairoSurface* im = new CairoSurface(format, info[1]->IntegerValue(), info[2]->IntegerValue());
+        CairoSurface* im = new CairoSurface(format, 
+                                            info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked(),
+                                            info[2]->IntegerValue(Nan::GetCurrentContext()).ToChecked());
         im->Wrap(info.This());
         info.GetReturnValue().Set(info.This());
         return;

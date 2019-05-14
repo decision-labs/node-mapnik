@@ -36,16 +36,16 @@ static inline NAN_METHOD(register_fonts)
             }
 
             v8::Local<v8::Object> options = info[1].As<v8::Object>();
-            if (options->Has(Nan::New("recurse").ToLocalChecked()))
-            {
-                v8::Local<v8::Value> recurse_opt = options->Get(Nan::New("recurse").ToLocalChecked());
+			if (options->Has(Nan::GetCurrentContext(), Nan::New("recurse").ToLocalChecked()).ToChecked())
+			{
+				v8::Local<v8::Value> recurse_opt = options->Get(Nan::New("recurse").ToLocalChecked());
                 if (!recurse_opt->IsBoolean())
                 {
                     Nan::ThrowTypeError("'recurse' must be a Boolean");
                     return;
                 }
 
-                bool recurse = recurse_opt->BooleanValue();
+                bool recurse = recurse_opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
                 std::string path = TOSTR(info[0]);
                 found = mapnik::freetype_engine::register_fonts(path,recurse);
             }
