@@ -1,5 +1,12 @@
 # CARTO node-mapnik changelog
 
+## 3.6.2-carto.14
+
+**Release date**: 2019-05-14
+
+Changes:
+ - Update mapnik to [v3.0.15.15](https://github.com/CartoDB/mapnik/blob/v3.0.15.15/CHANGELOG.carto.md#301515) which includes multiple bug fixes and dependency updates (binary distribution).
+
 ## 3.6.2-carto.13
 
 **Release date**: 2019-04-10
