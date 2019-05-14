@@ -37,7 +37,7 @@
   "dependencies": {
     "mapnik-vector-tile": "cartodb/mapnik-vector-tile#v1.6.1-carto.2",
     "nan": "2.13.2",
-    "node-pre-gyp": "0.12.0"
+    "node-pre-gyp": "0.13.0"
   },
   "bin": {
     "mapnik-index.js": "./bin/mapnik-index.js",

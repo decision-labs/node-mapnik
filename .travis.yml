@@ -54,10 +54,10 @@ matrix:
       env: BUILDTYPE=release
       node_js: 10
       
-##### linux node v11
+##### linux node v12
     - os: linux
       env: BUILDTYPE=release
-      node_js: 11
+      node_js: 12
 
 ##### linux node 10 - Sanitizer build
     - os: linux
