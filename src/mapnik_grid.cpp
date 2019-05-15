@@ -97,7 +97,7 @@ NAN_METHOD(Grid::New)
 
             if (Nan::Has(options, Nan::New("key").ToLocalChecked()).FromMaybe(false))
 			{
-                v8::Local<v8::Value> bind_opt = options->Get(Nan::New("key").ToLocalChecked());
+                v8::Local<v8::Value> bind_opt = Nan::Get(options, Nan::New("key").ToLocalChecked()).ToLocalChecked();
                 if (!bind_opt->IsString())
                 {
                     Nan::ThrowTypeError("optional arg 'key' must be an string");
@@ -366,7 +366,7 @@ NAN_METHOD(Grid::encodeSync)
 
         if (Nan::Has(options, Nan::New("resolution").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> bind_opt = options->Get(Nan::New("resolution").ToLocalChecked());
+            v8::Local<v8::Value> bind_opt = Nan::Get(options, Nan::New("resolution").ToLocalChecked()).ToLocalChecked();
             if (!bind_opt->IsNumber())
             {
                 Nan::ThrowTypeError("'resolution' must be an Integer");
@@ -383,7 +383,7 @@ NAN_METHOD(Grid::encodeSync)
 
         if (Nan::Has(options, Nan::New("features").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> bind_opt = options->Get(Nan::New("features").ToLocalChecked());
+            v8::Local<v8::Value> bind_opt = Nan::Get(options, Nan::New("features").ToLocalChecked()).ToLocalChecked();
             if (!bind_opt->IsBoolean())
             {
                 Nan::ThrowTypeError("'features' must be an Boolean");
@@ -477,7 +477,7 @@ NAN_METHOD(Grid::encode)
 
         if (Nan::Has(options, Nan::New("resolution").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> bind_opt = options->Get(Nan::New("resolution").ToLocalChecked());
+            v8::Local<v8::Value> bind_opt = Nan::Get(options, Nan::New("resolution").ToLocalChecked()).ToLocalChecked();
             if (!bind_opt->IsNumber())
             {
                 Nan::ThrowTypeError("'resolution' must be an Integer");
@@ -494,7 +494,7 @@ NAN_METHOD(Grid::encode)
 
         if (Nan::Has(options, Nan::New("features").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> bind_opt = options->Get(Nan::New("features").ToLocalChecked());
+            v8::Local<v8::Value> bind_opt = Nan::Get(options, Nan::New("features").ToLocalChecked()).ToLocalChecked();
             if (!bind_opt->IsBoolean())
             {
                 Nan::ThrowTypeError("'features' must be an Boolean");

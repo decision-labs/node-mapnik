@@ -106,41 +106,41 @@ NAN_METHOD(hsl2rgb) {
 
 static void parseTintOps(v8::Local<v8::Object> const& tint, Tinter & tinter, std::string & msg) {
     Nan::HandleScope scope;
-    v8::Local<v8::Value> hue = tint->Get(Nan::New("h").ToLocalChecked());
+    v8::Local<v8::Value> hue = Nan::Get(tint, Nan::New("h").ToLocalChecked()).ToLocalChecked();
     if (!hue.IsEmpty() && hue->IsArray()) {
         v8::Local<v8::Array> val_array = v8::Local<v8::Array>::Cast(hue);
         if (val_array->Length() != 2) {
             msg = "h array must be a pair of values";
         }
-        tinter.h0 = val_array->Get(0)->NumberValue(Nan::GetCurrentContext()).ToChecked();
-        tinter.h1 = val_array->Get(1)->NumberValue(Nan::GetCurrentContext()).ToChecked();
+        tinter.h0 = Nan::Get(val_array, 0).ToLocalChecked()->NumberValue(Nan::GetCurrentContext()).ToChecked();
+        tinter.h1 = Nan::Get(val_array, 1).ToLocalChecked()->NumberValue(Nan::GetCurrentContext()).ToChecked();
     }
-    v8::Local<v8::Value> sat = tint->Get(Nan::New("s").ToLocalChecked());
+    v8::Local<v8::Value> sat = Nan::Get(tint, Nan::New("s").ToLocalChecked()).ToLocalChecked();
     if (!sat.IsEmpty() && sat->IsArray()) {
         v8::Local<v8::Array> val_array = v8::Local<v8::Array>::Cast(sat);
         if (val_array->Length() != 2) {
             msg = "s array must be a pair of values";
         }
-        tinter.s0 = val_array->Get(0)->NumberValue(Nan::GetCurrentContext()).ToChecked();
-        tinter.s1 = val_array->Get(1)->NumberValue(Nan::GetCurrentContext()).ToChecked();
+        tinter.s0 = Nan::Get(val_array, 0).ToLocalChecked()->NumberValue(Nan::GetCurrentContext()).ToChecked();
+        tinter.s1 = Nan::Get(val_array, 1).ToLocalChecked()->NumberValue(Nan::GetCurrentContext()).ToChecked();
     }
-    v8::Local<v8::Value> light = tint->Get(Nan::New("l").ToLocalChecked());
+    v8::Local<v8::Value> light = Nan::Get(tint, Nan::New("l").ToLocalChecked()).ToLocalChecked();
     if (!light.IsEmpty() && light->IsArray()) {
         v8::Local<v8::Array> val_array = v8::Local<v8::Array>::Cast(light);
         if (val_array->Length() != 2) {
             msg = "l array must be a pair of values";
         }
-        tinter.l0 = val_array->Get(0)->NumberValue(Nan::GetCurrentContext()).ToChecked();
-        tinter.l1 = val_array->Get(1)->NumberValue(Nan::GetCurrentContext()).ToChecked();
+        tinter.l0 = Nan::Get(val_array, 0).ToLocalChecked()->NumberValue(Nan::GetCurrentContext()).ToChecked();
+        tinter.l1 = Nan::Get(val_array, 1).ToLocalChecked()->NumberValue(Nan::GetCurrentContext()).ToChecked();
     }
-    v8::Local<v8::Value> alpha = tint->Get(Nan::New("a").ToLocalChecked());
+    v8::Local<v8::Value> alpha = Nan::Get(tint, Nan::New("a").ToLocalChecked()).ToLocalChecked();
     if (!alpha.IsEmpty() && alpha->IsArray()) {
         v8::Local<v8::Array> val_array = v8::Local<v8::Array>::Cast(alpha);
         if (val_array->Length() != 2) {
             msg = "a array must be a pair of values";
         }
-        tinter.a0 = val_array->Get(0)->NumberValue(Nan::GetCurrentContext()).ToChecked();
-        tinter.a1 = val_array->Get(1)->NumberValue(Nan::GetCurrentContext()).ToChecked();
+        tinter.a0 = Nan::Get(val_array, 0).ToLocalChecked()->NumberValue(Nan::GetCurrentContext()).ToChecked();
+        tinter.a1 = Nan::Get(val_array, 1).ToLocalChecked()->NumberValue(Nan::GetCurrentContext()).ToChecked();
     }
 }
 
@@ -494,9 +494,10 @@ NAN_METHOD(Blend) {
 
     // Validate options
     if (!options.IsEmpty()) {
-        baton->quality = options->Get(Nan::New("quality").ToLocalChecked())->Int32Value(Nan::GetCurrentContext()).ToChecked();
+        baton->quality = Nan::Get(options, Nan::New("quality").ToLocalChecked()).ToLocalChecked()
+			->Int32Value(Nan::GetCurrentContext()).ToChecked();
 
-        v8::Local<v8::Value> format_val = options->Get(Nan::New("format").ToLocalChecked());
+        v8::Local<v8::Value> format_val = Nan::Get(options, Nan::New("format").ToLocalChecked()).ToLocalChecked();
         if (!format_val.IsEmpty() && format_val->IsString()) {
             std::string format_val_string = TOSTR(format_val);
             if (format_val_string == "jpeg" || format_val_string == "jpg") {
@@ -524,11 +525,11 @@ NAN_METHOD(Blend) {
             }
         }
 
-        baton->reencode = options->Get(Nan::New("reencode").ToLocalChecked())->BooleanValue(Nan::GetCurrentContext()).ToChecked();
-        baton->width = options->Get(Nan::New("width").ToLocalChecked())->Int32Value(Nan::GetCurrentContext()).ToChecked();
-        baton->height = options->Get(Nan::New("height").ToLocalChecked())->Int32Value(Nan::GetCurrentContext()).ToChecked();
+        baton->reencode = Nan::Get(options, Nan::New("reencode").ToLocalChecked()).ToLocalChecked()->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+        baton->width = Nan::Get(options, Nan::New("width").ToLocalChecked()).ToLocalChecked()->Int32Value(Nan::GetCurrentContext()).ToChecked();
+        baton->height = Nan::Get(options, Nan::New("height").ToLocalChecked()).ToLocalChecked()->Int32Value(Nan::GetCurrentContext()).ToChecked();
 
-        v8::Local<v8::Value> matte_val = options->Get(Nan::New("matte").ToLocalChecked());
+        v8::Local<v8::Value> matte_val = Nan::Get(options, Nan::New("matte").ToLocalChecked()).ToLocalChecked();
         if (!matte_val.IsEmpty() && matte_val->IsString()) {
             if (!hexToUInt32Color(TOSTR(matte_val->ToString(Nan::GetCurrentContext()).ToLocalChecked()), baton->matte))
             {
@@ -542,12 +543,12 @@ NAN_METHOD(Blend) {
             }
         }
 
-        v8::Local<v8::Value> palette_val = options->Get(Nan::New("palette").ToLocalChecked());
+        v8::Local<v8::Value> palette_val = Nan::Get(options, Nan::New("palette").ToLocalChecked()).ToLocalChecked();
         if (!palette_val.IsEmpty() && palette_val->IsObject()) {
             baton->palette = Nan::ObjectWrap::Unwrap<Palette>(palette_val->ToObject(Nan::GetCurrentContext()).ToLocalChecked())->palette();
         }
 
-        v8::Local<v8::Value> mode_val = options->Get(Nan::New("mode").ToLocalChecked());
+        v8::Local<v8::Value> mode_val = palette_val = Nan::Get(options, Nan::New("mode").ToLocalChecked()).ToLocalChecked();
         if (!mode_val.IsEmpty() && mode_val->IsString()) {
             std::string mode_string = TOSTR(mode_val);
             if (mode_string == "octree" || mode_string == "o") {
@@ -559,7 +560,7 @@ NAN_METHOD(Blend) {
         }
 
         if (Nan::Has(options, Nan::New("compression").ToLocalChecked()).FromMaybe(false)) {
-            v8::Local<v8::Value> compression_val = options->Get(Nan::New("compression").ToLocalChecked());
+            v8::Local<v8::Value> compression_val = palette_val = Nan::Get(options, Nan::New("compression").ToLocalChecked()).ToLocalChecked();
             if (!compression_val.IsEmpty() && compression_val->IsNumber())
             {
                 baton->compression = compression_val->Int32Value(Nan::GetCurrentContext()).ToChecked();
@@ -595,7 +596,7 @@ NAN_METHOD(Blend) {
         Nan::ThrowTypeError("First argument must contain at least one Buffer.");
         return;
     } else if (length == 1 && !baton->reencode) {
-        v8::Local<v8::Value> buffer = js_images->Get(0);
+        v8::Local<v8::Value> buffer = Nan::Get(js_images, 0).ToLocalChecked();
         if (node::Buffer::HasInstance(buffer)) {
             // Directly pass through buffer if it's the only one.
             v8::Local<v8::Value> argv[] = {
@@ -613,7 +614,7 @@ NAN_METHOD(Blend) {
             if (buffer->IsObject()) {
                 v8::Local<v8::Object> props = buffer->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
                 valid = Nan::Has(props, Nan::New("buffer").ToLocalChecked()).FromMaybe(false) &&
-                        node::Buffer::HasInstance(props->Get(Nan::New("buffer").ToLocalChecked()));
+                        node::Buffer::HasInstance(Nan::Get(props, Nan::New("buffer").ToLocalChecked()).ToLocalChecked());
             }
             if (!valid) {
                 Nan::ThrowTypeError("All elements must be Buffers or objects with a 'buffer' property.");
@@ -634,21 +635,21 @@ NAN_METHOD(Blend) {
 
     for (uint32_t i = 0; i < length; ++i) {
         ImagePtr image = std::make_shared<BImage>();
-        v8::Local<v8::Value> buffer = js_images->Get(i);
+        v8::Local<v8::Value> buffer = Nan::Get(js_images, i).ToLocalChecked();
         if (node::Buffer::HasInstance(buffer)) {
             image->buffer.Reset(buffer.As<v8::Object>());
         } else if (buffer->IsObject()) {
             v8::Local<v8::Object> props = buffer->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
             if (Nan::Has(props, Nan::New("buffer").ToLocalChecked()).FromMaybe(false)) {
-                buffer = props->Get(Nan::New("buffer").ToLocalChecked());
+                buffer = Nan::Get(props, Nan::New("buffer").ToLocalChecked()).ToLocalChecked();
                 if (node::Buffer::HasInstance(buffer)) {
                     image->buffer.Reset(buffer.As<v8::Object>());
                 }
             }
-            image->x = props->Get(Nan::New("x").ToLocalChecked())->Int32Value(Nan::GetCurrentContext()).ToChecked();
-            image->y = props->Get(Nan::New("y").ToLocalChecked())->Int32Value(Nan::GetCurrentContext()).ToChecked();
+            image->x = Nan::Get(props, Nan::New("x").ToLocalChecked()).ToLocalChecked()->Int32Value(Nan::GetCurrentContext()).ToChecked();
+            image->y = Nan::Get(props, Nan::New("y").ToLocalChecked()).ToLocalChecked()->Int32Value(Nan::GetCurrentContext()).ToChecked();
 
-            v8::Local<v8::Value> tint_val = props->Get(Nan::New("tint").ToLocalChecked());
+            v8::Local<v8::Value> tint_val = Nan::Get(props, Nan::New("tint").ToLocalChecked()).ToLocalChecked();
             if (!tint_val.IsEmpty() && tint_val->IsObject()) {
                 v8::Local<v8::Object> tint = tint_val->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
                 if (!tint.IsEmpty()) {

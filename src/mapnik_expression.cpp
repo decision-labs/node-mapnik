@@ -101,7 +101,7 @@ NAN_METHOD(Expression::evaluate)
         v8::Local<v8::Object> options = info[1].As<v8::Object>();
         if (Nan::Has(options, Nan::New("variables").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> bind_opt = options->Get(Nan::New("variables").ToLocalChecked());
+            v8::Local<v8::Value> bind_opt = Nan::Get(options, Nan::New("variables").ToLocalChecked()).ToLocalChecked();
             if (!bind_opt->IsObject())
             {
                 Nan::ThrowTypeError("optional arg 'variables' must be an object");
