@@ -421,6 +421,7 @@ void Work_Blend(uv_work_t* req)
 void Work_AfterBlend(uv_work_t* req) {
     Nan::HandleScope scope;
     BlendBaton* baton = static_cast<BlendBaton*>(req->data);
+	Nan::AsyncResource async_resource(__func__);
 
     if (!baton->message.length()) {
         std::string result = baton->stream.str();
@@ -428,12 +429,12 @@ void Work_AfterBlend(uv_work_t* req) {
             Nan::Null(),
             Nan::CopyBuffer((char *)result.data(), mapnik::safe_cast<std::uint32_t>(result.length())).ToLocalChecked(),
         };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(baton->callback), 2, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(baton->callback), 2, argv);
     } else {
         v8::Local<v8::Value> argv[] = {
             Nan::Error(baton->message.c_str())
         };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(baton->callback), 1, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(baton->callback), 1, argv);
     }
     delete baton;
 }
@@ -601,7 +602,8 @@ NAN_METHOD(Blend) {
                 Nan::Null(),
                 buffer
             };
-            Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(baton->callback), 2, argv);
+			Nan::AsyncResource async_resource(__func__);
+            async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(baton->callback), 2, argv);
             return;
         } else {
             // Check whether the argument is a complex image with offsets etc.

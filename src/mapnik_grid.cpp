@@ -186,6 +186,7 @@ void Grid::EIO_Clear(uv_work_t* req)
 void Grid::EIO_AfterClear(uv_work_t* req)
 {
     Nan::HandleScope scope;
+	Nan::AsyncResource async_resource(__func__);
     clear_grid_baton_t *closure = static_cast<clear_grid_baton_t *>(req->data);
     if (closure->error)
     {
@@ -194,13 +195,13 @@ void Grid::EIO_AfterClear(uv_work_t* req)
         // coverage
         /* LCOV_EXCL_START */
         v8::Local<v8::Value> argv[1] = { Nan::Error(closure->error_name.c_str()) };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
         /* LCOV_EXCL_STOP */
     }
     else
     {
         v8::Local<v8::Value> argv[2] = { Nan::Null(), closure->g->handle() };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
     closure->g->Unref();
     closure->cb.Reset();
@@ -549,7 +550,7 @@ void Grid::EIO_Encode(uv_work_t* req)
 void Grid::EIO_AfterEncode(uv_work_t* req)
 {
     Nan::HandleScope scope;
-
+	Nan::AsyncResource async_resource(__func__);
     encode_grid_baton_t *closure = static_cast<encode_grid_baton_t *>(req->data);
 
 
@@ -559,7 +560,7 @@ void Grid::EIO_AfterEncode(uv_work_t* req)
         // so simply removing the following from coverage
         /* LCOV_EXCL_START */
         v8::Local<v8::Value> argv[1] = { Nan::Error(closure->error_name.c_str()) };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
         /* LCOV_EXCL_STOP */
     }
     else
@@ -597,7 +598,7 @@ void Grid::EIO_AfterEncode(uv_work_t* req)
         json->Set(Nan::New("data").ToLocalChecked(), feature_data);
 
         v8::Local<v8::Value> argv[2] = { Nan::Null(), json };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
 
     closure->g->Unref();
