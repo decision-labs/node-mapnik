@@ -401,7 +401,7 @@ NAN_METHOD(VectorTile::New)
             Nan::ThrowTypeError("optional fourth argument must be an options object");
             return;
         }
-        options = info[3]->ToObject();
+        options = info[3]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
         if (Nan::Has(options, Nan::New("tile_size").ToLocalChecked()).FromMaybe(false))
         {
             v8::Local<v8::Value> opt = options->Get(Nan::GetCurrentContext(), Nan::New("tile_size").ToLocalChecked()).ToLocalChecked();
@@ -563,7 +563,7 @@ v8::Local<v8::Value> VectorTile::_compositeSync(Nan::NAN_METHOD_ARGS_TYPE info)
             Nan::ThrowTypeError("optional second argument must be an options object");
             return scope.Escape(Nan::Undefined());
         }
-        v8::Local<v8::Object> options = info[1]->ToObject();
+        v8::Local<v8::Object> options = info[1]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
         if (Nan::Has(options, Nan::New("area_threshold").ToLocalChecked()).FromMaybe(false))
         {
             v8::Local<v8::Value> area_thres = options->Get(Nan::New("area_threshold").ToLocalChecked());
@@ -784,7 +784,7 @@ v8::Local<v8::Value> VectorTile::_compositeSync(Nan::NAN_METHOD_ARGS_TYPE info)
             Nan::ThrowTypeError("must provide an array of VectorTile objects");
             return scope.Escape(Nan::Undefined());
         }
-        v8::Local<v8::Object> tile_obj = val->ToObject();
+        v8::Local<v8::Object> tile_obj = val->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
         if (tile_obj->IsNull() || tile_obj->IsUndefined() || !Nan::New(VectorTile::constructor)->HasInstance(tile_obj))
         {
             Nan::ThrowTypeError("must provide an array of VectorTile objects");
@@ -952,7 +952,7 @@ NAN_METHOD(VectorTile::composite)
             Nan::ThrowTypeError("optional second argument must be an options object");
             return;
         }
-        v8::Local<v8::Object> options = info[1]->ToObject();
+        v8::Local<v8::Object> options = info[1]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
         if (Nan::Has(options, Nan::New("area_threshold").ToLocalChecked()).FromMaybe(false))
         {
             v8::Local<v8::Value> area_thres = options->Get(Nan::New("area_threshold").ToLocalChecked());
@@ -1192,7 +1192,7 @@ NAN_METHOD(VectorTile::composite)
             Nan::ThrowTypeError("must provide an array of VectorTile objects");
             return;
         }
-        v8::Local<v8::Object> tile_obj = val->ToObject();
+        v8::Local<v8::Object> tile_obj = val->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
         if (tile_obj->IsNull() || tile_obj->IsUndefined() || !Nan::New(VectorTile::constructor)->HasInstance(tile_obj))
         {
             delete closure;
@@ -1577,7 +1577,7 @@ NAN_METHOD(VectorTile::query)
             Nan::ThrowTypeError("optional third argument must be an options object");
             return;
         }
-        options = info[2]->ToObject();
+        options = info[2]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
         if (Nan::Has(options, Nan::New("tolerance").ToLocalChecked()).FromMaybe(false))
         {
             v8::Local<v8::Value> tol = options->Get(Nan::New("tolerance").ToLocalChecked());
@@ -1792,7 +1792,7 @@ v8::Local<v8::Array> VectorTile::_queryResultToV8(std::vector<query_result> cons
     for (auto const& item : result)
     {
         v8::Local<v8::Value> feat = Feature::NewInstance(item.feature);
-        v8::Local<v8::Object> feat_obj = feat->ToObject();
+        v8::Local<v8::Object> feat_obj = feat->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
         feat_obj->Set(Nan::New("layer").ToLocalChecked(),Nan::New<v8::String>(item.layer).ToLocalChecked());
         feat_obj->Set(Nan::New("distance").ToLocalChecked(),Nan::New<v8::Number>(item.distance));
         feat_obj->Set(Nan::New("x_hit").ToLocalChecked(),Nan::New<v8::Number>(item.x_hit));
@@ -1895,7 +1895,7 @@ NAN_METHOD(VectorTile::queryMany)
             Nan::ThrowTypeError("optional second argument must be an options object");
             return;
         }
-        options = info[1]->ToObject();
+        options = info[1]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
         if (Nan::Has(options, Nan::New("tolerance").ToLocalChecked()).FromMaybe(false))
         {
             v8::Local<v8::Value> tol = options->Get(Nan::New("tolerance").ToLocalChecked());
@@ -2124,7 +2124,7 @@ v8::Local<v8::Object> VectorTile::_queryManyResultToV8(queryMany_result const& r
     for (auto const& item : result.features)
     {
         v8::Local<v8::Value> feat = Feature::NewInstance(item.second.feature);
-        v8::Local<v8::Object> feat_obj = feat->ToObject();
+        v8::Local<v8::Object> feat_obj = feat->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
         feat_obj->Set(Nan::New("layer").ToLocalChecked(),Nan::New<v8::String>(item.second.layer).ToLocalChecked());
         features->Set(item.first, feat_obj);
     }
@@ -2516,7 +2516,7 @@ NAN_METHOD(VectorTile::toJSON)
             Nan::ThrowError("The first argument must be an object");
             return;
         }
-        v8::Local<v8::Object> options = info[0]->ToObject();
+        v8::Local<v8::Object> options = info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
 
         if (Nan::Has(options, Nan::New("decode_geometry").ToLocalChecked()).FromMaybe(false))
         {
@@ -3217,7 +3217,7 @@ NAN_METHOD(VectorTile::addGeoJSON)
             return;
         }
 
-        options = info[2]->ToObject();
+        options = info[2]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
         if (Nan::Has(options, Nan::New("area_threshold").ToLocalChecked()).FromMaybe(false))
         {
             v8::Local<v8::Value> param_val = options->Get(Nan::New("area_threshold").ToLocalChecked());
@@ -3365,7 +3365,7 @@ v8::Local<v8::Value> VectorTile::_addImageSync(Nan::NAN_METHOD_ARGS_TYPE info)
         return scope.Escape(Nan::Undefined());
     }
     std::string layer_name = TOSTR(info[1]);
-    v8::Local<v8::Object> obj = info[0]->ToObject();
+    v8::Local<v8::Object> obj = info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
     if (obj->IsNull() || 
         obj->IsUndefined() || 
         !Nan::New(Image::constructor)->HasInstance(obj))
@@ -3392,7 +3392,7 @@ v8::Local<v8::Value> VectorTile::_addImageSync(Nan::NAN_METHOD_ARGS_TYPE info)
             return scope.Escape(Nan::Undefined());
         }
 
-        v8::Local<v8::Object> options = info[2]->ToObject();
+        v8::Local<v8::Object> options = info[2]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
         if (Nan::Has(options, Nan::New("image_scaling").ToLocalChecked()).FromMaybe(false))
         {
             v8::Local<v8::Value> param_val = options->Get(Nan::New("image_scaling").ToLocalChecked());
@@ -3517,7 +3517,7 @@ NAN_METHOD(VectorTile::addImage)
         return;
     }
     std::string layer_name = TOSTR(info[1]);
-    v8::Local<v8::Object> obj = info[0]->ToObject();
+    v8::Local<v8::Object> obj = info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
     if (obj->IsNull() || 
         obj->IsUndefined() || 
         !Nan::New(Image::constructor)->HasInstance(obj))
@@ -3544,7 +3544,7 @@ NAN_METHOD(VectorTile::addImage)
             return;
         }
 
-        v8::Local<v8::Object> options = info[2]->ToObject();
+        v8::Local<v8::Object> options = info[2]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
         if (Nan::Has(options, Nan::New("image_scaling").ToLocalChecked()).FromMaybe(false))
         {
             v8::Local<v8::Value> param_val = options->Get(Nan::New("image_scaling").ToLocalChecked());
@@ -3679,7 +3679,7 @@ v8::Local<v8::Value> VectorTile::_addImageBufferSync(Nan::NAN_METHOD_ARGS_TYPE i
         return scope.Escape(Nan::Undefined());
     }
     std::string layer_name = TOSTR(info[1]);
-    v8::Local<v8::Object> obj = info[0]->ToObject();
+    v8::Local<v8::Object> obj = info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
     if (obj->IsNull() || obj->IsUndefined() || !node::Buffer::HasInstance(obj))
     {
         Nan::ThrowTypeError("first arg must be a buffer object");
@@ -3767,7 +3767,7 @@ NAN_METHOD(VectorTile::addImageBuffer)
         return;
     }
     std::string layer_name = TOSTR(info[1]);
-    v8::Local<v8::Object> obj = info[0]->ToObject();
+    v8::Local<v8::Object> obj = info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
     if (obj->IsNull() || obj->IsUndefined() || !node::Buffer::HasInstance(obj))
     {
         Nan::ThrowTypeError("first arg must be a buffer object");
@@ -3862,7 +3862,7 @@ v8::Local<v8::Value> VectorTile::_addDataSync(Nan::NAN_METHOD_ARGS_TYPE info)
         Nan::ThrowTypeError("first argument must be a buffer object");
         return scope.Escape(Nan::Undefined());
     }
-    v8::Local<v8::Object> obj = info[0]->ToObject();
+    v8::Local<v8::Object> obj = info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
     if (obj->IsNull() || obj->IsUndefined() || !node::Buffer::HasInstance(obj))
     {
         Nan::ThrowTypeError("first arg must be a buffer object");
@@ -3884,7 +3884,7 @@ v8::Local<v8::Value> VectorTile::_addDataSync(Nan::NAN_METHOD_ARGS_TYPE info)
             Nan::ThrowTypeError("second arg must be a options object");
             return scope.Escape(Nan::Undefined());
         }
-        options = info[1]->ToObject();
+        options = info[1]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
         if (Nan::Has(options, Nan::New<v8::String>("validate").ToLocalChecked()).FromMaybe(false))
         {
             v8::Local<v8::Value> param_val = options->Get(Nan::New("validate").ToLocalChecked());
@@ -3968,7 +3968,7 @@ NAN_METHOD(VectorTile::addData)
         Nan::ThrowTypeError("first argument must be a buffer object");
         return;
     }
-    v8::Local<v8::Object> obj = info[0]->ToObject();
+    v8::Local<v8::Object> obj = info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
     if (obj->IsNull() || obj->IsUndefined() || !node::Buffer::HasInstance(obj))
     {
         Nan::ThrowTypeError("first arg must be a buffer object");
@@ -3985,7 +3985,7 @@ NAN_METHOD(VectorTile::addData)
             Nan::ThrowTypeError("second arg must be a options object");
             return;
         }
-        options = info[1]->ToObject();
+        options = info[1]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
         if (Nan::Has(options, Nan::New<v8::String>("validate").ToLocalChecked()).FromMaybe(false))
         {
             v8::Local<v8::Value> param_val = options->Get(Nan::New("validate").ToLocalChecked());
@@ -4099,7 +4099,7 @@ v8::Local<v8::Value> VectorTile::_setDataSync(Nan::NAN_METHOD_ARGS_TYPE info)
         Nan::ThrowTypeError("first argument must be a buffer object");
         return scope.Escape(Nan::Undefined());
     }
-    v8::Local<v8::Object> obj = info[0]->ToObject();
+    v8::Local<v8::Object> obj = info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
     if (obj->IsNull() || obj->IsUndefined() || !node::Buffer::HasInstance(obj))
     {
         Nan::ThrowTypeError("first arg must be a buffer object");
@@ -4121,7 +4121,7 @@ v8::Local<v8::Value> VectorTile::_setDataSync(Nan::NAN_METHOD_ARGS_TYPE info)
             Nan::ThrowTypeError("second arg must be a options object");
             return scope.Escape(Nan::Undefined());
         }
-        options = info[1]->ToObject();
+        options = info[1]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
         if (Nan::Has(options, Nan::New<v8::String>("validate").ToLocalChecked()).FromMaybe(false))
         {
             v8::Local<v8::Value> param_val = options->Get(Nan::New("validate").ToLocalChecked());
@@ -4205,7 +4205,7 @@ NAN_METHOD(VectorTile::setData)
         Nan::ThrowTypeError("first argument must be a buffer object");
         return;
     }
-    v8::Local<v8::Object> obj = info[0]->ToObject();
+    v8::Local<v8::Object> obj = info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
     if (obj->IsNull() || obj->IsUndefined() || !node::Buffer::HasInstance(obj))
     {
         Nan::ThrowTypeError("first arg must be a buffer object");
@@ -4222,7 +4222,7 @@ NAN_METHOD(VectorTile::setData)
             Nan::ThrowTypeError("second arg must be a options object");
             return;
         }
-        options = info[1]->ToObject();
+        options = info[1]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
         if (Nan::Has(options, Nan::New<v8::String>("validate").ToLocalChecked()).FromMaybe(false))
         {
             v8::Local<v8::Value> param_val = options->Get(Nan::New("validate").ToLocalChecked());
@@ -4349,7 +4349,7 @@ v8::Local<v8::Value> VectorTile::_getDataSync(Nan::NAN_METHOD_ARGS_TYPE info)
             return scope.Escape(Nan::Undefined());
         }
 
-        options = info[0]->ToObject();
+        options = info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
 
         if (Nan::Has(options, Nan::New<v8::String>("compression").ToLocalChecked()).FromMaybe(false))
         {
@@ -4359,7 +4359,7 @@ v8::Local<v8::Value> VectorTile::_getDataSync(Nan::NAN_METHOD_ARGS_TYPE info)
                 Nan::ThrowTypeError("option 'compression' must be a string, either 'gzip', or 'none' (default)");
                 return scope.Escape(Nan::Undefined());
             }
-            compress = std::string("gzip") == (TOSTR(param_val->ToString()));
+            compress = std::string("gzip") == (TOSTR(param_val->ToString(Nan::GetCurrentContext()).ToLocalChecked()));
         }
 
         if (Nan::Has(options, Nan::New<v8::String>("level").ToLocalChecked()).FromMaybe(false))
@@ -4385,23 +4385,23 @@ v8::Local<v8::Value> VectorTile::_getDataSync(Nan::NAN_METHOD_ARGS_TYPE info)
                 Nan::ThrowTypeError("option 'strategy' must be one of the following strings: FILTERED, HUFFMAN_ONLY, RLE, FIXED, DEFAULT");
                 return scope.Escape(Nan::Undefined());
             }
-            else if (std::string("FILTERED") == TOSTR(param_val->ToString()))
+            else if (std::string("FILTERED") == TOSTR(param_val->ToString(Nan::GetCurrentContext()).ToLocalChecked()))
             {
                 strategy = Z_FILTERED;
             }
-            else if (std::string("HUFFMAN_ONLY") == TOSTR(param_val->ToString()))
+            else if (std::string("HUFFMAN_ONLY") == TOSTR(param_val->ToString(Nan::GetCurrentContext()).ToLocalChecked()))
             {
                 strategy = Z_HUFFMAN_ONLY;
             }
-            else if (std::string("RLE") == TOSTR(param_val->ToString()))
+            else if (std::string("RLE") == TOSTR(param_val->ToString(Nan::GetCurrentContext()).ToLocalChecked()))
             {
                 strategy = Z_RLE;
             }
-            else if (std::string("FIXED") == TOSTR(param_val->ToString()))
+            else if (std::string("FIXED") == TOSTR(param_val->ToString(Nan::GetCurrentContext()).ToLocalChecked()))
             {
                 strategy = Z_FIXED;
             }
-            else if (std::string("DEFAULT") == TOSTR(param_val->ToString()))
+            else if (std::string("DEFAULT") == TOSTR(param_val->ToString(Nan::GetCurrentContext()).ToLocalChecked()))
             {
                 strategy = Z_DEFAULT_STRATEGY;
             }
@@ -4514,7 +4514,7 @@ NAN_METHOD(VectorTile::getData)
             return;
         }
 
-        options = info[0]->ToObject();
+        options = info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
 
         if (Nan::Has(options, Nan::New("compression").ToLocalChecked()).FromMaybe(false))
         {
@@ -4524,7 +4524,7 @@ NAN_METHOD(VectorTile::getData)
                 Nan::ThrowTypeError("option 'compression' must be a string, either 'gzip', or 'none' (default)");
                 return;
             }
-            compress = std::string("gzip") == (TOSTR(param_val->ToString()));
+            compress = std::string("gzip") == (TOSTR(param_val->ToString(Nan::GetCurrentContext()).ToLocalChecked()));
         }
 
         if (Nan::Has(options, Nan::New("level").ToLocalChecked()).FromMaybe(false))
@@ -4550,23 +4550,23 @@ NAN_METHOD(VectorTile::getData)
                 Nan::ThrowTypeError("option 'strategy' must be one of the following strings: FILTERED, HUFFMAN_ONLY, RLE, FIXED, DEFAULT");
                 return;
             }
-            else if (std::string("FILTERED") == TOSTR(param_val->ToString()))
+            else if (std::string("FILTERED") == TOSTR(param_val->ToString(Nan::GetCurrentContext()).ToLocalChecked()))
             {
                 strategy = Z_FILTERED;
             }
-            else if (std::string("HUFFMAN_ONLY") == TOSTR(param_val->ToString()))
+            else if (std::string("HUFFMAN_ONLY") == TOSTR(param_val->ToString(Nan::GetCurrentContext()).ToLocalChecked()))
             {
                 strategy = Z_HUFFMAN_ONLY;
             }
-            else if (std::string("RLE") == TOSTR(param_val->ToString()))
+            else if (std::string("RLE") == TOSTR(param_val->ToString(Nan::GetCurrentContext()).ToLocalChecked()))
             {
                 strategy = Z_RLE;
             }
-            else if (std::string("FIXED") == TOSTR(param_val->ToString()))
+            else if (std::string("FIXED") == TOSTR(param_val->ToString(Nan::GetCurrentContext()).ToLocalChecked()))
             {
                 strategy = Z_FIXED;
             }
-            else if (std::string("DEFAULT") == TOSTR(param_val->ToString()))
+            else if (std::string("DEFAULT") == TOSTR(param_val->ToString(Nan::GetCurrentContext()).ToLocalChecked()))
             {
                 strategy = Z_DEFAULT_STRATEGY;
             }
@@ -4812,7 +4812,7 @@ NAN_METHOD(VectorTile::render)
         Nan::ThrowTypeError("mapnik.Map expected as first arg");
         return;
     }
-    v8::Local<v8::Object> obj = info[0]->ToObject();
+    v8::Local<v8::Object> obj = info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
     if (obj->IsNull() || obj->IsUndefined() || !Nan::New(Map::constructor)->HasInstance(obj))
     {
         Nan::ThrowTypeError("mapnik.Map expected as first arg");
@@ -4825,7 +4825,7 @@ NAN_METHOD(VectorTile::render)
         Nan::ThrowTypeError("a renderable mapnik object is expected as second arg");
         return;
     }
-    v8::Local<v8::Object> im_obj = info[1]->ToObject();
+    v8::Local<v8::Object> im_obj = info[1]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
 
     // ensure callback is a function
     v8::Local<v8::Value> callback = info[info.Length()-1];
@@ -4849,7 +4849,7 @@ NAN_METHOD(VectorTile::render)
             Nan::ThrowTypeError("optional third argument must be an options object");
             return;
         }
-        options = info[2]->ToObject();
+        options = info[2]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
         if (Nan::Has(options, Nan::New("z").ToLocalChecked()).FromMaybe(false))
         {
             v8::Local<v8::Value> bind_opt = options->Get(Nan::New("z").ToLocalChecked());
@@ -4950,7 +4950,7 @@ NAN_METHOD(VectorTile::render)
                 Nan::ThrowTypeError("optional arg 'variables' must be an object");
                 return;
             }
-            object_to_container(closure->variables,bind_opt->ToObject());
+            object_to_container(closure->variables,bind_opt->ToObject(Nan::GetCurrentContext()).ToLocalChecked());
         }
     }
 
@@ -6070,7 +6070,7 @@ v8::Local<v8::Value> VectorTile::_reportGeometryValiditySync(Nan::NAN_METHOD_ARG
             Nan::ThrowError("The first argument must be an object");
             return scope.Escape(Nan::Undefined());
         }
-        v8::Local<v8::Object> options = info[0]->ToObject();
+        v8::Local<v8::Object> options = info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
 
         if (Nan::Has(options, Nan::New("split_multi_features").ToLocalChecked()).FromMaybe(false))
         {
@@ -6238,7 +6238,7 @@ NAN_METHOD(VectorTile::reportGeometryValidity)
             Nan::ThrowError("The first argument must be an object");
             return;
         }
-        v8::Local<v8::Object> options = info[0]->ToObject();
+        v8::Local<v8::Object> options = info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
 
         if (Nan::Has(options, Nan::New("split_multi_features").ToLocalChecked()).FromMaybe(false))
         {
@@ -6512,7 +6512,7 @@ NAN_METHOD(VectorTile::info)
         return;
     }
 
-    v8::Local<v8::Object> obj = info[0]->ToObject();
+    v8::Local<v8::Object> obj = info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
     if (obj->IsNull() || obj->IsUndefined() || !node::Buffer::HasInstance(obj))
     {
         Nan::ThrowTypeError("first argument is invalid, must be a Buffer");

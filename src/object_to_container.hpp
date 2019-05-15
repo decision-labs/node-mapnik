@@ -13,10 +13,10 @@ static inline void object_to_container(mapnik::attributes & cont, v8::Local<v8::
     mapnik::transcoder tr("utf8");
     cont.reserve(a_length);
     for(std::size_t i=0; i < a_length; ++i) {
-        v8::Local<v8::Value> name = names->Get(i)->ToString();
+        v8::Local<v8::Value> name = names->Get(i)->ToString(Nan::GetCurrentContext()).ToLocalChecked();
         v8::Local<v8::Value> value = vars->Get(name);
         if (value->IsBoolean()) {
-            cont[TOSTR(name)] = value->ToBoolean()->Value();
+            cont[TOSTR(name)] = value->ToBoolean(Nan::GetCurrentContext()).ToLocalChecked()->Value();
         } else if (value->IsString()) {
             cont[TOSTR(name)] = tr.transcode(TOSTR(value));
         } else if (value->IsNumber()) {
