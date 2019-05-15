@@ -158,7 +158,7 @@ NAN_METHOD(MemoryDatasource::featureset)
                 return;
             }
             v8::Local<v8::Object> options = info[0]->ToObject();
-            if (options->Has(Nan::GetCurrentContext(), Nan::New("extent").ToLocalChecked()).ToChecked())
+            if (Nan::Has(options, Nan::New("extent").ToLocalChecked()).FromMaybe(false))
             {
                 v8::Local<v8::Value> extent_opt = options->Get(Nan::New("extent").ToLocalChecked());
                 if (!extent_opt->IsArray())
@@ -227,9 +227,9 @@ NAN_METHOD(MemoryDatasource::add)
 
     if (obj->Has(Nan::GetCurrentContext(), Nan::New("wkt").ToLocalChecked()).ToChecked() ||
 			(obj->Has(Nan::GetCurrentContext(), Nan::New("x").ToLocalChecked()).ToChecked() &&
-			 obj->Has(Nan::GetCurrentContext(), Nan::New("y").ToLocalChecked()).ToChecked()))
+			 obj->Has(Nan::GetCurrentContext(), Nan::New("y").ToLocalChecked()).FromMaybe(false)))
     {
-        if (obj->Has(Nan::GetCurrentContext(), Nan::New("wkt").ToLocalChecked()).ToChecked())
+        if (obj->Has(Nan::GetCurrentContext(), Nan::New("wkt").ToLocalChecked()).FromMaybe(false))
         {
             Nan::ThrowError("wkt not yet supported");
             return;
@@ -243,7 +243,7 @@ NAN_METHOD(MemoryDatasource::add)
             mapnik::feature_ptr feature(mapnik::feature_factory::create(ctx,d->feature_id_));
             ++(d->feature_id_);
             feature->set_geometry(mapnik::geometry::point<double>(x->NumberValue(Nan::GetCurrentContext()).ToChecked(),y->NumberValue(Nan::GetCurrentContext()).ToChecked()));
-            if (obj->Has(Nan::GetCurrentContext(), Nan::New("properties").ToLocalChecked()).ToChecked())
+            if (obj->Has(Nan::GetCurrentContext(), Nan::New("properties").ToLocalChecked()).FromMaybe(false))
             {
                 v8::Local<v8::Value> props = obj->Get(Nan::New("properties").ToLocalChecked());
                 if (props->IsObject())

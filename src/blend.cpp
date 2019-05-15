@@ -558,7 +558,7 @@ NAN_METHOD(Blend) {
             }
         }
 
-        if (options->Has(Nan::GetCurrentContext(), Nan::New("compression").ToLocalChecked()).ToChecked()) {
+        if (Nan::Has(options, Nan::New("compression").ToLocalChecked()).FromMaybe(false)) {
             v8::Local<v8::Value> compression_val = options->Get(Nan::New("compression").ToLocalChecked());
             if (!compression_val.IsEmpty() && compression_val->IsNumber())
             {
@@ -612,7 +612,7 @@ NAN_METHOD(Blend) {
             bool valid = false;
             if (buffer->IsObject()) {
                 v8::Local<v8::Object> props = buffer->ToObject();
-                valid = props->Has(Nan::GetCurrentContext(), Nan::New("buffer").ToLocalChecked()).ToChecked() &&
+                valid = Nan::Has(props, Nan::New("buffer").ToLocalChecked()).FromMaybe(false) &&
                         node::Buffer::HasInstance(props->Get(Nan::New("buffer").ToLocalChecked()));
             }
             if (!valid) {
@@ -639,7 +639,7 @@ NAN_METHOD(Blend) {
             image->buffer.Reset(buffer.As<v8::Object>());
         } else if (buffer->IsObject()) {
             v8::Local<v8::Object> props = buffer->ToObject();
-            if (props->Has(Nan::GetCurrentContext(), Nan::New("buffer").ToLocalChecked()).ToChecked()) {
+            if (Nan::Has(props, Nan::New("buffer").ToLocalChecked()).FromMaybe(false)) {
                 buffer = props->Get(Nan::New("buffer").ToLocalChecked());
                 if (node::Buffer::HasInstance(buffer)) {
                     image->buffer.Reset(buffer.As<v8::Object>());

@@ -95,7 +95,8 @@ NAN_METHOD(Grid::New)
             }
             v8::Local<v8::Object> options = info[2].As<v8::Object>();
 
-            if (options->Has(Nan::GetCurrentContext(), Nan::New("key").ToLocalChecked()).ToChecked()) {
+            if (Nan::Has(options, Nan::New("key").ToLocalChecked()).FromMaybe(false))
+			{
                 v8::Local<v8::Value> bind_opt = options->Get(Nan::New("key").ToLocalChecked());
                 if (!bind_opt->IsString())
                 {
@@ -363,7 +364,7 @@ NAN_METHOD(Grid::encodeSync)
 
         v8::Local<v8::Object> options = info[0].As<v8::Object>();
 
-        if (options->Has(Nan::GetCurrentContext(), Nan::New("resolution").ToLocalChecked()).ToChecked())
+        if (Nan::Has(options, Nan::New("resolution").ToLocalChecked()).FromMaybe(false))
         {
             v8::Local<v8::Value> bind_opt = options->Get(Nan::New("resolution").ToLocalChecked());
             if (!bind_opt->IsNumber())
@@ -380,7 +381,7 @@ NAN_METHOD(Grid::encodeSync)
             }
         }
 
-        if (options->Has(Nan::GetCurrentContext(), Nan::New("features").ToLocalChecked()).ToChecked())
+        if (Nan::Has(options, Nan::New("features").ToLocalChecked()).FromMaybe(false))
         {
             v8::Local<v8::Value> bind_opt = options->Get(Nan::New("features").ToLocalChecked());
             if (!bind_opt->IsBoolean())
@@ -474,7 +475,7 @@ NAN_METHOD(Grid::encode)
 
         v8::Local<v8::Object> options = info[0].As<v8::Object>();
 
-        if (options->Has(Nan::GetCurrentContext(), Nan::New("resolution").ToLocalChecked()).ToChecked())
+        if (Nan::Has(options, Nan::New("resolution").ToLocalChecked()).FromMaybe(false))
         {
             v8::Local<v8::Value> bind_opt = options->Get(Nan::New("resolution").ToLocalChecked());
             if (!bind_opt->IsNumber())
@@ -491,7 +492,7 @@ NAN_METHOD(Grid::encode)
             }
         }
 
-        if (options->Has(Nan::GetCurrentContext(), Nan::New("features").ToLocalChecked()).ToChecked())
+        if (Nan::Has(options, Nan::New("features").ToLocalChecked()).FromMaybe(false))
         {
             v8::Local<v8::Value> bind_opt = options->Get(Nan::New("features").ToLocalChecked());
             if (!bind_opt->IsBoolean())
