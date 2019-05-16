@@ -40,7 +40,7 @@ void Logger::Initialize(v8::Local<v8::Object> target) {
     // DEBUG
 
     // Not sure if needed...
-    target->Set(Nan::New("Logger").ToLocalChecked(), Nan::GetFunction(lcons).ToLocalChecked());
+    Nan::Set(target, Nan::New("Logger").ToLocalChecked(), Nan::GetFunction(lcons).ToLocalChecked());
     constructor.Reset(lcons);
 
 }
