@@ -18,15 +18,15 @@ fi
 if [ ! -f ./mason_packages/.link/bin/mapnik-config ]; then
 
     # mapnik deps
-    install jpeg_turbo 1.5.1
-    install libpng 1.6.28
-    install libtiff 4.0.7
+    install jpeg_turbo 1.5.2
+    install libpng 1.6.37
+    install libtiff 4.0.8
     install icu ${ICU_VERSION}
-    install proj 4.9.3
+    install proj 5.2.0
     install pixman 0.34.0
-    install cairo 1.14.8
+    install cairo 1.14.12
     install webp 0.6.0
-    install libgdal 2.1.3
+    install gdal 2.4.1 libgdal
     install boost 1.65.1
     install boost_libsystem 1.65.1
     install boost_libfilesystem 1.65.1

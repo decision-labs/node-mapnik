@@ -51,8 +51,8 @@ void Grid::Initialize(v8::Local<v8::Object> target) {
     ATTR(lcons, "key", get_key, set_key);
     ATTR(lcons, "metrics_enabled", get_metrics_enabled, set_metrics_enabled);
 
-    target->Set(Nan::New("Grid").ToLocalChecked(), lcons->GetFunction());
-    NODE_MAPNIK_DEFINE_64_BIT_CONSTANT(lcons->GetFunction(), "base_mask", mapnik::grid::base_mask);
+    Nan::Set(target, Nan::New("Grid").ToLocalChecked(), Nan::GetFunction(lcons).ToLocalChecked());
+    NODE_MAPNIK_DEFINE_64_BIT_CONSTANT(Nan::GetFunction(lcons).ToLocalChecked(), "base_mask", mapnik::grid::base_mask);
 
     constructor.Reset(lcons);
 }
@@ -95,8 +95,9 @@ NAN_METHOD(Grid::New)
             }
             v8::Local<v8::Object> options = info[2].As<v8::Object>();
 
-            if (options->Has(Nan::New("key").ToLocalChecked())) {
-                v8::Local<v8::Value> bind_opt = options->Get(Nan::New("key").ToLocalChecked());
+            if (Nan::Has(options, Nan::New("key").ToLocalChecked()).FromMaybe(false))
+			{
+                v8::Local<v8::Value> bind_opt = Nan::Get(options, Nan::New("key").ToLocalChecked()).ToLocalChecked();
                 if (!bind_opt->IsString())
                 {
                     Nan::ThrowTypeError("optional arg 'key' must be an string");
@@ -107,7 +108,7 @@ NAN_METHOD(Grid::New)
             }
         }
 
-        Grid* g = new Grid(info[0]->IntegerValue(), info[1]->IntegerValue(), key);
+        Grid* g = new Grid(info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked(), info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked(), key);
         g->Wrap(info.This());
         info.GetReturnValue().Set(info.This());
         return;
@@ -186,6 +187,7 @@ void Grid::EIO_Clear(uv_work_t* req)
 void Grid::EIO_AfterClear(uv_work_t* req)
 {
     Nan::HandleScope scope;
+	Nan::AsyncResource async_resource(__func__);
     clear_grid_baton_t *closure = static_cast<clear_grid_baton_t *>(req->data);
     if (closure->error)
     {
@@ -194,13 +196,13 @@ void Grid::EIO_AfterClear(uv_work_t* req)
         // coverage
         /* LCOV_EXCL_START */
         v8::Local<v8::Value> argv[1] = { Nan::Error(closure->error_name.c_str()) };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
         /* LCOV_EXCL_STOP */
     }
     else
     {
         v8::Local<v8::Value> argv[2] = { Nan::Null(), closure->g->handle() };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
     closure->g->Unref();
     closure->cb.Reset();
@@ -302,7 +304,7 @@ NAN_METHOD(Grid::fields)
     for (; itr != end; ++itr)
     {
         std::string name = *itr;
-        l->Set(idx, Nan::New<v8::String>(name).ToLocalChecked());
+        Nan::Set(l, idx, Nan::New<v8::String>(name).ToLocalChecked());
         ++idx;
     }
     info.GetReturnValue().Set(l);
@@ -327,10 +329,10 @@ NAN_METHOD(Grid::view)
         return;
     }
 
-    unsigned x = info[0]->IntegerValue();
-    unsigned y = info[1]->IntegerValue();
-    unsigned w = info[2]->IntegerValue();
-    unsigned h = info[3]->IntegerValue();
+    unsigned x = info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+    unsigned y = info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+    unsigned w = info[2]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+    unsigned h = info[3]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
 
     Grid* g = Nan::ObjectWrap::Unwrap<Grid>(info.Holder());
     info.GetReturnValue().Set(GridView::NewInstance(g,x,y,w,h));
@@ -362,16 +364,16 @@ NAN_METHOD(Grid::encodeSync)
 
         v8::Local<v8::Object> options = info[0].As<v8::Object>();
 
-        if (options->Has(Nan::New("resolution").ToLocalChecked()))
+        if (Nan::Has(options, Nan::New("resolution").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> bind_opt = options->Get(Nan::New("resolution").ToLocalChecked());
+            v8::Local<v8::Value> bind_opt = Nan::Get(options, Nan::New("resolution").ToLocalChecked()).ToLocalChecked();
             if (!bind_opt->IsNumber())
             {
                 Nan::ThrowTypeError("'resolution' must be an Integer");
                 return;
             }
 
-            resolution = bind_opt->IntegerValue();
+            resolution = bind_opt->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             if (resolution == 0)
             {
                 Nan::ThrowTypeError("'resolution' can not be zero");
@@ -379,16 +381,16 @@ NAN_METHOD(Grid::encodeSync)
             }
         }
 
-        if (options->Has(Nan::New("features").ToLocalChecked()))
+        if (Nan::Has(options, Nan::New("features").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> bind_opt = options->Get(Nan::New("features").ToLocalChecked());
+            v8::Local<v8::Value> bind_opt = Nan::Get(options, Nan::New("features").ToLocalChecked()).ToLocalChecked();
             if (!bind_opt->IsBoolean())
             {
                 Nan::ThrowTypeError("'features' must be an Boolean");
                 return;
             }
 
-            add_features = bind_opt->BooleanValue();
+            add_features = bind_opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
         }
     }
 
@@ -404,7 +406,7 @@ NAN_METHOD(Grid::encodeSync)
         unsigned int i;
         for (it = key_order.begin(), i = 0; it < key_order.end(); ++it, ++i)
         {
-            keys_a->Set(i, Nan::New<v8::String>(*it).ToLocalChecked());
+            Nan::Set(keys_a, i, Nan::New<v8::String>(*it).ToLocalChecked());
         }
 
         mapnik::grid const& grid_type = *g->get();
@@ -424,11 +426,11 @@ NAN_METHOD(Grid::encodeSync)
         for (unsigned j=0;j<lines.size();++j)
         {
             node_mapnik::grid_line_type const & line = lines[j];
-            grid_array->Set(j, Nan::New<v8::String>(line.get(),array_size).ToLocalChecked());
+            Nan::Set(grid_array, j, Nan::New<v8::String>(line.get(),array_size).ToLocalChecked());
         }
-        json->Set(Nan::New("grid").ToLocalChecked(), grid_array);
-        json->Set(Nan::New("keys").ToLocalChecked(), keys_a);
-        json->Set(Nan::New("data").ToLocalChecked(), feature_data);
+        Nan::Set(json, Nan::New("grid").ToLocalChecked(), grid_array);
+        Nan::Set(json, Nan::New("keys").ToLocalChecked(), keys_a);
+        Nan::Set(json, Nan::New("data").ToLocalChecked(), feature_data);
         info.GetReturnValue().Set(json);
 
     }
@@ -473,16 +475,16 @@ NAN_METHOD(Grid::encode)
 
         v8::Local<v8::Object> options = info[0].As<v8::Object>();
 
-        if (options->Has(Nan::New("resolution").ToLocalChecked()))
+        if (Nan::Has(options, Nan::New("resolution").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> bind_opt = options->Get(Nan::New("resolution").ToLocalChecked());
+            v8::Local<v8::Value> bind_opt = Nan::Get(options, Nan::New("resolution").ToLocalChecked()).ToLocalChecked();
             if (!bind_opt->IsNumber())
             {
                 Nan::ThrowTypeError("'resolution' must be an Integer");
                 return;
             }
 
-            resolution = bind_opt->IntegerValue();
+            resolution = bind_opt->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             if (resolution == 0)
             {
                 Nan::ThrowTypeError("'resolution' can not be zero");
@@ -490,16 +492,16 @@ NAN_METHOD(Grid::encode)
             }
         }
 
-        if (options->Has(Nan::New("features").ToLocalChecked()))
+        if (Nan::Has(options, Nan::New("features").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> bind_opt = options->Get(Nan::New("features").ToLocalChecked());
+            v8::Local<v8::Value> bind_opt = Nan::Get(options, Nan::New("features").ToLocalChecked()).ToLocalChecked();
             if (!bind_opt->IsBoolean())
             {
                 Nan::ThrowTypeError("'features' must be an Boolean");
                 return;
             }
 
-            add_features = bind_opt->BooleanValue();
+            add_features = bind_opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
         }
     }
 
@@ -549,7 +551,7 @@ void Grid::EIO_Encode(uv_work_t* req)
 void Grid::EIO_AfterEncode(uv_work_t* req)
 {
     Nan::HandleScope scope;
-
+	Nan::AsyncResource async_resource(__func__);
     encode_grid_baton_t *closure = static_cast<encode_grid_baton_t *>(req->data);
 
 
@@ -559,7 +561,7 @@ void Grid::EIO_AfterEncode(uv_work_t* req)
         // so simply removing the following from coverage
         /* LCOV_EXCL_START */
         v8::Local<v8::Value> argv[1] = { Nan::Error(closure->error_name.c_str()) };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
         /* LCOV_EXCL_STOP */
     }
     else
@@ -571,7 +573,7 @@ void Grid::EIO_AfterEncode(uv_work_t* req)
         unsigned int i;
         for (it = closure->key_order.begin(), i = 0; it < closure->key_order.end(); ++it, ++i)
         {
-            keys_a->Set(i, Nan::New<v8::String>(*it).ToLocalChecked());
+            Nan::Set(keys_a, i, Nan::New<v8::String>(*it).ToLocalChecked());
         }
 
         mapnik::grid const& grid_type = *closure->g->get();
@@ -590,14 +592,14 @@ void Grid::EIO_AfterEncode(uv_work_t* req)
         for (unsigned j=0;j<closure->lines.size();++j)
         {
             node_mapnik::grid_line_type const & line = closure->lines[j];
-            grid_array->Set(j, Nan::New<v8::String>(line.get(),array_size).ToLocalChecked());
+            Nan::Set(grid_array, j, Nan::New<v8::String>(line.get(),array_size).ToLocalChecked());
         }
-        json->Set(Nan::New("grid").ToLocalChecked(), grid_array);
-        json->Set(Nan::New("keys").ToLocalChecked(), keys_a);
-        json->Set(Nan::New("data").ToLocalChecked(), feature_data);
+        Nan::Set(json, Nan::New("grid").ToLocalChecked(), grid_array);
+        Nan::Set(json, Nan::New("keys").ToLocalChecked(), keys_a);
+        Nan::Set(json, Nan::New("data").ToLocalChecked(), feature_data);
 
         v8::Local<v8::Value> argv[2] = { Nan::Null(), json };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
 
     closure->g->Unref();
@@ -626,7 +628,7 @@ NAN_SETTER(Grid::set_metrics_enabled)
     }
     else
     {
-        bool val = value->BooleanValue();
+        bool val = value->BooleanValue(Nan::GetCurrentContext()).ToChecked();
         g->this_->metrics_.enabled_ = val;
     }
 #endif

@@ -47,7 +47,7 @@ void ImageView::Initialize(v8::Local<v8::Object> target) {
     Nan::SetPrototypeMethod(lcons, "isSolidSync", isSolidSync);
     Nan::SetPrototypeMethod(lcons, "getPixel", getPixel);
 
-    target->Set(Nan::New("ImageView").ToLocalChecked(),lcons->GetFunction());
+    Nan::Set(target, Nan::New("ImageView").ToLocalChecked(),Nan::GetFunction(lcons).ToLocalChecked());
     constructor.Reset(lcons);
 }
 
@@ -98,7 +98,7 @@ v8::Local<v8::Value> ImageView::NewInstance(Image * JSImage ,
     ImageView* imv = new ImageView(JSImage);
     imv->this_ = std::make_shared<mapnik::image_view_any>(mapnik::create_view(*(JSImage->get()),x,y,w,h));
     v8::Local<v8::Value> ext = Nan::New<v8::External>(imv);
-    v8::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::New(constructor)->GetFunction(), 1, &ext);
+    v8::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::GetFunction(Nan::New(constructor)).ToLocalChecked(), 1, &ext);
     if (maybe_local.IsEmpty()) Nan::ThrowError("Could not create new ImageView instance");
     return scope.Escape(maybe_local.ToLocalChecked());
 }
@@ -253,10 +253,11 @@ struct visitor_get_pixel_view
 void ImageView::EIO_AfterIsSolid(uv_work_t* req)
 {
     Nan::HandleScope scope;
+	Nan::AsyncResource async_resource(__func__);
     is_solid_image_view_baton_t *closure = static_cast<is_solid_image_view_baton_t *>(req->data);
     if (closure->error) {
         v8::Local<v8::Value> argv[1] = { Nan::Error(closure->error_name.c_str()) };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
     else
     {
@@ -266,12 +267,12 @@ void ImageView::EIO_AfterIsSolid(uv_work_t* req)
                                      Nan::New(closure->result),
                                      mapnik::util::apply_visitor(visitor_get_pixel_view(0,0),*(closure->im->this_)),
             };
-            Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 3, argv);
+            async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 3, argv);
         }
         else
         {
             v8::Local<v8::Value> argv[2] = { Nan::Null(), Nan::New(closure->result) };
-            Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+            async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
         }
     }
     closure->im->Unref();
@@ -314,15 +315,16 @@ NAN_METHOD(ImageView::getPixel)
             return;
         }
 
-        v8::Local<v8::Object> options = info[2]->ToObject();
+        v8::Local<v8::Object> options = info[2]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
 
-        if (options->Has(Nan::New("get_color").ToLocalChecked())) {
-            v8::Local<v8::Value> bind_opt = options->Get(Nan::New("get_color").ToLocalChecked());
+        if (Nan::Has(options, Nan::New("get_color").ToLocalChecked()).FromMaybe(false))
+		{
+            v8::Local<v8::Value> bind_opt = Nan::Get(options, Nan::New("get_color").ToLocalChecked()).ToLocalChecked();
             if (!bind_opt->IsBoolean()) {
                 Nan::ThrowTypeError("optional arg 'color' must be a boolean");
                 return;
             }
-            get_color = bind_opt->BooleanValue();
+            get_color = bind_opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
         }
 
     }
@@ -336,8 +338,8 @@ NAN_METHOD(ImageView::getPixel)
             Nan::ThrowTypeError("second arg, 'y' must be an integer");
             return;
         }
-        x = info[0]->IntegerValue();
-        y = info[1]->IntegerValue();
+        x = info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+        y = info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
     } else {
         Nan::ThrowTypeError("must supply x,y to query pixel color");
         return;
@@ -398,9 +400,9 @@ NAN_METHOD(ImageView::encodeSync)
 
         v8::Local<v8::Object> options = info[1].As<v8::Object>();
 
-        if (options->Has(Nan::New("palette").ToLocalChecked()))
-        {
-            v8::Local<v8::Value> format_opt = options->Get(Nan::New("palette").ToLocalChecked());
+        if (Nan::Has(options, Nan::New("palette").ToLocalChecked()).FromMaybe(false))
+		{
+            v8::Local<v8::Value> format_opt = Nan::Get(options, Nan::New("palette").ToLocalChecked()).ToLocalChecked();
             if (!format_opt->IsObject()) {
                 Nan::ThrowTypeError("'palette' must be an object");
                 return;
@@ -471,9 +473,9 @@ NAN_METHOD(ImageView::encode)
 
         v8::Local<v8::Object> options = info[1].As<v8::Object>();
 
-        if (options->Has(Nan::New("palette").ToLocalChecked()))
+        if (Nan::Has(options, Nan::New("palette").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> format_opt = options->Get(Nan::New("palette").ToLocalChecked());
+            v8::Local<v8::Value> format_opt = Nan::Get(options, Nan::New("palette").ToLocalChecked()).ToLocalChecked();
             if (!format_opt->IsObject()) {
                 Nan::ThrowTypeError("'palette' must be an object");
                 return;
@@ -530,17 +532,18 @@ void ImageView::AsyncEncode(uv_work_t* req)
 void ImageView::AfterEncode(uv_work_t* req)
 {
     Nan::HandleScope scope;
+	Nan::AsyncResource async_resource(__func__);
 
     encode_image_view_baton_t *baton = static_cast<encode_image_view_baton_t *>(req->data);
 
     if (!baton->error_name.empty()) {
         v8::Local<v8::Value> argv[1] = { Nan::Error(baton->error_name.c_str()) };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(baton->cb), 1, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(baton->cb), 1, argv);
     }
     else
     {
         v8::Local<v8::Value> argv[2] = { Nan::Null(), Nan::CopyBuffer((char*)baton->result.data(), baton->result.size()).ToLocalChecked() };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(baton->cb), 2, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(baton->cb), 2, argv);
     }
 
     baton->im->Unref();
