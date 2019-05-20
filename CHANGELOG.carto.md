@@ -1,5 +1,13 @@
 # CARTO node-mapnik changelog
 
+## 3.6.2-carto.15
+
+**Release date**: 2019-05-20
+
+Changes:
+ - Update mapnik to [v3.0.15.16](https://github.com/CartoDB/mapnik/blob/v3.0.15.16/CHANGELOG.carto.md#301516) which fixes an issue with the markers cache.
+
+
 ## 3.6.2-carto.14
 
 **Release date**: 2019-05-17
