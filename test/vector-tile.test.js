@@ -3020,7 +3020,7 @@ describe('mapnik.VectorTile ', function() {
         done();
     });
 
-    it('should be able to render data->vtile and vtile->image with roughly the same results', function(done) {
+    it('should be able to render data->vtile and vtile->image with roughtly the same results', function(done) {
         var x=3;
         var y=2;
         var z=2;
