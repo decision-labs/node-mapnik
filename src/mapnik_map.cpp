@@ -851,7 +851,7 @@ void Map::EIO_QueryMap(uv_work_t* req)
     }
 }
 
-void Map::EIO_AfterQueryMap(uv_work_t* req)
+void Map::EIO_AfterQueryMap(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -1147,7 +1147,7 @@ void Map::EIO_Load(uv_work_t* req)
     }
 }
 
-void Map::EIO_AfterLoad(uv_work_t* req)
+void Map::EIO_AfterLoad(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -1426,7 +1426,7 @@ void Map::EIO_FromString(uv_work_t* req)
     }
 }
 
-void Map::EIO_AfterFromString(uv_work_t* req)
+void Map::EIO_AfterFromString(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -2198,7 +2198,7 @@ void Map::EIO_RenderVectorTile(uv_work_t* req)
     }
 }
 
-void Map::EIO_AfterRenderVectorTile(uv_work_t* req)
+void Map::EIO_AfterRenderVectorTile(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -2269,7 +2269,7 @@ void Map::EIO_RenderGrid(uv_work_t* req)
     }
 }
 
-void Map::EIO_AfterRenderGrid(uv_work_t* req)
+void Map::EIO_AfterRenderGrid(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -2321,7 +2321,7 @@ void Map::EIO_RenderImage(uv_work_t* req)
     }
 }
 
-void Map::EIO_AfterRenderImage(uv_work_t* req)
+void Map::EIO_AfterRenderImage(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -2554,7 +2554,7 @@ void Map::EIO_RenderFile(uv_work_t* req)
     }
 }
 
-void Map::EIO_AfterRenderFile(uv_work_t* req)
+void Map::EIO_AfterRenderFile(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);

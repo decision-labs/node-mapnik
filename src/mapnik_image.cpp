@@ -769,7 +769,7 @@ void Image::EIO_Filter(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterFilter(uv_work_t* req)
+void Image::EIO_AfterFilter(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -994,7 +994,7 @@ void Image::EIO_Fill(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterFill(uv_work_t* req)
+void Image::EIO_AfterFill(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -1108,7 +1108,7 @@ void Image::EIO_Clear(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterClear(uv_work_t* req)
+void Image::EIO_AfterClear(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -1264,7 +1264,7 @@ void Image::EIO_Premultiply(uv_work_t* req)
     mapnik::premultiply_alpha(*closure->im->this_);
 }
 
-void Image::EIO_AfterMultiply(uv_work_t* req)
+void Image::EIO_AfterMultiply(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -1399,7 +1399,7 @@ void Image::EIO_IsSolid(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterIsSolid(uv_work_t* req)
+void Image::EIO_AfterIsSolid(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -1606,7 +1606,7 @@ void Image::EIO_Copy(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterCopy(uv_work_t* req)
+void Image::EIO_AfterCopy(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -2081,7 +2081,7 @@ void Image::EIO_Resize(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterResize(uv_work_t* req)
+void Image::EIO_AfterResize(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -2518,7 +2518,7 @@ void Image::EIO_Open(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterOpen(uv_work_t* req)
+void Image::EIO_AfterOpen(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -3019,7 +3019,7 @@ void Image::EIO_FromSVG(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterFromSVG(uv_work_t* req)
+void Image::EIO_AfterFromSVG(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -3261,7 +3261,7 @@ void Image::EIO_FromSVGBytes(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterFromSVGBytes(uv_work_t* req)
+void Image::EIO_AfterFromSVGBytes(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -3600,7 +3600,7 @@ void Image::EIO_FromBytes(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterFromBytes(uv_work_t* req)
+void Image::EIO_AfterFromBytes(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -3831,7 +3831,7 @@ void Image::EIO_Encode(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterEncode(uv_work_t* req)
+void Image::EIO_AfterEncode(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -4035,7 +4035,7 @@ void Image::EIO_Save(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterSave(uv_work_t* req)
+void Image::EIO_AfterSave(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -4265,7 +4265,7 @@ void Image::EIO_Composite(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterComposite(uv_work_t* req)
+void Image::EIO_AfterComposite(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);

@@ -184,7 +184,7 @@ void Grid::EIO_Clear(uv_work_t* req)
     }
 }
 
-void Grid::EIO_AfterClear(uv_work_t* req)
+void Grid::EIO_AfterClear(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -548,7 +548,7 @@ void Grid::EIO_Encode(uv_work_t* req)
     }
 }
 
-void Grid::EIO_AfterEncode(uv_work_t* req)
+void Grid::EIO_AfterEncode(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);

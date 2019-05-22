@@ -418,7 +418,7 @@ void Work_Blend(uv_work_t* req)
     Blend_Encode(target, baton, alpha);
 }
 
-void Work_AfterBlend(uv_work_t* req) {
+void EIO_AfterBlend(uv_work_t* req, int) {
     Nan::HandleScope scope;
     BlendBaton* baton = static_cast<BlendBaton*>(req->data);
 	Nan::AsyncResource async_resource(__func__);
@@ -674,7 +674,7 @@ NAN_METHOD(Blend) {
         baton->images.push_back(image);
     }
 
-    uv_queue_work(uv_default_loop(), &(baton.release())->request, Work_Blend, (uv_after_work_cb)Work_AfterBlend);
+    uv_queue_work(uv_default_loop(), &(baton.release())->request, Work_Blend, (uv_after_work_cb)EIO_AfterBlend);
 
     return;
 }

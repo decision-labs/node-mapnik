@@ -1239,7 +1239,7 @@ void VectorTile::EIO_Composite(uv_work_t* req)
     }
 }
 
-void VectorTile::EIO_AfterComposite(uv_work_t* req)
+void VectorTile::EIO_AfterComposite(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -1652,7 +1652,7 @@ void VectorTile::EIO_Query(uv_work_t* req)
     }
 }
 
-void VectorTile::EIO_AfterQuery(uv_work_t* req)
+void VectorTile::EIO_AfterQuery(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -2161,7 +2161,7 @@ void VectorTile::EIO_QueryMany(uv_work_t* req)
     }
 }
 
-void VectorTile::EIO_AfterQueryMany(uv_work_t* req)
+void VectorTile::EIO_AfterQueryMany(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -3622,7 +3622,7 @@ void VectorTile::EIO_AddImage(uv_work_t* req)
     }
 }
 
-void VectorTile::EIO_AfterAddImage(uv_work_t* req)
+void VectorTile::EIO_AfterAddImage(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -3807,7 +3807,7 @@ void VectorTile::EIO_AddImageBuffer(uv_work_t* req)
     }
 }
 
-void VectorTile::EIO_AfterAddImageBuffer(uv_work_t* req)
+void VectorTile::EIO_AfterAddImageBuffer(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -4046,7 +4046,7 @@ void VectorTile::EIO_AddData(uv_work_t* req)
     }
 }
 
-void VectorTile::EIO_AfterAddData(uv_work_t* req)
+void VectorTile::EIO_AfterAddData(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -4285,7 +4285,7 @@ void VectorTile::EIO_SetData(uv_work_t* req)
     }
 }
 
-void VectorTile::EIO_AfterSetData(uv_work_t* req)
+void VectorTile::EIO_AfterSetData(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -5305,7 +5305,7 @@ void VectorTile::EIO_RenderTile(uv_work_t* req)
     }
 }
 
-void VectorTile::EIO_AfterRenderTile(uv_work_t* req)
+void VectorTile::EIO_AfterRenderTile(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -5430,7 +5430,7 @@ void VectorTile::EIO_Clear(uv_work_t* req)
     }
 }
 
-void VectorTile::EIO_AfterClear(uv_work_t* req)
+void VectorTile::EIO_AfterClear(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -6178,7 +6178,7 @@ void VectorTile::EIO_ReportGeometrySimplicity(uv_work_t* req)
     }
 }
 
-void VectorTile::EIO_AfterReportGeometrySimplicity(uv_work_t* req)
+void VectorTile::EIO_AfterReportGeometrySimplicity(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -6310,7 +6310,7 @@ void VectorTile::EIO_ReportGeometryValidity(uv_work_t* req)
     }
 }
 
-void VectorTile::EIO_AfterReportGeometryValidity(uv_work_t* req)
+void VectorTile::EIO_AfterReportGeometryValidity(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);

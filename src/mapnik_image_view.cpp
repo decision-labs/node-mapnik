@@ -250,7 +250,7 @@ struct visitor_get_pixel_view
 
 };
 
-void ImageView::EIO_AfterIsSolid(uv_work_t* req)
+void ImageView::EIO_AfterIsSolid(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -504,7 +504,7 @@ NAN_METHOD(ImageView::encode)
     baton->format = format;
     baton->palette = palette;
     baton->cb.Reset(callback.As<v8::Function>());
-    uv_queue_work(uv_default_loop(), &baton->request, AsyncEncode, (uv_after_work_cb)AfterEncode);
+    uv_queue_work(uv_default_loop(), &baton->request, AsyncEncode, (uv_after_work_cb)EIO_AfterEncode);
     im->Ref();
     return;
 }
@@ -529,7 +529,7 @@ void ImageView::AsyncEncode(uv_work_t* req)
     }
 }
 
-void ImageView::AfterEncode(uv_work_t* req)
+void ImageView::EIO_AfterEncode(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);

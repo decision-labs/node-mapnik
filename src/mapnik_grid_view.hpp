@@ -6,6 +6,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic ignored "-Wcast-function-type"
 #include <nan.h>
 #pragma GCC diagnostic pop
 
@@ -29,13 +30,13 @@ public:
     static NAN_METHOD(encode);
     static NAN_METHOD(fields);
     static void EIO_Encode(uv_work_t* req);
-    static void EIO_AfterEncode(uv_work_t* req);
+    static void EIO_AfterEncode(uv_work_t* req, int);
 
     static NAN_METHOD(width);
     static NAN_METHOD(height);
     static NAN_METHOD(isSolid);
     static void EIO_IsSolid(uv_work_t* req);
-    static void EIO_AfterIsSolid(uv_work_t* req);
+    static void EIO_AfterIsSolid(uv_work_t* req, int);
     static v8::Local<v8::Value> _isSolidSync(Nan::NAN_METHOD_ARGS_TYPE info);
     static NAN_METHOD(isSolidSync);
     static NAN_METHOD(getPixel);

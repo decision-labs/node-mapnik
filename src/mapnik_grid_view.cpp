@@ -183,7 +183,7 @@ void GridView::EIO_IsSolid(uv_work_t* req)
     }
 }
 
-void GridView::EIO_AfterIsSolid(uv_work_t* req)
+void GridView::EIO_AfterIsSolid(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -482,7 +482,7 @@ void GridView::EIO_Encode(uv_work_t* req)
     }
 }
 
-void GridView::EIO_AfterEncode(uv_work_t* req)
+void GridView::EIO_AfterEncode(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);

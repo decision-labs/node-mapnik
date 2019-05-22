@@ -4,6 +4,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic ignored "-Wcast-function-type"
 #include <nan.h>
 #pragma GCC diagnostic pop
 
@@ -68,7 +69,7 @@ public:
     static NAN_METHOD(toJSON);
     static NAN_METHOD(query);
     static void EIO_Query(uv_work_t* req);
-    static void EIO_AfterQuery(uv_work_t* req);
+    static void EIO_AfterQuery(uv_work_t* req, int);
     static std::vector<query_result> _query(VectorTile* d, double lon, double lat, double tolerance, std::string const& layer_name);
     static bool _querySort(query_result const& a, query_result const& b);
     static v8::Local<v8::Array> _queryResultToV8(std::vector<query_result> const& result);
@@ -77,7 +78,7 @@ public:
     static bool _queryManySort(query_hit const& a, query_hit const& b);
     static v8::Local<v8::Object> _queryManyResultToV8(queryMany_result const& result);
     static void EIO_QueryMany(uv_work_t* req);
-    static void EIO_AfterQueryMany(uv_work_t* req);
+    static void EIO_AfterQueryMany(uv_work_t* req, int);
     static NAN_METHOD(extent);
     static NAN_METHOD(bufferedExtent);
     static NAN_METHOD(names);
@@ -92,48 +93,48 @@ public:
     static NAN_METHOD(addGeoJSON);
     static NAN_METHOD(addImage);
     static void EIO_AddImage(uv_work_t* req);
-    static void EIO_AfterAddImage(uv_work_t* req);
+    static void EIO_AfterAddImage(uv_work_t* req, int);
     static v8::Local<v8::Value> _addImageSync(Nan::NAN_METHOD_ARGS_TYPE info);
     static NAN_METHOD(addImageSync);
     static NAN_METHOD(addImageBuffer);
     static void EIO_AddImageBuffer(uv_work_t* req);
-    static void EIO_AfterAddImageBuffer(uv_work_t* req);
+    static void EIO_AfterAddImageBuffer(uv_work_t* req, int);
     static v8::Local<v8::Value> _addImageBufferSync(Nan::NAN_METHOD_ARGS_TYPE info);
     static NAN_METHOD(addImageBufferSync);
     static void EIO_RenderTile(uv_work_t* req);
-    static void EIO_AfterRenderTile(uv_work_t* req);
+    static void EIO_AfterRenderTile(uv_work_t* req, int);
     static NAN_METHOD(setData);
     static void EIO_SetData(uv_work_t* req);
-    static void EIO_AfterSetData(uv_work_t* req);
+    static void EIO_AfterSetData(uv_work_t* req, int);
     static v8::Local<v8::Value> _setDataSync(Nan::NAN_METHOD_ARGS_TYPE info);
     static NAN_METHOD(setDataSync);
     static NAN_METHOD(addData);
     static void EIO_AddData(uv_work_t* req);
-    static void EIO_AfterAddData(uv_work_t* req);
+    static void EIO_AfterAddData(uv_work_t* req, int);
     static v8::Local<v8::Value> _addDataSync(Nan::NAN_METHOD_ARGS_TYPE info);
     static NAN_METHOD(addDataSync);
     static NAN_METHOD(composite);
     static NAN_METHOD(compositeSync);
     static v8::Local<v8::Value> _compositeSync(Nan::NAN_METHOD_ARGS_TYPE info);
     static void EIO_Composite(uv_work_t* req);
-    static void EIO_AfterComposite(uv_work_t* req);
+    static void EIO_AfterComposite(uv_work_t* req, int);
     static NAN_METHOD(painted);
     static NAN_METHOD(clearSync);
     static v8::Local<v8::Value> _clearSync(Nan::NAN_METHOD_ARGS_TYPE info);
     static NAN_METHOD(clear);
     static void EIO_Clear(uv_work_t* req);
-    static void EIO_AfterClear(uv_work_t* req);
+    static void EIO_AfterClear(uv_work_t* req, int);
     static NAN_METHOD(empty);
     static NAN_METHOD(info);
 #if BOOST_VERSION >= 105800
     static NAN_METHOD(reportGeometrySimplicity);
     static void EIO_ReportGeometrySimplicity(uv_work_t* req);
-    static void EIO_AfterReportGeometrySimplicity(uv_work_t* req);
+    static void EIO_AfterReportGeometrySimplicity(uv_work_t* req, int);
     static NAN_METHOD(reportGeometrySimplicitySync);
     static v8::Local<v8::Value> _reportGeometrySimplicitySync(Nan::NAN_METHOD_ARGS_TYPE info);
     static NAN_METHOD(reportGeometryValidity);
     static void EIO_ReportGeometryValidity(uv_work_t* req);
-    static void EIO_AfterReportGeometryValidity(uv_work_t* req);
+    static void EIO_AfterReportGeometryValidity(uv_work_t* req, int);
     static NAN_METHOD(reportGeometryValiditySync);
     static v8::Local<v8::Value> _reportGeometryValiditySync(Nan::NAN_METHOD_ARGS_TYPE info);
 #endif // BOOST_VERSION >= 105800
