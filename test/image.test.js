@@ -63,7 +63,7 @@ describe('mapnik.Image ', function() {
 
     it('should encode with a pallete', function(done) {
         var im = new mapnik.Image(256, 256);
-        var pal = new mapnik.Palette(new Buffer('\xff\x09\x93\xFF\x01\x02\x03\x04','ascii'));
+        var pal = new mapnik.Palette(new Buffer.from('\xff\x09\x93\xFF\x01\x02\x03\x04','ascii'));
         assert.ok(im.encodeSync('png', {palette:pal}));
         im.encode('png', {palette:pal}, function(err, result) {
             if (err) throw err;
@@ -99,13 +99,13 @@ describe('mapnik.Image ', function() {
         assert.throws(function() { mapnik.Image.fromBytes({}); });
         assert.throws(function() { mapnik.Image.fromBytes({}, function(err, result) {}); });
         assert.throws(function() { mapnik.Image.fromBytesSync({}); });
-        assert.throws(function() { mapnik.Image.fromBytes(new Buffer(0)); });
-        assert.throws(function() { mapnik.Image.fromBytes(new Buffer(0),{premultiply:1},function(){}); });
-        assert.throws(function() { mapnik.Image.fromBytes(new Buffer(0), null); });
-        assert.throws(function() { mapnik.Image.fromBytesSync(new Buffer(1024)); });
-        var buffer = new Buffer('\x89\x50\x4E\x47\x0D\x0A\x1A\x0A' + new Array(48).join('\0'), 'binary');
+        assert.throws(function() { mapnik.Image.fromBytes(new Buffer.from(0)); });
+        assert.throws(function() { mapnik.Image.fromBytes(new Buffer.from(0),{premultiply:1},function(){}); });
+        assert.throws(function() { mapnik.Image.fromBytes(new Buffer.from(0), null); });
+        assert.throws(function() { mapnik.Image.fromBytesSync(new Buffer.from(1024)); });
+        var buffer = new Buffer.from('\x89\x50\x4E\x47\x0D\x0A\x1A\x0A' + new Array(48).join('\0'), 'binary');
         assert.throws(function() { mapnik.Image.fromBytesSync(buffer); });
-        buffer = new Buffer('\x89\x50\x4E\x47\x0D\x0A\x1A\x0A', 'binary');
+        buffer = new Buffer.from('\x89\x50\x4E\x47\x0D\x0A\x1A\x0A', 'binary');
         assert.throws(function() { mapnik.Image.fromBytesSync(buffer); });
         var stuff = mapnik.Image.fromBytes(buffer, function(err, result) {
             assert.throws(function() { if (err) throw err; });
@@ -1562,7 +1562,7 @@ describe('mapnik.Image ', function() {
     });
 
     it('should fail to use fromBufferSync due to bad input', function() {
-        var b = new Buffer(16);
+        var b = new Buffer.alloc(16);
         assert.throws(function() { var im = new mapnik.Image.fromBufferSync(); });
         assert.throws(function() { var im = new mapnik.Image.fromBufferSync(null, null, null); });
         assert.throws(function() { var im = new mapnik.Image.fromBufferSync(null, 2, b); });
