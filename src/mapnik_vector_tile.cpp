@@ -1200,10 +1200,10 @@ NAN_METHOD(VectorTile::composite)
             return;
         }
         VectorTile* vt = Nan::ObjectWrap::Unwrap<VectorTile>(tile_obj);
-        vt->Ref();
+        vt->_ref();
         closure->vtiles.push_back(vt);
     }
-    closure->d->Ref();
+    closure->d->_ref();
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Composite, (uv_after_work_cb)EIO_AfterComposite);
     return;
@@ -1257,9 +1257,9 @@ void VectorTile::EIO_AfterComposite(uv_work_t* req, int)
     }
     for (VectorTile* vt : closure->vtiles)
     {
-        vt->Unref();
+        vt->_unref();
     }
-    closure->d->Unref();
+    closure->d->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -1633,7 +1633,7 @@ NAN_METHOD(VectorTile::query)
         closure->error = false;
         closure->cb.Reset(callback.As<v8::Function>());
         uv_queue_work(uv_default_loop(), &closure->request, EIO_Query, (uv_after_work_cb)EIO_AfterQuery);
-        d->Ref();
+        d->_ref();
         return;
     }
 }
@@ -1670,7 +1670,7 @@ void VectorTile::EIO_AfterQuery(uv_work_t* req, int)
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
 
-    closure->d->Unref();
+    closure->d->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -1978,7 +1978,7 @@ NAN_METHOD(VectorTile::queryMany)
         closure->request.data = closure;
         closure->cb.Reset(callback.As<v8::Function>());
         uv_queue_work(uv_default_loop(), &closure->request, EIO_QueryMany, (uv_after_work_cb)EIO_AfterQueryMany);
-        d->Ref();
+        d->_ref();
         return;
     }
 }
@@ -2179,7 +2179,7 @@ void VectorTile::EIO_AfterQueryMany(uv_work_t* req, int)
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
 
-    closure->d->Unref();
+    closure->d->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -3091,7 +3091,7 @@ NAN_METHOD(VectorTile::toGeoJSON)
     v8::Local<v8::Value> callback = info[info.Length()-1];
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, to_geojson, (uv_after_work_cb)after_to_geojson);
-    closure->v->Ref();
+    closure->v->_ref();
     return;
 }
 
@@ -3147,7 +3147,7 @@ void VectorTile::after_to_geojson(uv_work_t* req)
         v8::Local<v8::Value> argv[2] = { Nan::Null(), Nan::New<v8::String>(closure->result).ToLocalChecked() };
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
-    closure->v->Unref();
+    closure->v->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -3584,7 +3584,7 @@ NAN_METHOD(VectorTile::addImage)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_AddImage, (uv_after_work_cb)EIO_AfterAddImage);
-    d->Ref();
+    d->_ref();
     im->_ref();
     return;
 }
@@ -3638,7 +3638,7 @@ void VectorTile::EIO_AfterAddImage(uv_work_t* req, int)
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
 
-    closure->d->Unref();
+    closure->d->_unref();
     closure->im->_unref();
     closure->cb.Reset();
     delete closure;
@@ -3786,7 +3786,7 @@ NAN_METHOD(VectorTile::addImageBuffer)
     closure->data = node::Buffer::Data(obj);
     closure->dataLength = node::Buffer::Length(obj);
     uv_queue_work(uv_default_loop(), &closure->request, EIO_AddImageBuffer, (uv_after_work_cb)EIO_AfterAddImageBuffer);
-    d->Ref();
+    d->_ref();
     return;
 }
 
@@ -3825,7 +3825,7 @@ void VectorTile::EIO_AfterAddImageBuffer(uv_work_t* req, int)
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
 
-    closure->d->Unref();
+    closure->d->_unref();
     closure->cb.Reset();
     closure->buffer.Reset();
     delete closure;
@@ -4021,7 +4021,7 @@ NAN_METHOD(VectorTile::addData)
     closure->data = node::Buffer::Data(obj);
     closure->dataLength = node::Buffer::Length(obj);
     uv_queue_work(uv_default_loop(), &closure->request, EIO_AddData, (uv_after_work_cb)EIO_AfterAddData);
-    d->Ref();
+    d->_ref();
     return;
 }
 
@@ -4062,7 +4062,7 @@ void VectorTile::EIO_AfterAddData(uv_work_t* req, int)
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
 
-    closure->d->Unref();
+    closure->d->_unref();
     closure->cb.Reset();
     closure->buffer.Reset();
     delete closure;
@@ -4258,7 +4258,7 @@ NAN_METHOD(VectorTile::setData)
     closure->data = node::Buffer::Data(obj);
     closure->dataLength = node::Buffer::Length(obj);
     uv_queue_work(uv_default_loop(), &closure->request, EIO_SetData, (uv_after_work_cb)EIO_AfterSetData);
-    d->Ref();
+    d->_ref();
     return;
 }
 
@@ -4301,7 +4301,7 @@ void VectorTile::EIO_AfterSetData(uv_work_t* req, int)
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
 
-    closure->d->Unref();
+    closure->d->_unref();
     closure->cb.Reset();
     closure->buffer.Reset();
     delete closure;
@@ -4588,7 +4588,7 @@ NAN_METHOD(VectorTile::getData)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, get_data, (uv_after_work_cb)after_get_data);
-    d->Ref();
+    d->_ref();
     return;
 }
 
@@ -4662,7 +4662,7 @@ void VectorTile::after_get_data(uv_work_t* req)
         }
     }
 
-    closure->d->Unref();
+    closure->d->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -4677,6 +4677,20 @@ using surface_type = mapnik::util::variant
      ,Grid *
 #endif
      >;
+
+struct ref_visitor
+{
+    void operator() (dummy_surface) {} // no-op
+    template <typename SurfaceType>
+    void operator() (SurfaceType * surface)
+    {
+        if (surface != nullptr)
+        {
+            surface->_ref();
+        }
+    }
+};
+
 
 struct deref_visitor
 {
@@ -4735,11 +4749,6 @@ struct vector_tile_render_baton_t
         zxy_override(false),
         error(false)
         {}
-
-    ~vector_tile_render_baton_t()
-    {
-        mapnik::util::apply_visitor(deref_visitor(),surface);
-    }
 };
 
 struct baton_guard
@@ -4958,7 +4967,6 @@ NAN_METHOD(VectorTile::render)
     if (Nan::New(Image::constructor)->HasInstance(im_obj))
     {
         Image *im = Nan::ObjectWrap::Unwrap<Image>(im_obj);
-        im->_ref();
         closure->width = im->get()->width();
         closure->height = im->get()->height();
         closure->surface = im;
@@ -4966,7 +4974,6 @@ NAN_METHOD(VectorTile::render)
     else if (Nan::New(CairoSurface::constructor)->HasInstance(im_obj))
     {
         CairoSurface *c = Nan::ObjectWrap::Unwrap<CairoSurface>(im_obj);
-        c->_ref();
         closure->width = c->width();
         closure->height = c->height();
         closure->surface = c;
@@ -4998,7 +5005,6 @@ NAN_METHOD(VectorTile::render)
     else if (Nan::New(Grid::constructor)->HasInstance(im_obj))
     {
         Grid *g = Nan::ObjectWrap::Unwrap<Grid>(im_obj);
-        g->_ref();
         closure->width = g->get()->width();
         closure->height = g->get()->height();
         closure->surface = g;
@@ -5099,8 +5105,9 @@ NAN_METHOD(VectorTile::render)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_RenderTile, (uv_after_work_cb)EIO_AfterRenderTile);
+    mapnik::util::apply_visitor(ref_visitor(), closure->surface);
     m->_ref();
-    d->Ref();
+    d->_ref();
     guard.release();
     return;
 }
@@ -5336,8 +5343,9 @@ void VectorTile::EIO_AfterRenderTile(uv_work_t* req, int)
         }
     }
 
+	mapnik::util::apply_visitor(deref_visitor(), closure->surface);
     closure->m->_unref();
-    closure->d->Unref();
+    closure->d->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -5409,7 +5417,7 @@ NAN_METHOD(VectorTile::clear)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Clear, (uv_after_work_cb)EIO_AfterClear);
-    d->Ref();
+    d->_ref();
     return;
 }
 
@@ -5448,7 +5456,7 @@ void VectorTile::EIO_AfterClear(uv_work_t* req, int)
         v8::Local<v8::Value> argv[1] = { Nan::Null() };
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
-    closure->d->Unref();
+    closure->d->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -6158,7 +6166,7 @@ NAN_METHOD(VectorTile::reportGeometrySimplicity)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_ReportGeometrySimplicity, (uv_after_work_cb)EIO_AfterReportGeometrySimplicity);
-    closure->v->Ref();
+    closure->v->_ref();
     return;
 }
 
@@ -6196,7 +6204,7 @@ void VectorTile::EIO_AfterReportGeometrySimplicity(uv_work_t* req, int)
         v8::Local<v8::Value> argv[2] = { Nan::Null(), array };
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
-    closure->v->Unref();
+    closure->v->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -6290,7 +6298,7 @@ NAN_METHOD(VectorTile::reportGeometryValidity)
     closure->web_merc = web_merc;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_ReportGeometryValidity, (uv_after_work_cb)EIO_AfterReportGeometryValidity);
-    closure->v->Ref();
+    closure->v->_ref();
     return;
 }
 
@@ -6328,7 +6336,7 @@ void VectorTile::EIO_AfterReportGeometryValidity(uv_work_t* req, int)
         v8::Local<v8::Value> argv[2] = { Nan::Null(), array };
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
-    closure->v->Unref();
+    closure->v->_unref();
     closure->cb.Reset();
     delete closure;
 }

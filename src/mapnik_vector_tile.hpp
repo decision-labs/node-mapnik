@@ -193,12 +193,12 @@ public:
     
     void _ref()
     { 
-        Ref(); 
+        Ref();
     }
     
     void _unref()
     { 
-        Unref(); 
+        Unref();
     }
 
 private:

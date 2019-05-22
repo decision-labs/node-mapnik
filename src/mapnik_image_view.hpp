@@ -46,6 +46,9 @@ public:
 
     ImageView(Image * JSImage);
 
+    void _ref() { Ref(); }
+    void _unref() { Unref(); }
+
 private:
     ~ImageView();
     image_view_ptr this_;

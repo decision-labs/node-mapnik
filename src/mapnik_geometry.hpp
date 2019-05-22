@@ -29,6 +29,9 @@ public:
     static void to_json(uv_work_t* req);
     static void EIO_After_to_json(uv_work_t* req, int);
     Geometry(mapnik::feature_ptr f);
+
+    void _ref() { Ref(); }
+    void _unref() { Unref(); }
 private:
     ~Geometry();
     mapnik::feature_ptr feat_;

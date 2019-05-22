@@ -44,6 +44,9 @@ public:
     GridView(Grid * JSGrid);
     inline grid_view_ptr get() { return this_; }
 
+    void _ref() { Ref(); }
+    void _unref() { Unref(); }
+
 private:
     ~GridView();
     grid_view_ptr this_;

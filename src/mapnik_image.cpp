@@ -751,7 +751,7 @@ NAN_METHOD(Image::filter)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Filter, (uv_after_work_cb)EIO_AfterFilter);
-    im->Ref();
+    im->_ref();
     return;
 }
 
@@ -784,7 +784,7 @@ void Image::EIO_AfterFilter(uv_work_t* req, int)
         v8::Local<v8::Value> argv[2] = { Nan::Null(), closure->im->handle() };
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
-    closure->im->Unref();
+    closure->im->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -960,7 +960,7 @@ NAN_METHOD(Image::fill)
         closure->error = false;
         closure->cb.Reset(callback.As<v8::Function>());
         uv_queue_work(uv_default_loop(), &closure->request, EIO_Fill, (uv_after_work_cb)EIO_AfterFill);
-        im->Ref();
+        im->_ref();
     }
     return;
 }
@@ -1009,7 +1009,7 @@ void Image::EIO_AfterFill(uv_work_t* req, int)
         v8::Local<v8::Value> argv[2] = { Nan::Null(), closure->im->handle() };
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
-    closure->im->Unref();
+    closure->im->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -1090,7 +1090,7 @@ NAN_METHOD(Image::clear)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Clear, (uv_after_work_cb)EIO_AfterClear);
-    im->Ref();
+    im->_ref();
     return;
 }
 
@@ -1123,7 +1123,7 @@ void Image::EIO_AfterClear(uv_work_t* req, int)
         v8::Local<v8::Value> argv[2] = { Nan::Null(), closure->im->handle() };
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
-    closure->im->Unref();
+    closure->im->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -1254,7 +1254,7 @@ NAN_METHOD(Image::premultiply)
     closure->im = im;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Premultiply, (uv_after_work_cb)EIO_AfterMultiply);
-    im->Ref();
+    im->_ref();
     return;
 }
 
@@ -1271,7 +1271,7 @@ void Image::EIO_AfterMultiply(uv_work_t* req, int)
     image_op_baton_t *closure = static_cast<image_op_baton_t *>(req->data);
     v8::Local<v8::Value> argv[2] = { Nan::Null(), closure->im->handle() };
     async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
-    closure->im->Unref();
+    closure->im->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -1326,7 +1326,7 @@ NAN_METHOD(Image::demultiply)
     closure->im = im;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Demultiply, (uv_after_work_cb)EIO_AfterMultiply);
-    im->Ref();
+    im->_ref();
     return;
 }
 
@@ -1381,7 +1381,7 @@ NAN_METHOD(Image::isSolid)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_IsSolid, (uv_after_work_cb)EIO_AfterIsSolid);
-    im->Ref();
+    im->_ref();
     return;
 }
 
@@ -1424,7 +1424,7 @@ void Image::EIO_AfterIsSolid(uv_work_t* req, int)
             async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
         }
     }
-    closure->im->Unref();
+    closure->im->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -1583,7 +1583,7 @@ NAN_METHOD(Image::copy)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Copy, (uv_after_work_cb)EIO_AfterCopy);
-    closure->im1->Ref();
+    closure->im1->_ref();
     return;
 }
 
@@ -1634,7 +1634,7 @@ void Image::EIO_AfterCopy(uv_work_t* req, int)
         v8::Local<v8::Value> argv[2] = { Nan::Null(), maybe_local.ToLocalChecked() };
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
-    closure->im1->Unref();
+    closure->im1->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -1927,7 +1927,7 @@ NAN_METHOD(Image::resize)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Resize, (uv_after_work_cb)EIO_AfterResize);
-    closure->im1->Ref();
+    closure->im1->_ref();
     return;
 }
 
@@ -2100,7 +2100,7 @@ void Image::EIO_AfterResize(uv_work_t* req, int)
         v8::Local<v8::Value> argv[2] = { Nan::Null(), maybe_local.ToLocalChecked() };
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
-    closure->im1->Unref();
+    closure->im1->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -3805,7 +3805,7 @@ NAN_METHOD(Image::encode)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Encode, (uv_after_work_cb)EIO_AfterEncode);
-    im->Ref();
+    im->_ref();
 
     return;
 }
@@ -3848,7 +3848,7 @@ void Image::EIO_AfterEncode(uv_work_t* req, int)
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
 
-    closure->im->Unref();
+    closure->im->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -4015,7 +4015,7 @@ NAN_METHOD(Image::save)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Save, (uv_after_work_cb)EIO_AfterSave);
-    im->Ref();
+    im->_ref();
     return;
 }
 
@@ -4050,7 +4050,7 @@ void Image::EIO_AfterSave(uv_work_t* req, int)
         v8::Local<v8::Value> argv[1] = { Nan::Null() };
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
-    closure->im->Unref();
+    closure->im->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -4235,8 +4235,8 @@ NAN_METHOD(Image::composite)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Composite, (uv_after_work_cb)EIO_AfterComposite);
-    closure->im1->Ref();
-    closure->im2->Ref();
+    closure->im1->_ref();
+    closure->im2->_ref();
     return;
 }
 
@@ -4281,8 +4281,8 @@ void Image::EIO_AfterComposite(uv_work_t* req, int)
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
 
-    closure->im1->Unref();
-    closure->im2->Unref();
+    closure->im1->_unref();
+    closure->im2->_unref();
     closure->cb.Reset();
     delete closure;
 }

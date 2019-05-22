@@ -134,7 +134,7 @@ NAN_METHOD(ImageView::isSolid)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_IsSolid, (uv_after_work_cb)EIO_AfterIsSolid);
-    im->Ref();
+    im->_ref();
     return;
 }
 
@@ -275,7 +275,7 @@ void ImageView::EIO_AfterIsSolid(uv_work_t* req, int)
             async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
         }
     }
-    closure->im->Unref();
+    closure->im->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -505,7 +505,7 @@ NAN_METHOD(ImageView::encode)
     baton->palette = palette;
     baton->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &baton->request, AsyncEncode, (uv_after_work_cb)EIO_AfterEncode);
-    im->Ref();
+    im->_ref();
     return;
 }
 
@@ -546,7 +546,7 @@ void ImageView::EIO_AfterEncode(uv_work_t* req, int)
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(baton->cb), 2, argv);
     }
 
-    baton->im->Unref();
+    baton->im->_unref();
     baton->cb.Reset();
     delete baton;
 }
