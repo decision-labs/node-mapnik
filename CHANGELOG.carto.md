@@ -8,6 +8,7 @@ Changes:
  - Silence GCC warnings around uv_after_work_cb functions.
  - Tests: Avoid Buffer() constructor.
  - Avoid dangling references when an error happenned before an async task.
+ - mapnik_image: Avoid throwing in callbacks as it leaks resources.
 
 ## 3.6.2-carto.15
 
