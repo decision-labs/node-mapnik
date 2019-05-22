@@ -1,5 +1,14 @@
 # CARTO node-mapnik changelog
 
+## 3.6.2-carto.16
+
+**Release date**: 2019-XX-XX
+
+Changes:
+ - Silence GCC warnings around uv_after_work_cb functions.
+ - Tests: Avoid Buffer() constructor.
+ - Avoid dangling references when an error happenned before an async task.
+
 ## 3.6.2-carto.15
 
 **Release date**: 2019-05-20
