@@ -244,8 +244,8 @@ NAN_METHOD(Geometry::toJSON)
     }
     v8::Local<v8::Value> callback = info[info.Length()-1];
     closure->cb.Reset(callback.As<v8::Function>());
-    uv_queue_work(uv_default_loop(), &closure->request, to_json, (uv_after_work_cb)after_to_json);
-    closure->g->Ref();
+    uv_queue_work(uv_default_loop(), &closure->request, to_json, (uv_after_work_cb)EIO_After_to_json);
+    closure->g->_ref();
     return;
 }
 
@@ -292,7 +292,7 @@ void Geometry::to_json(uv_work_t* req)
     }
 }
 
-void Geometry::after_to_json(uv_work_t* req)
+void Geometry::EIO_After_to_json(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
     to_json_baton *closure = static_cast<to_json_baton *>(req->data);
@@ -311,7 +311,7 @@ void Geometry::after_to_json(uv_work_t* req)
         v8::Local<v8::Value> argv[2] = { Nan::Null(), Nan::New<v8::String>(closure->result).ToLocalChecked() };
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
-    closure->g->Unref();
+    closure->g->_unref();
     if (closure->tr) {
         closure->tr->_unref();
     }

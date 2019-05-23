@@ -751,7 +751,7 @@ NAN_METHOD(Image::filter)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Filter, (uv_after_work_cb)EIO_AfterFilter);
-    im->Ref();
+    im->_ref();
     return;
 }
 
@@ -769,7 +769,7 @@ void Image::EIO_Filter(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterFilter(uv_work_t* req)
+void Image::EIO_AfterFilter(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -784,7 +784,7 @@ void Image::EIO_AfterFilter(uv_work_t* req)
         v8::Local<v8::Value> argv[2] = { Nan::Null(), closure->im->handle() };
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
-    closure->im->Unref();
+    closure->im->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -960,7 +960,7 @@ NAN_METHOD(Image::fill)
         closure->error = false;
         closure->cb.Reset(callback.As<v8::Function>());
         uv_queue_work(uv_default_loop(), &closure->request, EIO_Fill, (uv_after_work_cb)EIO_AfterFill);
-        im->Ref();
+        im->_ref();
     }
     return;
 }
@@ -994,7 +994,7 @@ void Image::EIO_Fill(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterFill(uv_work_t* req)
+void Image::EIO_AfterFill(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -1009,7 +1009,7 @@ void Image::EIO_AfterFill(uv_work_t* req)
         v8::Local<v8::Value> argv[2] = { Nan::Null(), closure->im->handle() };
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
-    closure->im->Unref();
+    closure->im->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -1090,7 +1090,7 @@ NAN_METHOD(Image::clear)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Clear, (uv_after_work_cb)EIO_AfterClear);
-    im->Ref();
+    im->_ref();
     return;
 }
 
@@ -1108,7 +1108,7 @@ void Image::EIO_Clear(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterClear(uv_work_t* req)
+void Image::EIO_AfterClear(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -1123,7 +1123,7 @@ void Image::EIO_AfterClear(uv_work_t* req)
         v8::Local<v8::Value> argv[2] = { Nan::Null(), closure->im->handle() };
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
-    closure->im->Unref();
+    closure->im->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -1254,7 +1254,7 @@ NAN_METHOD(Image::premultiply)
     closure->im = im;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Premultiply, (uv_after_work_cb)EIO_AfterMultiply);
-    im->Ref();
+    im->_ref();
     return;
 }
 
@@ -1264,14 +1264,14 @@ void Image::EIO_Premultiply(uv_work_t* req)
     mapnik::premultiply_alpha(*closure->im->this_);
 }
 
-void Image::EIO_AfterMultiply(uv_work_t* req)
+void Image::EIO_AfterMultiply(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
     image_op_baton_t *closure = static_cast<image_op_baton_t *>(req->data);
     v8::Local<v8::Value> argv[2] = { Nan::Null(), closure->im->handle() };
     async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
-    closure->im->Unref();
+    closure->im->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -1326,7 +1326,7 @@ NAN_METHOD(Image::demultiply)
     closure->im = im;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Demultiply, (uv_after_work_cb)EIO_AfterMultiply);
-    im->Ref();
+    im->_ref();
     return;
 }
 
@@ -1381,7 +1381,7 @@ NAN_METHOD(Image::isSolid)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_IsSolid, (uv_after_work_cb)EIO_AfterIsSolid);
-    im->Ref();
+    im->_ref();
     return;
 }
 
@@ -1399,7 +1399,7 @@ void Image::EIO_IsSolid(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterIsSolid(uv_work_t* req)
+void Image::EIO_AfterIsSolid(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -1424,7 +1424,7 @@ void Image::EIO_AfterIsSolid(uv_work_t* req)
             async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
         }
     }
-    closure->im->Unref();
+    closure->im->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -1583,7 +1583,7 @@ NAN_METHOD(Image::copy)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Copy, (uv_after_work_cb)EIO_AfterCopy);
-    closure->im1->Ref();
+    closure->im1->_ref();
     return;
 }
 
@@ -1606,7 +1606,7 @@ void Image::EIO_Copy(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterCopy(uv_work_t* req)
+void Image::EIO_AfterCopy(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -1630,11 +1630,19 @@ void Image::EIO_AfterCopy(uv_work_t* req)
         Image* im = new Image(closure->im2);
         v8::Local<v8::Value> ext = Nan::New<v8::External>(im);
         Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::GetFunction(Nan::New(constructor)).ToLocalChecked(), 1, &ext);
-        if (maybe_local.IsEmpty()) Nan::ThrowError("Could not create new Image instance");
-        v8::Local<v8::Value> argv[2] = { Nan::Null(), maybe_local.ToLocalChecked() };
-        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+
+		if (maybe_local.IsEmpty())
+		{
+			v8::Local<v8::Value> argv[1] = { Nan::Error("Could not create new Image instance") };
+			async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+		}
+		else
+		{
+			v8::Local<v8::Value> argv[2] = { Nan::Null(), maybe_local.ToLocalChecked() };
+			async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+		}
     }
-    closure->im1->Unref();
+    closure->im1->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -1927,7 +1935,7 @@ NAN_METHOD(Image::resize)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Resize, (uv_after_work_cb)EIO_AfterResize);
-    closure->im1->Ref();
+    closure->im1->_ref();
     return;
 }
 
@@ -2081,7 +2089,7 @@ void Image::EIO_Resize(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterResize(uv_work_t* req)
+void Image::EIO_AfterResize(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -2096,11 +2104,19 @@ void Image::EIO_AfterResize(uv_work_t* req)
         Image* im = new Image(closure->im2);
         v8::Local<v8::Value> ext = Nan::New<v8::External>(im);
         Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::GetFunction(Nan::New(constructor)).ToLocalChecked(), 1, &ext);
-        if (maybe_local.IsEmpty()) Nan::ThrowError("Could not create new Image instance");
-        v8::Local<v8::Value> argv[2] = { Nan::Null(), maybe_local.ToLocalChecked() };
-        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+
+		if (maybe_local.IsEmpty())
+		{
+			v8::Local<v8::Value> argv[1] = { Nan::Error("Could not create new Image instance") };
+			async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+		}
+		else
+		{
+			v8::Local<v8::Value> argv[2] = { Nan::Null(), maybe_local.ToLocalChecked() };
+			async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+		}
     }
-    closure->im1->Unref();
+    closure->im1->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -2518,7 +2534,7 @@ void Image::EIO_Open(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterOpen(uv_work_t* req)
+void Image::EIO_AfterOpen(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -2533,9 +2549,16 @@ void Image::EIO_AfterOpen(uv_work_t* req)
         Image* im = new Image(closure->im);
         v8::Local<v8::Value> ext = Nan::New<v8::External>(im);
         Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::GetFunction(Nan::New(constructor)).ToLocalChecked(), 1, &ext);
-        if (maybe_local.IsEmpty()) Nan::ThrowError("Could not create new Image instance");
-        v8::Local<v8::Value> argv[2] = { Nan::Null(), maybe_local.ToLocalChecked() };
-        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+		if (maybe_local.IsEmpty())
+		{
+			v8::Local<v8::Value> argv[1] = { Nan::Error("Could not create new Image instance") };
+			async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+		}
+		else
+		{
+			v8::Local<v8::Value> argv[2] = { Nan::Null(), maybe_local.ToLocalChecked() };
+			async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+		}
     }
     closure->cb.Reset();
     delete closure;
@@ -3019,7 +3042,7 @@ void Image::EIO_FromSVG(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterFromSVG(uv_work_t* req)
+void Image::EIO_AfterFromSVG(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -3034,9 +3057,16 @@ void Image::EIO_AfterFromSVG(uv_work_t* req)
         Image* im = new Image(closure->im);
         v8::Local<v8::Value> ext = Nan::New<v8::External>(im);
         Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::GetFunction(Nan::New(constructor)).ToLocalChecked(), 1, &ext);
-        if (maybe_local.IsEmpty()) Nan::ThrowError("Could not create new Image instance");
-        v8::Local<v8::Value> argv[2] = { Nan::Null(), maybe_local.ToLocalChecked() };
-        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+		if (maybe_local.IsEmpty())
+		{
+			v8::Local<v8::Value> argv[1] = { Nan::Error("Could not create new Image instance") };
+			async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+		}
+		else
+		{
+			v8::Local<v8::Value> argv[2] = { Nan::Null(), maybe_local.ToLocalChecked() };
+			async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+		}
     }
     closure->cb.Reset();
     delete closure;
@@ -3261,7 +3291,7 @@ void Image::EIO_FromSVGBytes(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterFromSVGBytes(uv_work_t* req)
+void Image::EIO_AfterFromSVGBytes(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -3276,10 +3306,17 @@ void Image::EIO_AfterFromSVGBytes(uv_work_t* req)
         Image* im = new Image(closure->im);
         v8::Local<v8::Value> ext = Nan::New<v8::External>(im);
         Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::GetFunction(Nan::New(constructor)).ToLocalChecked(), 1, &ext);
-        if (maybe_local.IsEmpty()) Nan::ThrowError("Could not create new Image instance");
-        v8::Local<v8::Object> image_obj = maybe_local.ToLocalChecked()->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
-        v8::Local<v8::Value> argv[2] = { Nan::Null(), image_obj };
-        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+		if (maybe_local.IsEmpty())
+		{
+			v8::Local<v8::Value> argv[1] = { Nan::Error("Could not create new Image instance") };
+			async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+		}
+		else
+		{
+			v8::Local<v8::Object> image_obj = maybe_local.ToLocalChecked()->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
+			v8::Local<v8::Value> argv[2] = { Nan::Null(), image_obj };
+			async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+		}
     }
     closure->cb.Reset();
     closure->buffer.Reset();
@@ -3600,7 +3637,7 @@ void Image::EIO_FromBytes(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterFromBytes(uv_work_t* req)
+void Image::EIO_AfterFromBytes(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -3624,9 +3661,16 @@ void Image::EIO_AfterFromBytes(uv_work_t* req)
         Image* im = new Image(closure->im);
         v8::Local<v8::Value> ext = Nan::New<v8::External>(im);
         Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::GetFunction(Nan::New(constructor)).ToLocalChecked(), 1, &ext);
-        if (maybe_local.IsEmpty()) Nan::ThrowError("Could not create new Image instance");
-        v8::Local<v8::Value> argv[2] = { Nan::Null(), maybe_local.ToLocalChecked() };
-        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+		if (maybe_local.IsEmpty())
+		{
+			v8::Local<v8::Value> argv[1] = { Nan::Error("Could not create new Image instance") };
+			async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+		}
+		else
+		{
+			v8::Local<v8::Value> argv[2] = { Nan::Null(), maybe_local.ToLocalChecked() };
+			async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+		}
     }
     closure->cb.Reset();
     closure->buffer.Reset();
@@ -3805,7 +3849,7 @@ NAN_METHOD(Image::encode)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Encode, (uv_after_work_cb)EIO_AfterEncode);
-    im->Ref();
+    im->_ref();
 
     return;
 }
@@ -3831,7 +3875,7 @@ void Image::EIO_Encode(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterEncode(uv_work_t* req)
+void Image::EIO_AfterEncode(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -3848,7 +3892,7 @@ void Image::EIO_AfterEncode(uv_work_t* req)
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
 
-    closure->im->Unref();
+    closure->im->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -4015,7 +4059,7 @@ NAN_METHOD(Image::save)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Save, (uv_after_work_cb)EIO_AfterSave);
-    im->Ref();
+    im->_ref();
     return;
 }
 
@@ -4035,7 +4079,7 @@ void Image::EIO_Save(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterSave(uv_work_t* req)
+void Image::EIO_AfterSave(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -4050,7 +4094,7 @@ void Image::EIO_AfterSave(uv_work_t* req)
         v8::Local<v8::Value> argv[1] = { Nan::Null() };
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
-    closure->im->Unref();
+    closure->im->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -4235,8 +4279,8 @@ NAN_METHOD(Image::composite)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Composite, (uv_after_work_cb)EIO_AfterComposite);
-    closure->im1->Ref();
-    closure->im2->Ref();
+    closure->im1->_ref();
+    closure->im2->_ref();
     return;
 }
 
@@ -4265,7 +4309,7 @@ void Image::EIO_Composite(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterComposite(uv_work_t* req)
+void Image::EIO_AfterComposite(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -4281,8 +4325,8 @@ void Image::EIO_AfterComposite(uv_work_t* req)
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
 
-    closure->im1->Unref();
-    closure->im2->Unref();
+    closure->im1->_unref();
+    closure->im2->_unref();
     closure->cb.Reset();
     delete closure;
 }

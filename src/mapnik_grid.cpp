@@ -162,7 +162,7 @@ NAN_METHOD(Grid::clear)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Clear, (uv_after_work_cb)EIO_AfterClear);
-    g->Ref();
+    g->_ref();
     return;
 }
 
@@ -184,7 +184,7 @@ void Grid::EIO_Clear(uv_work_t* req)
     }
 }
 
-void Grid::EIO_AfterClear(uv_work_t* req)
+void Grid::EIO_AfterClear(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -204,7 +204,7 @@ void Grid::EIO_AfterClear(uv_work_t* req)
         v8::Local<v8::Value> argv[2] = { Nan::Null(), closure->g->handle() };
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
-    closure->g->Unref();
+    closure->g->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -522,7 +522,7 @@ NAN_METHOD(Grid::encode)
     closure->cb.Reset(callback.As<v8::Function>());
     // todo - reserve lines size?
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Encode, (uv_after_work_cb)EIO_AfterEncode);
-    g->Ref();
+    g->_ref();
     return;
 }
 
@@ -548,7 +548,7 @@ void Grid::EIO_Encode(uv_work_t* req)
     }
 }
 
-void Grid::EIO_AfterEncode(uv_work_t* req)
+void Grid::EIO_AfterEncode(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -602,7 +602,7 @@ void Grid::EIO_AfterEncode(uv_work_t* req)
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
 
-    closure->g->Unref();
+    closure->g->_unref();
     closure->cb.Reset();
     delete closure;
 }

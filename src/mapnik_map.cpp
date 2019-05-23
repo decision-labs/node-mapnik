@@ -791,7 +791,7 @@ v8::Local<v8::Value> Map::abstractQueryPoint(Nan::NAN_METHOD_ARGS_TYPE info, boo
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_QueryMap, (uv_after_work_cb)EIO_AfterQueryMap);
-    m->Ref();
+    m->_ref();
     return Nan::Undefined();
 }
 
@@ -851,10 +851,10 @@ void Map::EIO_QueryMap(uv_work_t* req)
     }
 }
 
-void Map::EIO_AfterQueryMap(uv_work_t* req)
+void Map::EIO_AfterQueryMap(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
-	Nan::AsyncResource async_resource(__func__);
+    Nan::AsyncResource async_resource(__func__);
     query_map_baton_t *closure = static_cast<query_map_baton_t *>(req->data);
     if (closure->error) {
         v8::Local<v8::Value> argv[1] = { Nan::Error(closure->error_name.c_str()) };
@@ -887,7 +887,7 @@ void Map::EIO_AfterQueryMap(uv_work_t* req)
         }
     }
 
-    closure->m->Unref();
+    closure->m->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -1128,7 +1128,7 @@ NAN_METHOD(Map::load)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Load, (uv_after_work_cb)EIO_AfterLoad);
-    m->Ref();
+    m->_ref();
     return;
 }
 
@@ -1147,7 +1147,7 @@ void Map::EIO_Load(uv_work_t* req)
     }
 }
 
-void Map::EIO_AfterLoad(uv_work_t* req)
+void Map::EIO_AfterLoad(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -1160,7 +1160,7 @@ void Map::EIO_AfterLoad(uv_work_t* req)
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
 
-    closure->m->Unref();
+    closure->m->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -1407,7 +1407,7 @@ NAN_METHOD(Map::fromString)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_FromString, (uv_after_work_cb)EIO_AfterFromString);
-    m->Ref();
+    m->_ref();
     return;
 }
 
@@ -1426,7 +1426,7 @@ void Map::EIO_FromString(uv_work_t* req)
     }
 }
 
-void Map::EIO_AfterFromString(uv_work_t* req)
+void Map::EIO_AfterFromString(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -1439,7 +1439,7 @@ void Map::EIO_AfterFromString(uv_work_t* req)
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
 
-    closure->m->Unref();
+    closure->m->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -1825,7 +1825,6 @@ NAN_METHOD(Map::render)
             closure->request.data = closure;
             closure->m = m;
             closure->im = Nan::ObjectWrap::Unwrap<Image>(obj);
-            closure->im->_ref();
             closure->buffer_size = buffer_size;
             closure->scale_factor = scale_factor;
             closure->scale_denominator = scale_denominator;
@@ -1852,7 +1851,7 @@ NAN_METHOD(Map::render)
             }
             closure->cb.Reset(info[info.Length() - 1].As<v8::Function>());
             uv_queue_work(uv_default_loop(), &closure->request, EIO_RenderImage, (uv_after_work_cb)EIO_AfterRenderImage);
-
+            closure->im->_ref();
         }
 #if defined(GRID_RENDERER)
         else if (Nan::New(Grid::constructor)->HasInstance(obj)) {
@@ -1953,7 +1952,6 @@ NAN_METHOD(Map::render)
             closure->request.data = closure;
             closure->m = m;
             closure->g = g;
-            closure->g->_ref();
             closure->layer_idx = layer_idx;
             closure->buffer_size = buffer_size;
             closure->scale_factor = scale_factor;
@@ -1969,6 +1967,7 @@ NAN_METHOD(Map::render)
             }
             closure->cb.Reset(info[info.Length() - 1].As<v8::Function>());
             uv_queue_work(uv_default_loop(), &closure->request, EIO_RenderGrid, (uv_after_work_cb)EIO_AfterRenderGrid);
+            closure->g->_ref();
         }
 #endif
         else if (Nan::New(VectorTile::constructor)->HasInstance(obj))
@@ -2133,7 +2132,6 @@ NAN_METHOD(Map::render)
             closure->request.data = closure;
             closure->m = m;
             closure->d = Nan::ObjectWrap::Unwrap<VectorTile>(obj);
-            closure->d->_ref();
             closure->scale_factor = scale_factor;
             closure->scale_denominator = scale_denominator;
             closure->offset_x = offset_x;
@@ -2147,6 +2145,7 @@ NAN_METHOD(Map::render)
             }
             closure->cb.Reset(info[info.Length() - 1].As<v8::Function>());
             uv_queue_work(uv_default_loop(), &closure->request, EIO_RenderVectorTile, (uv_after_work_cb)EIO_AfterRenderVectorTile);
+            closure->d->_ref();
         }
         else
         {
@@ -2154,7 +2153,7 @@ NAN_METHOD(Map::render)
             return;
         }
 
-        m->Ref();
+        m->_ref();
         return;
     }
     catch (std::exception const& ex)
@@ -2198,7 +2197,7 @@ void Map::EIO_RenderVectorTile(uv_work_t* req)
     }
 }
 
-void Map::EIO_AfterRenderVectorTile(uv_work_t* req)
+void Map::EIO_AfterRenderVectorTile(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -2216,7 +2215,7 @@ void Map::EIO_AfterRenderVectorTile(uv_work_t* req)
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
 
-    closure->m->Unref();
+    closure->m->_unref();
     closure->d->_unref();
     closure->cb.Reset();
     delete closure;
@@ -2269,7 +2268,7 @@ void Map::EIO_RenderGrid(uv_work_t* req)
     }
 }
 
-void Map::EIO_AfterRenderGrid(uv_work_t* req)
+void Map::EIO_AfterRenderGrid(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -2286,7 +2285,7 @@ void Map::EIO_AfterRenderGrid(uv_work_t* req)
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
 
-    closure->m->Unref();
+    closure->m->_unref();
     closure->g->_unref();
     closure->cb.Reset();
     delete closure;
@@ -2321,10 +2320,10 @@ void Map::EIO_RenderImage(uv_work_t* req)
     }
 }
 
-void Map::EIO_AfterRenderImage(uv_work_t* req)
+void Map::EIO_AfterRenderImage(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
-	Nan::AsyncResource async_resource(__func__);
+    Nan::AsyncResource async_resource(__func__);
     image_baton_t *closure = static_cast<image_baton_t *>(req->data);
     closure->m->release();
 
@@ -2336,7 +2335,7 @@ void Map::EIO_AfterRenderImage(uv_work_t* req)
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
 
-    closure->m->Unref();
+    closure->m->_unref();
     closure->im->_unref();
     closure->cb.Reset();
     delete closure;
@@ -2507,7 +2506,7 @@ NAN_METHOD(Map::renderFile)
     closure->output = output;
 
     uv_queue_work(uv_default_loop(), &closure->request, EIO_RenderFile, (uv_after_work_cb)EIO_AfterRenderFile);
-    m->Ref();
+    m->_ref();
 
     return;
 
@@ -2554,7 +2553,7 @@ void Map::EIO_RenderFile(uv_work_t* req)
     }
 }
 
-void Map::EIO_AfterRenderFile(uv_work_t* req)
+void Map::EIO_AfterRenderFile(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
 	Nan::AsyncResource async_resource(__func__);
@@ -2569,7 +2568,7 @@ void Map::EIO_AfterRenderFile(uv_work_t* req)
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
 
-    closure->m->Unref();
+    closure->m->_unref();
     closure->cb.Reset();
     delete closure;
 
