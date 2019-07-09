@@ -2,13 +2,15 @@
 
 ## 3.6.2-carto.16
 
-**Release date**: 2019-XX-XX
+**Release date**: 2019-07-09
 
 Changes:
  - Silence GCC warnings around uv_after_work_cb functions.
  - Tests: Avoid Buffer() constructor.
  - Avoid dangling references when an error happenned before an async task.
  - mapnik_image: Avoid throwing in callbacks as it leaks resources.
+ - Port some improvements from upstream node 12 port.
+ - Update mapnik to [v3.0.15.17](https://github.com/CartoDB/mapnik/blob/v3.0.15.17/CHANGELOG.carto.md#301517) which improves the precision of float variables in SQL queries.
 
 ## 3.6.2-carto.15
 
