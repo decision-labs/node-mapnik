@@ -4,6 +4,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic ignored "-Wcast-function-type"
 #include <nan.h>
 #pragma GCC diagnostic pop
 
@@ -26,8 +27,11 @@ public:
     static NAN_METHOD(toJSON);
     static NAN_METHOD(toJSONSync);
     static void to_json(uv_work_t* req);
-    static void after_to_json(uv_work_t* req);
+    static void EIO_After_to_json(uv_work_t* req, int);
     Geometry(mapnik::feature_ptr f);
+
+    void _ref() { Ref(); }
+    void _unref() { Unref(); }
 private:
     ~Geometry();
     mapnik::feature_ptr feat_;

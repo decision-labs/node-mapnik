@@ -206,7 +206,7 @@ describe('mapnik.ImageView ', function() {
     it('should encode with a pallete', function(done) {
         var im = new mapnik.Image(256, 256);
         var view = im.view(0,0,256,256);
-        var pal = new mapnik.Palette(new Buffer('\xff\x09\x93\xFF\x01\x02\x03\x04','ascii'));
+        var pal = new mapnik.Palette(new Buffer.from('\xff\x09\x93\xFF\x01\x02\x03\x04','ascii'));
         assert.ok(view.encodeSync('png', {palette:pal}));
         view.encode('png', {palette:pal}, function(err, result) {
             if (err) throw err;
@@ -218,7 +218,7 @@ describe('mapnik.ImageView ', function() {
     it('should be able to save an ImageView', function(done) {
         var im = new mapnik.Image(256, 256);
         var view = im.view(0,0,256,256);
-        var pal = new mapnik.Palette(new Buffer('\xff\x09\x93\xFF\x01\x02\x03\x04','ascii'));
+        var pal = new mapnik.Palette(new Buffer.from('\xff\x09\x93\xFF\x01\x02\x03\x04','ascii'));
         var expected = './test/tmp/mapnik-image-view-saved.png';
         view.save(expected);
         assert.ok(fs.existsSync(expected));

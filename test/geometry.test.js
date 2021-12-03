@@ -27,7 +27,7 @@ describe('mapnik.Geometry ', function() {
         var geom = f.geometry();
         assert.equal(geom.type(),mapnik.Geometry.MultiPoint);
         assert.deepEqual(JSON.parse(geom.toJSONSync()),point);
-        var expected_wkb = new Buffer('0104000000020000000101000000000000000000000000000000000000000101000000000000000000f03f000000000000f03f', 'hex');
+        var expected_wkb = new Buffer.from('0104000000020000000101000000000000000000000000000000000000000101000000000000000000f03f000000000000f03f', 'hex');
         assert.deepEqual(geom.toWKB(),expected_wkb);
     });
 
