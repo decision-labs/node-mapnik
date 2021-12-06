@@ -1,22 +1,21 @@
 {
-  "name": "mapnik",
+  "name": "@carto/mapnik",
   "description": "Tile rendering library for node",
   "url": "http://github.com/mapnik/node-mapnik",
   "homepage": "http://mapnik.org",
   "author": "Dane Springmeyer <dane@mapbox.com> (mapnik.org)",
-  "version": "3.7.0",
-  "mapnik_version":"v3.0.18",
+  "version": "v3.7.0-mapnik-v3.6.2-carto",
+  "mapnik_version": "v3.0.15.17",
   "main": "./lib/mapnik.js",
   "binary": {
     "module_name": "mapnik",
     "module_path": "./lib/binding/",
-    "host": "https://mapbox-node-binary.s3.amazonaws.com",
+    "host": "https://mapnik-carto.s3.amazonaws.com",
     "remote_path": "./{module_name}/v{version}/",
     "package_name": "{node_abi}-{platform}-{arch}-{configuration}{toolset}.tar.gz"
   },
   "bugs": {
-    "email": "dane@mapbox.com",
-    "url": "http://github.com/mapnik/node-mapnik/issues"
+    "url": "http://github.com/CartoDB/node-mapnik/issues"
   },
   "keywords": [
     "map",
@@ -28,7 +27,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/mapnik/node-mapnik.git"
+    "url": "git://github.com/CartoDB/node-mapnik.git"
   },
   "contributors": [
     "Konstantin Käfer",
@@ -36,14 +35,10 @@
   ],
   "license": "BSD-3-Clause",
   "dependencies": {
-    "mapnik-vector-tile": "1.6.1",
-    "protozero": "1.5.1",
-    "nan": "~2.8.0",
-    "node-pre-gyp": "~0.6.30"
+    "mapnik-vector-tile": "cartodb/mapnik-vector-tile#v1.6.1-carto.2",
+    "nan": "2.14.0",
+    "node-pre-gyp": "0.13.0"
   },
-  "bundledDependencies": [
-    "node-pre-gyp"
-  ],
   "bin": {
     "mapnik-index.js": "./bin/mapnik-index.js",
     "mapnik-inspect.js": "./bin/mapnik-inspect.js",
@@ -52,16 +47,16 @@
   },
   "scripts": {
     "prepublishOnly": "npm ls",
-    "test": "jshint bin lib/index.js lib/mapnik.js && mocha -R spec --timeout 50000",
+    "test": "jshint bin lib/index.js lib/mapnik.js && mocha --exit -R spec --timeout 50000",
     "install": "node-pre-gyp install --fallback-to-build",
     "docs": "documentation build src/*.cpp src/mapnik_plugins.hpp --polyglot -o documentation -f html --github --name Mapnik"
   },
   "devDependencies": {
-    "aws-sdk": "2.0.12",
-    "jshint": "^2.5.10",
-    "mocha": "2.x",
-    "@mapbox/sphericalmercator": "~1.0.2",
-    "bytes": "~2.1.0"
+    "@mapbox/sphericalmercator": "1.0.5",
+    "aws-sdk": "^2.457.0",
+    "bytes": "^3.1.0",
+    "jshint": "^2.10.2",
+    "mocha": "^6.1.4"
   },
   "jshintConfig": {
     "node": true,
