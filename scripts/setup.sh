@@ -3,7 +3,7 @@
 set -eu
 set -o pipefail
 
-export MASON_RELEASE="${MASON_RELEASE:-89d9b31}"
+export MASON_RELEASE="${MASON_RELEASE:-master}"
 export MASON_LLVM_RELEASE="${MASON_LLVM_RELEASE:-5.0.0}"
 
 PLATFORM=$(uname | tr A-Z a-z)
@@ -11,7 +11,7 @@ if [[ ${PLATFORM} == 'darwin' ]]; then
   PLATFORM="osx"
 fi
 
-MASON_URL="https://s3.amazonaws.com/mason-binaries/${PLATFORM}-$(uname -m)"
+MASON_URL="https://s3.amazonaws.com/mapnik-carto/${PLATFORM}-$(uname -m)"
 
 function run() {
     local config=${1}
@@ -58,7 +58,7 @@ function run() {
       local mason_release=${2}
       if [[ ! -d ${install_dir} ]]; then
           mkdir -p ${install_dir}
-          curl -sSfL https://github.com/mapbox/mason/archive/${mason_release}.tar.gz | tar --gunzip --extract --strip-components=1 --directory=${install_dir}
+          curl -sSfL https://github.com/CartoDB/mason/archive/${mason_release}.tar.gz | tar --gunzip --extract --strip-components=1 --directory=${install_dir}
       fi
     }
 

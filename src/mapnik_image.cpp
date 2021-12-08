@@ -13,6 +13,9 @@
 
 #include <mapnik/marker.hpp>
 #include <mapnik/marker_cache.hpp>
+#ifdef MAPNIK_METRICS
+#include <mapnik/metrics.hpp>
+#endif
 #include <mapnik/svg/svg_parser.hpp>
 #include <mapnik/svg/svg_storage.hpp>
 #include <mapnik/svg/svg_converter.hpp>
@@ -109,40 +112,42 @@ void Image::Initialize(v8::Local<v8::Object> target) {
     Nan::SetPrototypeMethod(lcons, "resize", resize);
     Nan::SetPrototypeMethod(lcons, "resizeSync", resizeSync);
     Nan::SetPrototypeMethod(lcons, "data", data);
+    Nan::SetPrototypeMethod(lcons, "get_metrics", get_metrics);
 
     // properties
     ATTR(lcons, "scaling", get_scaling, set_scaling);
     ATTR(lcons, "offset", get_offset, set_offset);
+    ATTR(lcons, "metrics_enabled", get_metrics_enabled, set_metrics_enabled);
 
     // This *must* go after the ATTR setting
-    Nan::SetMethod(lcons->GetFunction().As<v8::Object>(),
+    Nan::SetMethod(Nan::GetFunction(lcons).ToLocalChecked().As<v8::Object>(),
                     "open",
                     Image::open);
-    Nan::SetMethod(lcons->GetFunction().As<v8::Object>(),
+    Nan::SetMethod(Nan::GetFunction(lcons).ToLocalChecked().As<v8::Object>(),
                     "fromBytes",
                     Image::fromBytes);
-    Nan::SetMethod(lcons->GetFunction().As<v8::Object>(),
+    Nan::SetMethod(Nan::GetFunction(lcons).ToLocalChecked().As<v8::Object>(),
                     "openSync",
                     Image::openSync);
-    Nan::SetMethod(lcons->GetFunction().As<v8::Object>(),
+    Nan::SetMethod(Nan::GetFunction(lcons).ToLocalChecked().As<v8::Object>(),
                     "fromBytesSync",
                     Image::fromBytesSync);
-    Nan::SetMethod(lcons->GetFunction().As<v8::Object>(),
+    Nan::SetMethod(Nan::GetFunction(lcons).ToLocalChecked().As<v8::Object>(),
                     "fromBufferSync",
                     Image::fromBufferSync);
-    Nan::SetMethod(lcons->GetFunction().As<v8::Object>(),
+    Nan::SetMethod(Nan::GetFunction(lcons).ToLocalChecked().As<v8::Object>(),
                     "fromSVG",
                     Image::fromSVG);
-    Nan::SetMethod(lcons->GetFunction().As<v8::Object>(),
+    Nan::SetMethod(Nan::GetFunction(lcons).ToLocalChecked().As<v8::Object>(),
                     "fromSVGSync",
                     Image::fromSVGSync);
-    Nan::SetMethod(lcons->GetFunction().As<v8::Object>(),
+    Nan::SetMethod(Nan::GetFunction(lcons).ToLocalChecked().As<v8::Object>(),
                     "fromSVGBytes",
                     Image::fromSVGBytes);
-    Nan::SetMethod(lcons->GetFunction().As<v8::Object>(),
+    Nan::SetMethod(Nan::GetFunction(lcons).ToLocalChecked().As<v8::Object>(),
                     "fromSVGBytesSync",
                     Image::fromSVGBytesSync);
-    target->Set(Nan::New("Image").ToLocalChecked(),lcons->GetFunction());
+    Nan::Set(target, Nan::New("Image").ToLocalChecked(),Nan::GetFunction(lcons).ToLocalChecked());
     constructor.Reset(lcons);
 }
 
@@ -196,19 +201,19 @@ NAN_METHOD(Image::New)
             if (info[2]->IsObject())
             {
                 v8::Local<v8::Object> options = v8::Local<v8::Object>::Cast(info[2]);
-                if (options->Has(Nan::New("type").ToLocalChecked()))
+                if (Nan::Has(options, Nan::New("type").ToLocalChecked()).FromMaybe(false))
                 {
-                    v8::Local<v8::Value> init_val = options->Get(Nan::New("type").ToLocalChecked());
+                    v8::Local<v8::Value> init_val = Nan::Get(options, Nan::New("type").ToLocalChecked()).ToLocalChecked();
 
                     if (!init_val.IsEmpty() && init_val->IsNumber())
                     {
-                        int int_val = init_val->IntegerValue();
+                        int int_val = init_val->IntegerValue(Nan::GetCurrentContext()).ToChecked();
                         if (int_val >= mapnik::image_dtype::IMAGE_DTYPE_MAX || int_val < 0)
                         {
                             Nan::ThrowTypeError("Image 'type' must be a valid image type");
                             return;
                         }
-                        type = static_cast<mapnik::image_dtype>(init_val->IntegerValue());
+                        type = static_cast<mapnik::image_dtype>(init_val->IntegerValue(Nan::GetCurrentContext()).ToChecked());
                     }
                     else
                     {
@@ -217,12 +222,12 @@ NAN_METHOD(Image::New)
                     }
                 }
 
-                if (options->Has(Nan::New("initialize").ToLocalChecked()))
+                if (Nan::Has(options, Nan::New("initialize").ToLocalChecked()).FromMaybe(false))
                 {
-                    v8::Local<v8::Value> init_val = options->Get(Nan::New("initialize").ToLocalChecked());
+                    v8::Local<v8::Value> init_val = Nan::Get(options, Nan::New("initialize").ToLocalChecked()).ToLocalChecked();
                     if (!init_val.IsEmpty() && init_val->IsBoolean())
                     {
-                        initialize = init_val->BooleanValue();
+                        initialize = init_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
                     }
                     else
                     {
@@ -231,12 +236,12 @@ NAN_METHOD(Image::New)
                     }
                 }
 
-                if (options->Has(Nan::New("premultiplied").ToLocalChecked()))
+                if (Nan::Has(options, Nan::New("premultiplied").ToLocalChecked()).FromMaybe(false))
                 {
-                    v8::Local<v8::Value> pre_val = options->Get(Nan::New("premultiplied").ToLocalChecked());
+                    v8::Local<v8::Value> pre_val = Nan::Get(options, Nan::New("premultiplied").ToLocalChecked()).ToLocalChecked();
                     if (!pre_val.IsEmpty() && pre_val->IsBoolean())
                     {
-                        premultiplied = pre_val->BooleanValue();
+                        premultiplied = pre_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
                     }
                     else
                     {
@@ -245,12 +250,12 @@ NAN_METHOD(Image::New)
                     }
                 }
 
-                if (options->Has(Nan::New("painted").ToLocalChecked()))
+                if (Nan::Has(options, Nan::New("painted").ToLocalChecked()).FromMaybe(false))
                 {
-                    v8::Local<v8::Value> painted_val = options->Get(Nan::New("painted").ToLocalChecked());
+                    v8::Local<v8::Value> painted_val = Nan::Get(options, Nan::New("painted").ToLocalChecked()).ToLocalChecked();
                     if (!painted_val.IsEmpty() && painted_val->IsBoolean())
                     {
-                        painted = painted_val->BooleanValue();
+                        painted = painted_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
                     }
                     else
                     {
@@ -267,8 +272,8 @@ NAN_METHOD(Image::New)
         }
 
         try {
-            Image* im = new Image(info[0]->IntegerValue(),
-                                  info[1]->IntegerValue(),
+            Image* im = new Image(info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked(),
+                                  info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked(),
                                   type,
                                   initialize,
                                   premultiplied,
@@ -445,15 +450,16 @@ NAN_METHOD(Image::getPixel)
             return;
         }
 
-        v8::Local<v8::Object> options = info[2]->ToObject();
+        v8::Local<v8::Object> options = info[2]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
 
-        if (options->Has(Nan::New("get_color").ToLocalChecked())) {
-            v8::Local<v8::Value> bind_opt = options->Get(Nan::New("get_color").ToLocalChecked());
+        if (Nan::Has(options, Nan::New("get_color").ToLocalChecked()).FromMaybe(false))
+		{
+            v8::Local<v8::Value> bind_opt = Nan::Get(options, Nan::New("get_color").ToLocalChecked()).ToLocalChecked();
             if (!bind_opt->IsBoolean()) {
                 Nan::ThrowTypeError("optional arg 'color' must be a boolean");
                 return;
             }
-            get_color = bind_opt->BooleanValue();
+            get_color = bind_opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
         }
 
     }
@@ -467,8 +473,8 @@ NAN_METHOD(Image::getPixel)
             Nan::ThrowTypeError("second arg, 'y' must be an integer");
             return;
         }
-        x = info[0]->IntegerValue();
-        y = info[1]->IntegerValue();
+        x = info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+        y = info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
     } else {
         Nan::ThrowError("must supply x,y to query pixel color");
         return;
@@ -509,8 +515,8 @@ NAN_METHOD(Image::setPixel)
         Nan::ThrowTypeError("expects three arguments: x, y, and pixel value");
         return;
     }
-    int x = info[0]->IntegerValue();
-    int y = info[1]->IntegerValue();
+    int x = info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+    int y = info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
     Image* im = Nan::ObjectWrap::Unwrap<Image>(info.Holder());
     if (x < 0 || x >= static_cast<int>(im->this_->width()) || y < 0 || y >= static_cast<int>(im->this_->height()))
     {
@@ -519,22 +525,22 @@ NAN_METHOD(Image::setPixel)
     }
     if (info[2]->IsUint32())
     {
-        std::uint32_t val = info[2]->Uint32Value();
+        std::uint32_t val = info[2]->Uint32Value(Nan::GetCurrentContext()).ToChecked();
         mapnik::set_pixel<std::uint32_t>(*im->this_,x,y,val);
     }
     else if (info[2]->IsInt32())
     {
-        std::int32_t val = info[2]->Int32Value();
+        std::int32_t val = info[2]->Int32Value(Nan::GetCurrentContext()).ToChecked();
         mapnik::set_pixel<std::int32_t>(*im->this_,x,y,val);
     }
     else if (info[2]->IsNumber())
     {
-        double val = info[2]->NumberValue();
+        double val = info[2]->NumberValue(Nan::GetCurrentContext()).ToChecked();
         mapnik::set_pixel<double>(*im->this_,x,y,val);
     }
     else if (info[2]->IsObject())
     {
-        v8::Local<v8::Object> obj = info[2]->ToObject();
+        v8::Local<v8::Object> obj = info[2]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
         if (obj->IsNull() || obj->IsUndefined() || !Nan::New(Color::constructor)->HasInstance(obj))
         {
             Nan::ThrowTypeError("A numeric or color value is expected as third arg");
@@ -599,7 +605,7 @@ NAN_METHOD(Image::compare)
         Nan::ThrowTypeError("first argument should be a mapnik.Image");
         return;
     }
-    v8::Local<v8::Object> obj = info[0]->ToObject();
+    v8::Local<v8::Object> obj = info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
     if (obj->IsNull() || obj->IsUndefined() || !Nan::New(Image::constructor)->HasInstance(obj)) {
         Nan::ThrowTypeError("mapnik.Image expected as first arg");
         return;
@@ -615,24 +621,26 @@ NAN_METHOD(Image::compare)
             return;
         }
 
-        v8::Local<v8::Object> options = info[1]->ToObject();
+        v8::Local<v8::Object> options = info[1]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
 
-        if (options->Has(Nan::New("threshold").ToLocalChecked())) {
-            v8::Local<v8::Value> bind_opt = options->Get(Nan::New("threshold").ToLocalChecked());
+        if (Nan::Has(options, Nan::New("threshold").ToLocalChecked()).FromMaybe(false))
+		{
+            v8::Local<v8::Value> bind_opt = Nan::Get(options, Nan::New("threshold").ToLocalChecked()).ToLocalChecked();
             if (!bind_opt->IsNumber()) {
                 Nan::ThrowTypeError("optional arg 'threshold' must be a number");
                 return;
             }
-            threshold = bind_opt->IntegerValue();
+            threshold = bind_opt->IntegerValue(Nan::GetCurrentContext()).ToChecked();
         }
 
-        if (options->Has(Nan::New("alpha").ToLocalChecked())) {
-            v8::Local<v8::Value> bind_opt = options->Get(Nan::New("alpha").ToLocalChecked());
+        if (Nan::Has(options, Nan::New("alpha").ToLocalChecked()).FromMaybe(false))
+		{
+            v8::Local<v8::Value> bind_opt = Nan::Get(options, Nan::New("alpha").ToLocalChecked()).ToLocalChecked();
             if (!bind_opt->IsBoolean()) {
                 Nan::ThrowTypeError("optional arg 'alpha' must be a boolean");
                 return;
             }
-            alpha = bind_opt->BooleanValue();
+            alpha = bind_opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
         }
 
     }
@@ -743,7 +751,7 @@ NAN_METHOD(Image::filter)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Filter, (uv_after_work_cb)EIO_AfterFilter);
-    im->Ref();
+    im->_ref();
     return;
 }
 
@@ -761,21 +769,22 @@ void Image::EIO_Filter(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterFilter(uv_work_t* req)
+void Image::EIO_AfterFilter(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
+	Nan::AsyncResource async_resource(__func__);
     filter_image_baton_t *closure = static_cast<filter_image_baton_t *>(req->data);
     if (closure->error)
     {
         v8::Local<v8::Value> argv[1] = { Nan::Error(closure->error_name.c_str()) };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
     else
     {
         v8::Local<v8::Value> argv[2] = { Nan::Null(), closure->im->handle() };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
-    closure->im->Unref();
+    closure->im->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -812,22 +821,22 @@ v8::Local<v8::Value> Image::_fillSync(Nan::NAN_METHOD_ARGS_TYPE info) {
     {
         if (info[0]->IsUint32())
         {
-            std::uint32_t val = info[0]->Uint32Value();
+            std::uint32_t val = info[0]->Uint32Value(Nan::GetCurrentContext()).ToChecked();
             mapnik::fill<std::uint32_t>(*im->this_,val);
         }
         else if (info[0]->IsInt32())
         {
-            std::int32_t val = info[0]->Int32Value();
+            std::int32_t val = info[0]->Int32Value(Nan::GetCurrentContext()).ToChecked();
             mapnik::fill<std::int32_t>(*im->this_,val);
         }
         else if (info[0]->IsNumber())
         {
-            double val = info[0]->NumberValue();
+            double val = info[0]->NumberValue(Nan::GetCurrentContext()).ToChecked();
             mapnik::fill<double>(*im->this_,val);
         }
         else if (info[0]->IsObject())
         {
-            v8::Local<v8::Object> obj = info[0]->ToObject();
+            v8::Local<v8::Object> obj = info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
             if (obj->IsNull() || obj->IsUndefined() || !Nan::New(Color::constructor)->HasInstance(obj))
             {
                 Nan::ThrowTypeError("A numeric or color value is expected");
@@ -903,22 +912,22 @@ NAN_METHOD(Image::fill)
     fill_image_baton_t *closure = new fill_image_baton_t();
     if (info[0]->IsUint32())
     {
-        closure->val_u32 = info[0]->Uint32Value();
+        closure->val_u32 = info[0]->Uint32Value(Nan::GetCurrentContext()).ToChecked();
         closure->type = FILL_UINT32;
     }
     else if (info[0]->IsInt32())
     {
-        closure->val_32 = info[0]->Int32Value();
+        closure->val_32 = info[0]->Int32Value(Nan::GetCurrentContext()).ToChecked();
         closure->type = FILL_INT32;
     }
     else if (info[0]->IsNumber())
     {
-        closure->val_double = info[0]->NumberValue();
+        closure->val_double = info[0]->NumberValue(Nan::GetCurrentContext()).ToChecked();
         closure->type = FILL_DOUBLE;
     }
     else if (info[0]->IsObject())
     {
-        v8::Local<v8::Object> obj = info[0]->ToObject();
+        v8::Local<v8::Object> obj = info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
         if (obj->IsNull() || obj->IsUndefined() || !Nan::New(Color::constructor)->HasInstance(obj))
         {
             delete closure;
@@ -951,7 +960,7 @@ NAN_METHOD(Image::fill)
         closure->error = false;
         closure->cb.Reset(callback.As<v8::Function>());
         uv_queue_work(uv_default_loop(), &closure->request, EIO_Fill, (uv_after_work_cb)EIO_AfterFill);
-        im->Ref();
+        im->_ref();
     }
     return;
 }
@@ -985,21 +994,22 @@ void Image::EIO_Fill(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterFill(uv_work_t* req)
+void Image::EIO_AfterFill(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
+	Nan::AsyncResource async_resource(__func__);
     fill_image_baton_t *closure = static_cast<fill_image_baton_t *>(req->data);
     if (closure->error)
     {
         v8::Local<v8::Value> argv[1] = { Nan::Error(closure->error_name.c_str()) };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
     else
     {
         v8::Local<v8::Value> argv[2] = { Nan::Null(), closure->im->handle() };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
-    closure->im->Unref();
+    closure->im->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -1080,7 +1090,7 @@ NAN_METHOD(Image::clear)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Clear, (uv_after_work_cb)EIO_AfterClear);
-    im->Ref();
+    im->_ref();
     return;
 }
 
@@ -1098,21 +1108,22 @@ void Image::EIO_Clear(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterClear(uv_work_t* req)
+void Image::EIO_AfterClear(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
+	Nan::AsyncResource async_resource(__func__);
     clear_image_baton_t *closure = static_cast<clear_image_baton_t *>(req->data);
     if (closure->error)
     {
         v8::Local<v8::Value> argv[1] = { Nan::Error(closure->error_name.c_str()) };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
     else
     {
         v8::Local<v8::Value> argv[2] = { Nan::Null(), closure->im->handle() };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
-    closure->im->Unref();
+    closure->im->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -1145,7 +1156,7 @@ NAN_METHOD(Image::setGrayScaleToAlpha)
             return;
         }
 
-        v8::Local<v8::Object> obj = info[0]->ToObject();
+        v8::Local<v8::Object> obj = info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
 
         if (obj->IsNull() || obj->IsUndefined() || !Nan::New(Color::constructor)->HasInstance(obj)) {
             Nan::ThrowTypeError("mapnik.Color expected as first arg");
@@ -1243,7 +1254,7 @@ NAN_METHOD(Image::premultiply)
     closure->im = im;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Premultiply, (uv_after_work_cb)EIO_AfterMultiply);
-    im->Ref();
+    im->_ref();
     return;
 }
 
@@ -1253,13 +1264,14 @@ void Image::EIO_Premultiply(uv_work_t* req)
     mapnik::premultiply_alpha(*closure->im->this_);
 }
 
-void Image::EIO_AfterMultiply(uv_work_t* req)
+void Image::EIO_AfterMultiply(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
+	Nan::AsyncResource async_resource(__func__);
     image_op_baton_t *closure = static_cast<image_op_baton_t *>(req->data);
     v8::Local<v8::Value> argv[2] = { Nan::Null(), closure->im->handle() };
-    Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
-    closure->im->Unref();
+    async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+    closure->im->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -1314,7 +1326,7 @@ NAN_METHOD(Image::demultiply)
     closure->im = im;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Demultiply, (uv_after_work_cb)EIO_AfterMultiply);
-    im->Ref();
+    im->_ref();
     return;
 }
 
@@ -1369,7 +1381,7 @@ NAN_METHOD(Image::isSolid)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_IsSolid, (uv_after_work_cb)EIO_AfterIsSolid);
-    im->Ref();
+    im->_ref();
     return;
 }
 
@@ -1387,13 +1399,14 @@ void Image::EIO_IsSolid(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterIsSolid(uv_work_t* req)
+void Image::EIO_AfterIsSolid(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
+	Nan::AsyncResource async_resource(__func__);
     is_solid_image_baton_t *closure = static_cast<is_solid_image_baton_t *>(req->data);
     if (closure->error) {
         v8::Local<v8::Value> argv[1] = { Nan::Error(closure->error_name.c_str()) };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
     else
     {
@@ -1403,15 +1416,15 @@ void Image::EIO_AfterIsSolid(uv_work_t* req)
                                      Nan::New(closure->result),
                                      mapnik::util::apply_visitor(visitor_get_pixel(0,0),*(closure->im->this_)),
             };
-            Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 3, argv);
+            async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 3, argv);
         }
         else
         {
             v8::Local<v8::Value> argv[2] = { Nan::Null(), Nan::New(closure->result) };
-            Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+            async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
         }
     }
-    closure->im->Unref();
+    closure->im->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -1495,7 +1508,7 @@ NAN_METHOD(Image::copy)
     {
         if (info[0]->IsNumber())
         {
-            type = static_cast<mapnik::image_dtype>(info[0]->IntegerValue());
+            type = static_cast<mapnik::image_dtype>(info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked());
             if (type >= mapnik::image_dtype::IMAGE_DTYPE_MAX)
             {
                 Nan::ThrowTypeError("Image 'type' must be a valid image type");
@@ -1504,7 +1517,7 @@ NAN_METHOD(Image::copy)
         }
         else if (info[0]->IsObject())
         {
-            options = info[0]->ToObject();
+            options = info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
         }
         else
         {
@@ -1516,7 +1529,7 @@ NAN_METHOD(Image::copy)
     {
         if (info[1]->IsObject())
         {
-            options = info[1]->ToObject();
+            options = info[1]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
         }
         else
         {
@@ -1525,12 +1538,12 @@ NAN_METHOD(Image::copy)
         }
     }
 
-    if (options->Has(Nan::New("scaling").ToLocalChecked()))
+    if (Nan::Has(options, Nan::New("scaling").ToLocalChecked()).FromMaybe(false))
     {
-        v8::Local<v8::Value> scaling_val = options->Get(Nan::New("scaling").ToLocalChecked());
+        v8::Local<v8::Value> scaling_val = Nan::Get(options, Nan::New("scaling").ToLocalChecked()).ToLocalChecked();
         if (scaling_val->IsNumber())
         {
-            scaling = scaling_val->NumberValue();
+            scaling = scaling_val->NumberValue(Nan::GetCurrentContext()).ToChecked();
             scaling_or_offset_set = true;
         }
         else
@@ -1540,12 +1553,12 @@ NAN_METHOD(Image::copy)
         }
     }
 
-    if (options->Has(Nan::New("offset").ToLocalChecked()))
+    if (Nan::Has(options, Nan::New("offset").ToLocalChecked()).FromMaybe(false))
     {
-        v8::Local<v8::Value> offset_val = options->Get(Nan::New("offset").ToLocalChecked());
+        v8::Local<v8::Value> offset_val = Nan::Get(options, Nan::New("offset").ToLocalChecked()).ToLocalChecked();
         if (offset_val->IsNumber())
         {
-            offset = offset_val->NumberValue();
+            offset = offset_val->NumberValue(Nan::GetCurrentContext()).ToChecked();
             scaling_or_offset_set = true;
         }
         else
@@ -1570,7 +1583,7 @@ NAN_METHOD(Image::copy)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Copy, (uv_after_work_cb)EIO_AfterCopy);
-    closure->im1->Ref();
+    closure->im1->_ref();
     return;
 }
 
@@ -1593,14 +1606,15 @@ void Image::EIO_Copy(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterCopy(uv_work_t* req)
+void Image::EIO_AfterCopy(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
+	Nan::AsyncResource async_resource(__func__);
     copy_image_baton_t *closure = static_cast<copy_image_baton_t *>(req->data);
     if (closure->error)
     {
         v8::Local<v8::Value> argv[1] = { Nan::Error(closure->error_name.c_str()) };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
     else if (!closure->im2)
     {
@@ -1608,19 +1622,27 @@ void Image::EIO_AfterCopy(uv_work_t* req)
         // and simply removing it from coverage tests.
         /* LCOV_EXCL_START */
         v8::Local<v8::Value> argv[1] = { Nan::Error("could not render to image") };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
         /* LCOV_EXCL_STOP */
     }
     else
     {
         Image* im = new Image(closure->im2);
         v8::Local<v8::Value> ext = Nan::New<v8::External>(im);
-        Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::New(constructor)->GetFunction(), 1, &ext);
-        if (maybe_local.IsEmpty()) Nan::ThrowError("Could not create new Image instance");
-        v8::Local<v8::Value> argv[2] = { Nan::Null(), maybe_local.ToLocalChecked() };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+        Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::GetFunction(Nan::New(constructor)).ToLocalChecked(), 1, &ext);
+
+		if (maybe_local.IsEmpty())
+		{
+			v8::Local<v8::Value> argv[1] = { Nan::Error("Could not create new Image instance") };
+			async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+		}
+		else
+		{
+			v8::Local<v8::Value> argv[2] = { Nan::Null(), maybe_local.ToLocalChecked() };
+			async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+		}
     }
-    closure->im1->Unref();
+    closure->im1->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -1658,7 +1680,7 @@ v8::Local<v8::Value> Image::_copySync(Nan::NAN_METHOD_ARGS_TYPE info)
     {
         if (info[0]->IsNumber())
         {
-            type = static_cast<mapnik::image_dtype>(info[0]->IntegerValue());
+            type = static_cast<mapnik::image_dtype>(info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked());
             if (type >= mapnik::image_dtype::IMAGE_DTYPE_MAX)
             {
                 Nan::ThrowTypeError("Image 'type' must be a valid image type");
@@ -1667,7 +1689,7 @@ v8::Local<v8::Value> Image::_copySync(Nan::NAN_METHOD_ARGS_TYPE info)
         }
         else if (info[0]->IsObject())
         {
-            options = info[0]->ToObject();
+            options = info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
         }
         else
         {
@@ -1679,7 +1701,7 @@ v8::Local<v8::Value> Image::_copySync(Nan::NAN_METHOD_ARGS_TYPE info)
     {
         if (info[1]->IsObject())
         {
-            options = info[1]->ToObject();
+            options = info[1]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
         }
         else
         {
@@ -1688,12 +1710,12 @@ v8::Local<v8::Value> Image::_copySync(Nan::NAN_METHOD_ARGS_TYPE info)
         }
     }
 
-    if (options->Has(Nan::New("scaling").ToLocalChecked()))
+    if (Nan::Has(options, Nan::New("scaling").ToLocalChecked()).FromMaybe(false))
     {
-        v8::Local<v8::Value> scaling_val = options->Get(Nan::New("scaling").ToLocalChecked());
+        v8::Local<v8::Value> scaling_val = Nan::Get(options, Nan::New("scaling").ToLocalChecked()).ToLocalChecked();
         if (scaling_val->IsNumber())
         {
-            scaling = scaling_val->NumberValue();
+            scaling = scaling_val->NumberValue(Nan::GetCurrentContext()).ToChecked();
             scaling_or_offset_set = true;
         }
         else
@@ -1703,12 +1725,12 @@ v8::Local<v8::Value> Image::_copySync(Nan::NAN_METHOD_ARGS_TYPE info)
         }
     }
 
-    if (options->Has(Nan::New("offset").ToLocalChecked()))
+    if (Nan::Has(options, Nan::New("offset").ToLocalChecked()).FromMaybe(false))
     {
-        v8::Local<v8::Value> offset_val = options->Get(Nan::New("offset").ToLocalChecked());
+        v8::Local<v8::Value> offset_val = Nan::Get(options, Nan::New("offset").ToLocalChecked()).ToLocalChecked();
         if (offset_val->IsNumber())
         {
-            offset = offset_val->NumberValue();
+            offset = offset_val->NumberValue(Nan::GetCurrentContext()).ToChecked();
             scaling_or_offset_set = true;
         }
         else
@@ -1734,7 +1756,7 @@ v8::Local<v8::Value> Image::_copySync(Nan::NAN_METHOD_ARGS_TYPE info)
                                                     );
         Image* new_im = new Image(imagep);
         v8::Local<v8::Value> ext = Nan::New<v8::External>(new_im);
-        Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::New(constructor)->GetFunction(), 1, &ext);
+        Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::GetFunction(Nan::New(constructor)).ToLocalChecked(), 1, &ext);
         if (maybe_local.IsEmpty()) Nan::ThrowError("Could not create new Image instance");
         return scope.Escape(maybe_local.ToLocalChecked());
     }
@@ -1802,7 +1824,7 @@ NAN_METHOD(Image::resize)
     {
         if (info[0]->IsNumber())
         {
-            auto width_tmp = info[0]->IntegerValue();
+            auto width_tmp = info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             if (width_tmp <= 0)
             {
                 Nan::ThrowTypeError("Width must be a integer greater then zero");
@@ -1817,7 +1839,7 @@ NAN_METHOD(Image::resize)
         }
         if (info[1]->IsNumber())
         {
-            auto height_tmp = info[1]->IntegerValue();
+            auto height_tmp = info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             if (height_tmp <= 0)
             {
                 Nan::ThrowTypeError("Height must be a integer greater then zero");
@@ -1840,7 +1862,7 @@ NAN_METHOD(Image::resize)
     {
         if (info[2]->IsObject())
         {
-            options = info[2]->ToObject();
+            options = info[2]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
         }
         else
         {
@@ -1848,32 +1870,32 @@ NAN_METHOD(Image::resize)
             return;
         }
     }
-    if (options->Has(Nan::New("offset_x").ToLocalChecked()))
+    if (Nan::Has(options, Nan::New("offset_x").ToLocalChecked()).FromMaybe(false))
     {
-        v8::Local<v8::Value> bind_opt = options->Get(Nan::New("offset_x").ToLocalChecked());
+        v8::Local<v8::Value> bind_opt = Nan::Get(options, Nan::New("offset_x").ToLocalChecked()).ToLocalChecked();
         if (!bind_opt->IsNumber())
         {
             Nan::ThrowTypeError("optional arg 'offset_x' must be a number");
             return;
         }
-        offset_x = bind_opt->IntegerValue();
+        offset_x = bind_opt->IntegerValue(Nan::GetCurrentContext()).ToChecked();
     }
-    if (options->Has(Nan::New("offset_y").ToLocalChecked()))
+    if (Nan::Has(options, Nan::New("offset_y").ToLocalChecked()).FromMaybe(false))
     {
-        v8::Local<v8::Value> bind_opt = options->Get(Nan::New("offset_y").ToLocalChecked());
+        v8::Local<v8::Value> bind_opt = Nan::Get(options, Nan::New("offset_y").ToLocalChecked()).ToLocalChecked();
         if (!bind_opt->IsNumber())
         {
             Nan::ThrowTypeError("optional arg 'offset_y' must be a number");
             return;
         }
-        offset_y = bind_opt->IntegerValue();
+        offset_y = bind_opt->IntegerValue(Nan::GetCurrentContext()).ToChecked();
     }
-    if (options->Has(Nan::New("scaling_method").ToLocalChecked()))
+    if (Nan::Has(options, Nan::New("scaling_method").ToLocalChecked()).FromMaybe(false))
     {
-        v8::Local<v8::Value> scaling_val = options->Get(Nan::New("scaling_method").ToLocalChecked());
+        v8::Local<v8::Value> scaling_val = Nan::Get(options, Nan::New("scaling_method").ToLocalChecked()).ToLocalChecked();
         if (scaling_val->IsNumber())
         {
-            std::int64_t scaling_int = scaling_val->IntegerValue();
+            std::int64_t scaling_int = scaling_val->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             if (scaling_int > mapnik::SCALING_BLACKMAN || scaling_int < 0)
             {
                 Nan::ThrowTypeError("Invalid scaling_method");
@@ -1888,12 +1910,12 @@ NAN_METHOD(Image::resize)
         }
     }
 
-    if (options->Has(Nan::New("filter_factor").ToLocalChecked()))
+    if (Nan::Has(options, Nan::New("filter_factor").ToLocalChecked()).FromMaybe(false))
     {
-        v8::Local<v8::Value> ff_val = options->Get(Nan::New("filter_factor").ToLocalChecked());
+        v8::Local<v8::Value> ff_val = Nan::Get(options, Nan::New("filter_factor").ToLocalChecked()).ToLocalChecked();
         if (ff_val->IsNumber())
         {
-            filter_factor = ff_val->NumberValue();
+            filter_factor = ff_val->NumberValue(Nan::GetCurrentContext()).ToChecked();
         }
         else
         {
@@ -1913,7 +1935,7 @@ NAN_METHOD(Image::resize)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Resize, (uv_after_work_cb)EIO_AfterResize);
-    closure->im1->Ref();
+    closure->im1->_ref();
     return;
 }
 
@@ -2067,25 +2089,34 @@ void Image::EIO_Resize(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterResize(uv_work_t* req)
+void Image::EIO_AfterResize(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
+	Nan::AsyncResource async_resource(__func__);
     resize_image_baton_t *closure = static_cast<resize_image_baton_t *>(req->data);
     if (closure->error)
     {
         v8::Local<v8::Value> argv[1] = { Nan::Error(closure->error_name.c_str()) };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
     else
     {
         Image* im = new Image(closure->im2);
         v8::Local<v8::Value> ext = Nan::New<v8::External>(im);
-        Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::New(constructor)->GetFunction(), 1, &ext);
-        if (maybe_local.IsEmpty()) Nan::ThrowError("Could not create new Image instance");
-        v8::Local<v8::Value> argv[2] = { Nan::Null(), maybe_local.ToLocalChecked() };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+        Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::GetFunction(Nan::New(constructor)).ToLocalChecked(), 1, &ext);
+
+		if (maybe_local.IsEmpty())
+		{
+			v8::Local<v8::Value> argv[1] = { Nan::Error("Could not create new Image instance") };
+			async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+		}
+		else
+		{
+			v8::Local<v8::Value> argv[2] = { Nan::Null(), maybe_local.ToLocalChecked() };
+			async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+		}
     }
-    closure->im1->Unref();
+    closure->im1->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -2129,7 +2160,7 @@ v8::Local<v8::Value> Image::_resizeSync(Nan::NAN_METHOD_ARGS_TYPE info)
     {
         if (info[0]->IsNumber())
         {
-            int width_tmp = info[0]->IntegerValue();
+            int width_tmp = info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             if (width_tmp <= 0)
             {
                 Nan::ThrowTypeError("Width parameter must be an integer greater then zero");
@@ -2144,7 +2175,7 @@ v8::Local<v8::Value> Image::_resizeSync(Nan::NAN_METHOD_ARGS_TYPE info)
         }
         if (info[1]->IsNumber())
         {
-            int height_tmp = info[1]->IntegerValue();
+            int height_tmp = info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             if (height_tmp <= 0)
             {
                 Nan::ThrowTypeError("Height parameter must be an integer greater then zero");
@@ -2167,7 +2198,7 @@ v8::Local<v8::Value> Image::_resizeSync(Nan::NAN_METHOD_ARGS_TYPE info)
     {
         if (info[2]->IsObject())
         {
-            options = info[2]->ToObject();
+            options = info[2]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
         }
         else
         {
@@ -2175,33 +2206,33 @@ v8::Local<v8::Value> Image::_resizeSync(Nan::NAN_METHOD_ARGS_TYPE info)
             return scope.Escape(Nan::Undefined());
         }
     }
-    if (options->Has(Nan::New("offset_x").ToLocalChecked()))
+    if (Nan::Has(options, Nan::New("offset_x").ToLocalChecked()).FromMaybe(false))
     {
-        v8::Local<v8::Value> bind_opt = options->Get(Nan::New("offset_x").ToLocalChecked());
+        v8::Local<v8::Value> bind_opt = Nan::Get(options, Nan::New("offset_x").ToLocalChecked()).ToLocalChecked();
         if (!bind_opt->IsNumber())
         {
             Nan::ThrowTypeError("optional arg 'offset_x' must be a number");
             return scope.Escape(Nan::Undefined());
         }
-        offset_x = bind_opt->IntegerValue();
+        offset_x = bind_opt->IntegerValue(Nan::GetCurrentContext()).ToChecked();
     }
-    if (options->Has(Nan::New("offset_y").ToLocalChecked()))
+    if (Nan::Has(options, Nan::New("offset_y").ToLocalChecked()).FromMaybe(false))
     {
-        v8::Local<v8::Value> bind_opt = options->Get(Nan::New("offset_y").ToLocalChecked());
+        v8::Local<v8::Value> bind_opt = Nan::Get(options, Nan::New("offset_y").ToLocalChecked()).ToLocalChecked();
         if (!bind_opt->IsNumber())
         {
             Nan::ThrowTypeError("optional arg 'offset_y' must be a number");
             return scope.Escape(Nan::Undefined());
         }
-        offset_y = bind_opt->IntegerValue();
+        offset_y = bind_opt->IntegerValue(Nan::GetCurrentContext()).ToChecked();
     }
 
-    if (options->Has(Nan::New("scaling_method").ToLocalChecked()))
+    if (Nan::Has(options, Nan::New("scaling_method").ToLocalChecked()).FromMaybe(false))
     {
-        v8::Local<v8::Value> scaling_val = options->Get(Nan::New("scaling_method").ToLocalChecked());
+        v8::Local<v8::Value> scaling_val = Nan::Get(options, Nan::New("scaling_method").ToLocalChecked()).ToLocalChecked();
         if (scaling_val->IsNumber())
         {
-            std::int64_t scaling_int = scaling_val->IntegerValue();
+            std::int64_t scaling_int = scaling_val->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             if (scaling_int > mapnik::SCALING_BLACKMAN || scaling_int < 0)
             {
                 Nan::ThrowTypeError("Invalid scaling_method");
@@ -2216,12 +2247,12 @@ v8::Local<v8::Value> Image::_resizeSync(Nan::NAN_METHOD_ARGS_TYPE info)
         }
     }
 
-    if (options->Has(Nan::New("filter_factor").ToLocalChecked()))
+    if (Nan::Has(options, Nan::New("filter_factor").ToLocalChecked()).FromMaybe(false))
     {
-        v8::Local<v8::Value> ff_val = options->Get(Nan::New("filter_factor").ToLocalChecked());
+        v8::Local<v8::Value> ff_val = Nan::Get(options, Nan::New("filter_factor").ToLocalChecked()).ToLocalChecked();
         if (ff_val->IsNumber())
         {
-            filter_factor = ff_val->NumberValue();
+            filter_factor = ff_val->NumberValue(Nan::GetCurrentContext()).ToChecked();
         }
         else
         {
@@ -2267,7 +2298,7 @@ v8::Local<v8::Value> Image::_resizeSync(Nan::NAN_METHOD_ARGS_TYPE info)
         mapnik::util::apply_visitor(visit, *imagep);
         Image* new_im = new Image(imagep);
         v8::Local<v8::Value> ext = Nan::New<v8::External>(new_im);
-        Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::New(constructor)->GetFunction(), 1, &ext);
+        Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::GetFunction(Nan::New(constructor)).ToLocalChecked(), 1, &ext);
         if (maybe_local.IsEmpty()) Nan::ThrowError("Could not create new Image instance");
         return scope.Escape(maybe_local.ToLocalChecked());
     }
@@ -2378,7 +2409,7 @@ v8::Local<v8::Value> Image::_openSync(Nan::NAN_METHOD_ARGS_TYPE info)
                 }
                 Image* im = new Image(imagep);
                 v8::Local<v8::Value> ext = Nan::New<v8::External>(im);
-                Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::New(constructor)->GetFunction(), 1, &ext);
+                Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::GetFunction(Nan::New(constructor)).ToLocalChecked(), 1, &ext);
                 if (maybe_local.IsEmpty()) Nan::ThrowError("Could not create new Image instance");
                 return scope.Escape(maybe_local.ToLocalChecked());
             }
@@ -2503,23 +2534,31 @@ void Image::EIO_Open(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterOpen(uv_work_t* req)
+void Image::EIO_AfterOpen(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
+	Nan::AsyncResource async_resource(__func__);
     image_file_ptr_baton_t *closure = static_cast<image_file_ptr_baton_t *>(req->data);
     if (closure->error || !closure->im)
     {
         v8::Local<v8::Value> argv[1] = { Nan::Error(closure->error_name.c_str()) };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
     else
     {
         Image* im = new Image(closure->im);
         v8::Local<v8::Value> ext = Nan::New<v8::External>(im);
-        Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::New(constructor)->GetFunction(), 1, &ext);
-        if (maybe_local.IsEmpty()) Nan::ThrowError("Could not create new Image instance");
-        v8::Local<v8::Value> argv[2] = { Nan::Null(), maybe_local.ToLocalChecked() };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+        Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::GetFunction(Nan::New(constructor)).ToLocalChecked(), 1, &ext);
+		if (maybe_local.IsEmpty())
+		{
+			v8::Local<v8::Value> argv[1] = { Nan::Error("Could not create new Image instance") };
+			async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+		}
+		else
+		{
+			v8::Local<v8::Value> argv[2] = { Nan::Null(), maybe_local.ToLocalChecked() };
+			async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+		}
     }
     closure->cb.Reset();
     delete closure;
@@ -2589,6 +2628,7 @@ v8::Local<v8::Value> Image::_fromSVGSync(bool fromFile, Nan::NAN_METHOD_ARGS_TYP
     double scale = 1.0;
     std::uint32_t max_size = 2048;
     bool strict = false;
+    bool throw_on_unhandled_elements = false;
     if (info.Length() >= 2)
     {
         if (!info[1]->IsObject())
@@ -2596,46 +2636,56 @@ v8::Local<v8::Value> Image::_fromSVGSync(bool fromFile, Nan::NAN_METHOD_ARGS_TYP
             Nan::ThrowTypeError("optional second arg must be an options object");
             return scope.Escape(Nan::Undefined());
         }
-        v8::Local<v8::Object> options = info[1]->ToObject();
-        if (options->Has(Nan::New("scale").ToLocalChecked()))
+        v8::Local<v8::Object> options = info[1]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
+        if (Nan::Has(options, Nan::New("scale").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> scale_opt = options->Get(Nan::New("scale").ToLocalChecked());
+            v8::Local<v8::Value> scale_opt = Nan::Get(options, Nan::New("scale").ToLocalChecked()).ToLocalChecked();
             if (!scale_opt->IsNumber())
             {
                 Nan::ThrowTypeError("'scale' must be a number");
                 return scope.Escape(Nan::Undefined());
             }
-            scale = scale_opt->NumberValue();
+            scale = scale_opt->NumberValue(Nan::GetCurrentContext()).ToChecked();
             if (scale <= 0)
             {
                 Nan::ThrowTypeError("'scale' must be a positive non zero number");
                 return scope.Escape(Nan::Undefined());
             }
         }
-        if (options->Has(Nan::New("max_size").ToLocalChecked()))
+        if (Nan::Has(options, Nan::New("max_size").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> opt = options->Get(Nan::New("max_size").ToLocalChecked());
+            v8::Local<v8::Value> opt = Nan::Get(options, Nan::New("max_size").ToLocalChecked()).ToLocalChecked();
             if (!opt->IsNumber())
             {
                 Nan::ThrowTypeError("'max_size' must be a positive integer");
                 return scope.Escape(Nan::Undefined());
             }
-            auto max_size_val = opt->IntegerValue();
+            auto max_size_val = opt->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             if (max_size_val < 0 || max_size_val > 65535) {
                 Nan::ThrowTypeError("'max_size' must be a positive integer between 0 and 65535");
                 return scope.Escape(Nan::Undefined());
             }
             max_size = static_cast<std::uint32_t>(max_size_val);
         }
-        if (options->Has(Nan::New("strict").ToLocalChecked()))
+        if (Nan::Has(options, Nan::New("strict").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> opt = options->Get(Nan::New("strict").ToLocalChecked());
+            v8::Local<v8::Value> opt = Nan::Get(options, Nan::New("strict").ToLocalChecked()).ToLocalChecked();
             if (!opt->IsBoolean())
             {
                 Nan::ThrowTypeError("'strict' must be a boolean value");
                 return scope.Escape(Nan::Undefined());
             }
-            strict = opt->BooleanValue();
+            strict = opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+        }
+        if (Nan::Has(options, Nan::New("throw_on_unhandled_elements").ToLocalChecked()).FromMaybe(false))
+        {
+            v8::Local<v8::Value> opt = Nan::Get(options, Nan::New("throw_on_unhandled_elements").ToLocalChecked()).ToLocalChecked();
+            if (!opt->IsBoolean())
+            {
+                Nan::ThrowTypeError("'throw_on_unhandled_elements' must be a boolean value");
+                return scope.Escape(Nan::Undefined());
+            }
+            throw_on_unhandled_elements = opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
         }
     }
 
@@ -2650,7 +2700,7 @@ v8::Local<v8::Value> Image::_fromSVGSync(bool fromFile, Nan::NAN_METHOD_ARGS_TYP
         if (fromFile)
         {
             p.parse(TOSTR(info[0]));
-            if (!p.err_handler().error_messages().empty())
+            if (throw_on_unhandled_elements && !p.err_handler().error_messages().empty())
             {
                 std::ostringstream errorMessage;
                 errorMessage << "SVG parse error:" << std::endl;
@@ -2663,7 +2713,7 @@ v8::Local<v8::Value> Image::_fromSVGSync(bool fromFile, Nan::NAN_METHOD_ARGS_TYP
         }
         else
         {
-            v8::Local<v8::Object> obj = info[0]->ToObject();
+            v8::Local<v8::Object> obj = info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
             if (obj->IsNull() || obj->IsUndefined() || !node::Buffer::HasInstance(obj))
             {
                 Nan::ThrowTypeError("first argument is invalid, must be a Buffer");
@@ -2671,7 +2721,7 @@ v8::Local<v8::Value> Image::_fromSVGSync(bool fromFile, Nan::NAN_METHOD_ARGS_TYP
             }
             std::string svg_buffer(node::Buffer::Data(obj),node::Buffer::Length(obj));
             p.parse_from_string(svg_buffer);
-            if (!p.err_handler().error_messages().empty())
+            if (throw_on_unhandled_elements && !p.err_handler().error_messages().empty())
             {
                 std::ostringstream errorMessage;
                 errorMessage << "SVG parse error:" << std::endl;
@@ -2727,7 +2777,7 @@ v8::Local<v8::Value> Image::_fromSVGSync(bool fromFile, Nan::NAN_METHOD_ARGS_TYP
         mtx.translate(0.5 * im.width(), 0.5 * im.height());
 
         mapnik::svg::svg_renderer_agg<mapnik::svg::svg_path_adapter,
-            agg::pod_bvector<mapnik::svg::path_attributes>,
+            mapnik::svg_attribute_type,
             renderer_solid,
             agg::pixfmt_rgba32_pre > svg_renderer_this(svg_path,
                                                        marker_path->attributes());
@@ -2738,7 +2788,7 @@ v8::Local<v8::Value> Image::_fromSVGSync(bool fromFile, Nan::NAN_METHOD_ARGS_TYP
         image_ptr imagep = std::make_shared<mapnik::image_any>(im);
         Image *im2 = new Image(imagep);
         v8::Local<v8::Value> ext = Nan::New<v8::External>(im2);
-        Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::New(constructor)->GetFunction(), 1, &ext);
+        Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::GetFunction(Nan::New(constructor)).ToLocalChecked(), 1, &ext);
         if (maybe_local.IsEmpty()) Nan::ThrowError("Could not create new Image instance");
         return scope.Escape(maybe_local.ToLocalChecked());
     }
@@ -2762,6 +2812,7 @@ typedef struct {
     double scale;
     std::uint32_t max_size;
     bool strict;
+    bool throw_on_unhandled_elements;
     std::string error_name;
     Nan::Persistent<v8::Function> cb;
 } svg_file_ptr_baton_t;
@@ -2775,6 +2826,7 @@ typedef struct {
     double scale;
     std::uint32_t max_size;
     bool strict;
+    bool throw_on_unhandled_elements;
     std::string error_name;
     Nan::Persistent<v8::Object> buffer;
     Nan::Persistent<v8::Function> cb;
@@ -2823,6 +2875,7 @@ NAN_METHOD(Image::fromSVG)
     double scale = 1.0;
     std::uint32_t max_size = 2048;
     bool strict = false;
+    bool throw_on_unhandled_elements = false;
     if (info.Length() >= 3)
     {
         if (!info[1]->IsObject())
@@ -2830,46 +2883,56 @@ NAN_METHOD(Image::fromSVG)
             Nan::ThrowTypeError("optional second arg must be an options object");
             return;
         }
-        v8::Local<v8::Object> options = info[1]->ToObject();
-        if (options->Has(Nan::New("scale").ToLocalChecked()))
+        v8::Local<v8::Object> options = info[1]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
+        if (Nan::Has(options, Nan::New("scale").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> scale_opt = options->Get(Nan::New("scale").ToLocalChecked());
+            v8::Local<v8::Value> scale_opt = Nan::Get(options, Nan::New("scale").ToLocalChecked()).ToLocalChecked();
             if (!scale_opt->IsNumber())
             {
                 Nan::ThrowTypeError("'scale' must be a number");
                 return;
             }
-            scale = scale_opt->NumberValue();
+            scale = scale_opt->NumberValue(Nan::GetCurrentContext()).ToChecked();
             if (scale <= 0)
             {
                 Nan::ThrowTypeError("'scale' must be a positive non zero number");
                 return;
             }
         }
-        if (options->Has(Nan::New("max_size").ToLocalChecked()))
+        if (Nan::Has(options, Nan::New("max_size").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> opt = options->Get(Nan::New("max_size").ToLocalChecked());
+            v8::Local<v8::Value> opt = Nan::Get(options, Nan::New("max_size").ToLocalChecked()).ToLocalChecked();
             if (!opt->IsNumber())
             {
                 Nan::ThrowTypeError("'max_size' must be a positive integer");
                 return;
             }
-            auto max_size_val = opt->IntegerValue();
+            auto max_size_val = opt->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             if (max_size_val < 0 || max_size_val > 65535) {
                 Nan::ThrowTypeError("'max_size' must be a positive integer between 0 and 65535");
                 return;
             }
             max_size = static_cast<std::uint32_t>(max_size_val);
         }
-        if (options->Has(Nan::New("strict").ToLocalChecked()))
+        if (Nan::Has(options, Nan::New("strict").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> opt = options->Get(Nan::New("strict").ToLocalChecked());
+            v8::Local<v8::Value> opt = Nan::Get(options, Nan::New("strict").ToLocalChecked()).ToLocalChecked();
             if (!opt->IsBoolean())
             {
                 Nan::ThrowTypeError("'strict' must be a boolean value");
                 return;
             }
-            strict = opt->BooleanValue();
+            strict = opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+        }
+        if (Nan::Has(options, Nan::New("throw_on_unhandled_elements").ToLocalChecked()).FromMaybe(false))
+        {
+            v8::Local<v8::Value> opt = Nan::Get(options, Nan::New("throw_on_unhandled_elements").ToLocalChecked()).ToLocalChecked();
+            if (!opt->IsBoolean())
+            {
+                Nan::ThrowTypeError("'throw_on_unhandled_elements' must be a boolean value");
+                return;
+            }
+            throw_on_unhandled_elements = opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
         }
     }
 
@@ -2880,6 +2943,7 @@ NAN_METHOD(Image::fromSVG)
     closure->scale = scale;
     closure->max_size = max_size;
     closure->strict = strict;
+    closure->throw_on_unhandled_elements = throw_on_unhandled_elements;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_FromSVG, (uv_after_work_cb)EIO_AfterFromSVG);
     return;
@@ -2898,7 +2962,7 @@ void Image::EIO_FromSVG(uv_work_t* req)
         svg_converter_type svg(svg_path, marker_path->attributes());
         svg_parser p(svg, closure->strict);
         p.parse(closure->filename);
-        if (!p.err_handler().error_messages().empty())
+        if (closure->throw_on_unhandled_elements && !p.err_handler().error_messages().empty())
         {
             std::ostringstream errorMessage;
             errorMessage << "SVG parse error:" << std::endl;
@@ -2957,7 +3021,7 @@ void Image::EIO_FromSVG(uv_work_t* req)
         mtx.translate(0.5 * im.width(), 0.5 * im.height());
 
         mapnik::svg::svg_renderer_agg<mapnik::svg::svg_path_adapter,
-            agg::pod_bvector<mapnik::svg::path_attributes>,
+            mapnik::svg_attribute_type,
             renderer_solid,
             agg::pixfmt_rgba32_pre > svg_renderer_this(svg_path,
                                                        marker_path->attributes());
@@ -2978,23 +3042,31 @@ void Image::EIO_FromSVG(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterFromSVG(uv_work_t* req)
+void Image::EIO_AfterFromSVG(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
+	Nan::AsyncResource async_resource(__func__);
     svg_file_ptr_baton_t *closure = static_cast<svg_file_ptr_baton_t *>(req->data);
     if (closure->error || !closure->im)
     {
         v8::Local<v8::Value> argv[1] = { Nan::Error(closure->error_name.c_str()) };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
     else
     {
         Image* im = new Image(closure->im);
         v8::Local<v8::Value> ext = Nan::New<v8::External>(im);
-        Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::New(constructor)->GetFunction(), 1, &ext);
-        if (maybe_local.IsEmpty()) Nan::ThrowError("Could not create new Image instance");
-        v8::Local<v8::Value> argv[2] = { Nan::Null(), maybe_local.ToLocalChecked() };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+        Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::GetFunction(Nan::New(constructor)).ToLocalChecked(), 1, &ext);
+		if (maybe_local.IsEmpty())
+		{
+			v8::Local<v8::Value> argv[1] = { Nan::Error("Could not create new Image instance") };
+			async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+		}
+		else
+		{
+			v8::Local<v8::Value> argv[2] = { Nan::Null(), maybe_local.ToLocalChecked() };
+			async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+		}
     }
     closure->cb.Reset();
     delete closure;
@@ -3033,7 +3105,7 @@ NAN_METHOD(Image::fromSVGBytes)
         return;
     }
 
-    v8::Local<v8::Object> obj = info[0]->ToObject();
+    v8::Local<v8::Object> obj = info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
     if (obj->IsNull() || obj->IsUndefined() || !node::Buffer::HasInstance(obj)) {
         Nan::ThrowTypeError("first argument is invalid, must be a Buffer");
         return;
@@ -3048,7 +3120,8 @@ NAN_METHOD(Image::fromSVGBytes)
 
     double scale = 1.0;
     std::uint32_t max_size = 2048;
-    bool strict = true;
+    bool strict = false;
+    bool throw_on_unhandled_elements = false;
     if (info.Length() >= 3)
     {
         if (!info[1]->IsObject())
@@ -3056,46 +3129,56 @@ NAN_METHOD(Image::fromSVGBytes)
             Nan::ThrowTypeError("optional second arg must be an options object");
             return;
         }
-        v8::Local<v8::Object> options = info[1]->ToObject();
-        if (options->Has(Nan::New("scale").ToLocalChecked()))
+        v8::Local<v8::Object> options = info[1]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
+        if (Nan::Has(options, Nan::New("scale").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> scale_opt = options->Get(Nan::New("scale").ToLocalChecked());
+            v8::Local<v8::Value> scale_opt = Nan::Get(options, Nan::New("scale").ToLocalChecked()).ToLocalChecked();
             if (!scale_opt->IsNumber())
             {
                 Nan::ThrowTypeError("'scale' must be a number");
                 return;
             }
-            scale = scale_opt->NumberValue();
+            scale = scale_opt->NumberValue(Nan::GetCurrentContext()).ToChecked();
             if (scale <= 0)
             {
                 Nan::ThrowTypeError("'scale' must be a positive non zero number");
                 return;
             }
         }
-        if (options->Has(Nan::New("max_size").ToLocalChecked()))
+        if (Nan::Has(options, Nan::New("max_size").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> opt = options->Get(Nan::New("max_size").ToLocalChecked());
+            v8::Local<v8::Value> opt = Nan::Get(options, Nan::New("max_size").ToLocalChecked()).ToLocalChecked();
             if (!opt->IsNumber())
             {
                 Nan::ThrowTypeError("'max_size' must be a positive integer");
                 return;
             }
-            auto max_size_val = opt->IntegerValue();
+            auto max_size_val = opt->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             if (max_size_val < 0 || max_size_val > 65535) {
                 Nan::ThrowTypeError("'max_size' must be a positive integer between 0 and 65535");
                 return;
             }
             max_size = static_cast<std::uint32_t>(max_size_val);
         }
-        if (options->Has(Nan::New("strict").ToLocalChecked()))
+        if (Nan::Has(options, Nan::New("strict").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> opt = options->Get(Nan::New("strict").ToLocalChecked());
+            v8::Local<v8::Value> opt = Nan::Get(options, Nan::New("strict").ToLocalChecked()).ToLocalChecked();
             if (!opt->IsBoolean())
             {
                 Nan::ThrowTypeError("'strict' must be a boolean value");
                 return;
             }
-            strict = opt->BooleanValue();
+            strict = opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+        }
+        if (Nan::Has(options, Nan::New("throw_on_unhandled_elements").ToLocalChecked()).FromMaybe(false))
+        {
+            v8::Local<v8::Value> opt = Nan::Get(options, Nan::New("throw_on_unhandled_elements").ToLocalChecked()).ToLocalChecked();
+            if (!opt->IsBoolean())
+            {
+                Nan::ThrowTypeError("'throw_on_unhandled_elements' must be a boolean value");
+                return;
+            }
+            throw_on_unhandled_elements = opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
         }
     }
 
@@ -3108,6 +3191,7 @@ NAN_METHOD(Image::fromSVGBytes)
     closure->scale = scale;
     closure->max_size = max_size;
     closure->strict = strict;
+    closure->throw_on_unhandled_elements = throw_on_unhandled_elements;
     closure->dataLength = node::Buffer::Length(obj);
     uv_queue_work(uv_default_loop(), &closure->request, EIO_FromSVGBytes, (uv_after_work_cb)EIO_AfterFromSVGBytes);
     return;
@@ -3128,7 +3212,7 @@ void Image::EIO_FromSVGBytes(uv_work_t* req)
 
         std::string svg_buffer(closure->data,closure->dataLength);
         p.parse_from_string(svg_buffer);
-        if (!p.err_handler().error_messages().empty())
+        if (closure->throw_on_unhandled_elements && !p.err_handler().error_messages().empty())
         {
             std::ostringstream errorMessage;
             errorMessage << "SVG parse error:" << std::endl;
@@ -3186,7 +3270,7 @@ void Image::EIO_FromSVGBytes(uv_work_t* req)
         mtx.translate(0.5 * im.width(), 0.5 * im.height());
 
         mapnik::svg::svg_renderer_agg<mapnik::svg::svg_path_adapter,
-            agg::pod_bvector<mapnik::svg::path_attributes>,
+            mapnik::svg_attribute_type,
             renderer_solid,
             agg::pixfmt_rgba32_pre > svg_renderer_this(svg_path,
                                                        marker_path->attributes());
@@ -3207,22 +3291,32 @@ void Image::EIO_FromSVGBytes(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterFromSVGBytes(uv_work_t* req)
+void Image::EIO_AfterFromSVGBytes(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
+	Nan::AsyncResource async_resource(__func__);
     svg_mem_ptr_baton_t *closure = static_cast<svg_mem_ptr_baton_t *>(req->data);
     if (closure->error || !closure->im)
     {
         v8::Local<v8::Value> argv[1] = { Nan::Error(closure->error_name.c_str()) };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
     else
     {
         Image* im = new Image(closure->im);
         v8::Local<v8::Value> ext = Nan::New<v8::External>(im);
-        v8::Local<v8::Object> image_obj = Nan::New(constructor)->GetFunction()->NewInstance(1, &ext);
-        v8::Local<v8::Value> argv[2] = { Nan::Null(), image_obj };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+        Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::GetFunction(Nan::New(constructor)).ToLocalChecked(), 1, &ext);
+		if (maybe_local.IsEmpty())
+		{
+			v8::Local<v8::Value> argv[1] = { Nan::Error("Could not create new Image instance") };
+			async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+		}
+		else
+		{
+			v8::Local<v8::Object> image_obj = maybe_local.ToLocalChecked()->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
+			v8::Local<v8::Value> argv[2] = { Nan::Null(), image_obj };
+			async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+		}
     }
     closure->cb.Reset();
     closure->buffer.Reset();
@@ -3261,8 +3355,8 @@ v8::Local<v8::Value> Image::_fromBufferSync(Nan::NAN_METHOD_ARGS_TYPE info)
         return scope.Escape(Nan::Undefined());
     }
 
-    unsigned width = info[0]->IntegerValue();
-    unsigned height = info[1]->IntegerValue();
+    unsigned width = info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+    unsigned height = info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
 
     if (width <= 0 || height <= 0)
     {
@@ -3270,7 +3364,7 @@ v8::Local<v8::Value> Image::_fromBufferSync(Nan::NAN_METHOD_ARGS_TYPE info)
         return scope.Escape(Nan::Undefined());
     }
 
-    v8::Local<v8::Object> obj = info[2]->ToObject();
+    v8::Local<v8::Object> obj = info[2]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
     if (obj->IsNull() || obj->IsUndefined() || !node::Buffer::HasInstance(obj)) {
         Nan::ThrowTypeError("third argument is invalid, must be a Buffer");
         return scope.Escape(Nan::Undefined());
@@ -3291,18 +3385,18 @@ v8::Local<v8::Value> Image::_fromBufferSync(Nan::NAN_METHOD_ARGS_TYPE info)
         if (info[3]->IsObject())
         {
             v8::Local<v8::Object> options = v8::Local<v8::Object>::Cast(info[3]);
-            if (options->Has(Nan::New("type").ToLocalChecked()))
+            if (Nan::Has(options, Nan::New("type").ToLocalChecked()).FromMaybe(false))
             {
                 Nan::ThrowTypeError("'type' option not supported (only rgba images currently viable)");
                 return scope.Escape(Nan::Undefined());
             }
 
-            if (options->Has(Nan::New("premultiplied").ToLocalChecked()))
+            if (Nan::Has(options, Nan::New("premultiplied").ToLocalChecked()).FromMaybe(false))
             {
-                v8::Local<v8::Value> pre_val = options->Get(Nan::New("premultiplied").ToLocalChecked());
+                v8::Local<v8::Value> pre_val = Nan::Get(options, Nan::New("premultiplied").ToLocalChecked()).ToLocalChecked();
                 if (!pre_val.IsEmpty() && pre_val->IsBoolean())
                 {
-                    premultiplied = pre_val->BooleanValue();
+                    premultiplied = pre_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
                 }
                 else
                 {
@@ -3311,12 +3405,12 @@ v8::Local<v8::Value> Image::_fromBufferSync(Nan::NAN_METHOD_ARGS_TYPE info)
                 }
             }
 
-            if (options->Has(Nan::New("painted").ToLocalChecked()))
+            if (Nan::Has(options, Nan::New("painted").ToLocalChecked()).FromMaybe(false))
             {
-                v8::Local<v8::Value> painted_val = options->Get(Nan::New("painted").ToLocalChecked());
+                v8::Local<v8::Value> painted_val = Nan::Get(options, Nan::New("painted").ToLocalChecked()).ToLocalChecked();
                 if (!painted_val.IsEmpty() && painted_val->IsBoolean())
                 {
-                    painted = painted_val->BooleanValue();
+                    painted = painted_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
                 }
                 else
                 {
@@ -3338,10 +3432,10 @@ v8::Local<v8::Value> Image::_fromBufferSync(Nan::NAN_METHOD_ARGS_TYPE info)
         image_ptr imagep = std::make_shared<mapnik::image_any>(im_wrapper);
         Image* im = new Image(imagep);
         v8::Local<v8::Value> ext = Nan::New<v8::External>(im);
-        Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::New(constructor)->GetFunction(), 1, &ext);
+        Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::GetFunction(Nan::New(constructor)).ToLocalChecked(), 1, &ext);
         if (maybe_local.IsEmpty()) Nan::ThrowError("Could not create new Image instance");
-        v8::Local<v8::Object> image_obj = maybe_local.ToLocalChecked()->ToObject();
-        image_obj->Set(Nan::New("_buffer").ToLocalChecked(),obj);
+        v8::Local<v8::Object> image_obj = maybe_local.ToLocalChecked()->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
+        Nan::Set(image_obj, Nan::New("_buffer").ToLocalChecked(),obj);
         return scope.Escape(maybe_local.ToLocalChecked());
     }
     catch (std::exception const& ex)
@@ -3380,7 +3474,7 @@ v8::Local<v8::Value> Image::_fromBytesSync(Nan::NAN_METHOD_ARGS_TYPE info)
         return scope.Escape(Nan::Undefined());
     }
 
-    v8::Local<v8::Object> obj = info[0]->ToObject();
+    v8::Local<v8::Object> obj = info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
     if (obj->IsNull() || obj->IsUndefined() || !node::Buffer::HasInstance(obj)) {
         Nan::ThrowTypeError("first argument is invalid, must be a Buffer");
         return scope.Escape(Nan::Undefined());
@@ -3394,7 +3488,7 @@ v8::Local<v8::Value> Image::_fromBytesSync(Nan::NAN_METHOD_ARGS_TYPE info)
             image_ptr imagep = std::make_shared<mapnik::image_any>(reader->read(0,0,reader->width(),reader->height()));
             Image* im = new Image(imagep);
             v8::Local<v8::Value> ext = Nan::New<v8::External>(im);
-            Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::New(constructor)->GetFunction(), 1, &ext);
+            Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::GetFunction(Nan::New(constructor)).ToLocalChecked(), 1, &ext);
             if (maybe_local.IsEmpty()) Nan::ThrowError("Could not create new Image instance");
             return scope.Escape(maybe_local.ToLocalChecked());
         }
@@ -3448,7 +3542,7 @@ NAN_METHOD(Image::fromBytes)
         return;
     }
 
-    v8::Local<v8::Object> obj = info[0]->ToObject();
+    v8::Local<v8::Object> obj = info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
     if (obj->IsNull() || obj->IsUndefined() || !node::Buffer::HasInstance(obj)) {
         Nan::ThrowTypeError("first argument is invalid, must be a Buffer");
         return;
@@ -3468,12 +3562,12 @@ NAN_METHOD(Image::fromBytes)
         if (info[1]->IsObject())
         {
             v8::Local<v8::Object> options = v8::Local<v8::Object>::Cast(info[1]);
-            if (options->Has(Nan::New("premultiply").ToLocalChecked()))
+            if (Nan::Has(options, Nan::New("premultiply").ToLocalChecked()).FromMaybe(false))
             {
-                v8::Local<v8::Value> opt = options->Get(Nan::New("premultiply").ToLocalChecked());
+                v8::Local<v8::Value> opt = Nan::Get(options, Nan::New("premultiply").ToLocalChecked()).ToLocalChecked();
                 if (!opt.IsEmpty() && opt->IsBoolean())
                 {
-                    premultiply = opt->BooleanValue();
+                    premultiply = opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
                 }
                 else
                 {
@@ -3481,12 +3575,12 @@ NAN_METHOD(Image::fromBytes)
                     return;
                 }
             }
-            if (options->Has(Nan::New("max_size").ToLocalChecked()))
+            if (Nan::Has(options, Nan::New("max_size").ToLocalChecked()).FromMaybe(false))
             {
-                v8::Local<v8::Value> opt = options->Get(Nan::New("max_size").ToLocalChecked());
+                v8::Local<v8::Value> opt = Nan::Get(options, Nan::New("max_size").ToLocalChecked()).ToLocalChecked();
                 if (opt->IsNumber())
                 {
-                    auto max_size_val = opt->IntegerValue();
+                    auto max_size_val = opt->IntegerValue(Nan::GetCurrentContext()).ToChecked();
                     if (max_size_val < 0 || max_size_val > 65535) {
                         Nan::ThrowTypeError("max_size must be a positive integer between 0 and 65535");
                         return;
@@ -3543,14 +3637,15 @@ void Image::EIO_FromBytes(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterFromBytes(uv_work_t* req)
+void Image::EIO_AfterFromBytes(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
+	Nan::AsyncResource async_resource(__func__);
     image_mem_ptr_baton_t *closure = static_cast<image_mem_ptr_baton_t *>(req->data);
     if (!closure->error_name.empty())
     {
         v8::Local<v8::Value> argv[1] = { Nan::Error(closure->error_name.c_str()) };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
     else if (closure->im == nullptr)
     {
@@ -3559,16 +3654,23 @@ void Image::EIO_AfterFromBytes(uv_work_t* req)
         // mapnik was not providing an image type it should. This should never
         // be occuring so marking this out from coverage
         v8::Local<v8::Value> argv[1] = { Nan::Error("Failed to load from buffer") };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
         /* LCOV_EXCL_STOP */
     } else
     {
         Image* im = new Image(closure->im);
         v8::Local<v8::Value> ext = Nan::New<v8::External>(im);
-        Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::New(constructor)->GetFunction(), 1, &ext);
-        if (maybe_local.IsEmpty()) Nan::ThrowError("Could not create new Image instance");
-        v8::Local<v8::Value> argv[2] = { Nan::Null(), maybe_local.ToLocalChecked() };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+        Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::GetFunction(Nan::New(constructor)).ToLocalChecked(), 1, &ext);
+		if (maybe_local.IsEmpty())
+		{
+			v8::Local<v8::Value> argv[1] = { Nan::Error("Could not create new Image instance") };
+			async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+		}
+		else
+		{
+			v8::Local<v8::Value> argv[2] = { Nan::Null(), maybe_local.ToLocalChecked() };
+			async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+		}
     }
     closure->cb.Reset();
     closure->buffer.Reset();
@@ -3614,16 +3716,16 @@ NAN_METHOD(Image::encodeSync)
             Nan::ThrowTypeError("optional second arg must be an options object");
             return;
         }
-        v8::Local<v8::Object> options = info[1]->ToObject();
-        if (options->Has(Nan::New("palette").ToLocalChecked()))
+        v8::Local<v8::Object> options = info[1]->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
+        if (Nan::Has(options, Nan::New("palette").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> format_opt = options->Get(Nan::New("palette").ToLocalChecked());
+            v8::Local<v8::Value> format_opt = Nan::Get(options, Nan::New("palette").ToLocalChecked()).ToLocalChecked();
             if (!format_opt->IsObject()) {
                 Nan::ThrowTypeError("'palette' must be an object");
                 return;
             }
 
-            v8::Local<v8::Object> obj = format_opt->ToObject();
+            v8::Local<v8::Object> obj = format_opt->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
             if (obj->IsNull() || obj->IsUndefined() || !Nan::New(Palette::constructor)->HasInstance(obj)) {
                 Nan::ThrowTypeError("mapnik.Palette expected as second arg");
                 return;
@@ -3714,9 +3816,9 @@ NAN_METHOD(Image::encode)
 
         v8::Local<v8::Object> options = info[1].As<v8::Object>();
 
-        if (options->Has(Nan::New("palette").ToLocalChecked()))
+        if (Nan::Has(options, Nan::New("palette").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> format_opt = options->Get(Nan::New("palette").ToLocalChecked());
+            v8::Local<v8::Value> format_opt = Nan::Get(options, Nan::New("palette").ToLocalChecked()).ToLocalChecked();
             if (!format_opt->IsObject()) {
                 Nan::ThrowTypeError("'palette' must be an object");
                 return;
@@ -3747,7 +3849,7 @@ NAN_METHOD(Image::encode)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Encode, (uv_after_work_cb)EIO_AfterEncode);
-    im->Ref();
+    im->_ref();
 
     return;
 }
@@ -3773,23 +3875,24 @@ void Image::EIO_Encode(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterEncode(uv_work_t* req)
+void Image::EIO_AfterEncode(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
+	Nan::AsyncResource async_resource(__func__);
 
     encode_image_baton_t *closure = static_cast<encode_image_baton_t *>(req->data);
 
     if (closure->error) {
         v8::Local<v8::Value> argv[1] = { Nan::Error(closure->error_name.c_str()) };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
     else
     {
         v8::Local<v8::Value> argv[2] = { Nan::Null(), Nan::CopyBuffer((char*)closure->result.data(), closure->result.size()).ToLocalChecked() };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
 
-    closure->im->Unref();
+    closure->im->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -3820,10 +3923,10 @@ NAN_METHOD(Image::view)
     }
 
     // TODO parse args
-    unsigned x = info[0]->IntegerValue();
-    unsigned y = info[1]->IntegerValue();
-    unsigned w = info[2]->IntegerValue();
-    unsigned h = info[3]->IntegerValue();
+    unsigned x = info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+    unsigned y = info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+    unsigned w = info[2]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+    unsigned h = info[3]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
 
     Image* im = Nan::ObjectWrap::Unwrap<Image>(info.Holder());
     info.GetReturnValue().Set(ImageView::NewInstance(im,x,y,w,h));
@@ -3956,7 +4059,7 @@ NAN_METHOD(Image::save)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Save, (uv_after_work_cb)EIO_AfterSave);
-    im->Ref();
+    im->_ref();
     return;
 }
 
@@ -3976,21 +4079,22 @@ void Image::EIO_Save(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterSave(uv_work_t* req)
+void Image::EIO_AfterSave(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
+	Nan::AsyncResource async_resource(__func__);
     save_image_baton_t *closure = static_cast<save_image_baton_t *>(req->data);
     if (closure->error)
     {
         v8::Local<v8::Value> argv[1] = { Nan::Error(closure->error_name.c_str()) };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
     else
     {
         v8::Local<v8::Value> argv[1] = { Nan::Null() };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
-    closure->im->Unref();
+    closure->im->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -4095,15 +4199,15 @@ NAN_METHOD(Image::composite)
 
         v8::Local<v8::Object> options = info[1].As<v8::Object>();
 
-        if (options->Has(Nan::New("comp_op").ToLocalChecked()))
+        if (Nan::Has(options, Nan::New("comp_op").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> opt = options->Get(Nan::New("comp_op").ToLocalChecked());
+            v8::Local<v8::Value> opt = Nan::Get(options, Nan::New("comp_op").ToLocalChecked()).ToLocalChecked();
             if (!opt->IsNumber())
             {
                 Nan::ThrowTypeError("comp_op must be a mapnik.compositeOp value");
                 return;
             }
-            int mode_int = opt->IntegerValue();
+            int mode_int = opt->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             if (mode_int > static_cast<int>(mapnik::composite_mode_e::divide) || mode_int < 0)
             {
                 Nan::ThrowTypeError("Invalid comp_op value");
@@ -4112,43 +4216,43 @@ NAN_METHOD(Image::composite)
             mode = static_cast<mapnik::composite_mode_e>(mode_int);
         }
 
-        if (options->Has(Nan::New("opacity").ToLocalChecked()))
+        if (Nan::Has(options, Nan::New("opacity").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> opt = options->Get(Nan::New("opacity").ToLocalChecked());
+            v8::Local<v8::Value> opt = Nan::Get(options, Nan::New("opacity").ToLocalChecked()).ToLocalChecked();
             if (!opt->IsNumber()) {
                 Nan::ThrowTypeError("opacity must be a floating point number");
                 return;
             }
-            opacity = opt->NumberValue();
+            opacity = opt->NumberValue(Nan::GetCurrentContext()).ToChecked();
             if (opacity < 0 || opacity > 1) {
                 Nan::ThrowTypeError("opacity must be a floating point number between 0-1");
                 return;
             }
         }
 
-        if (options->Has(Nan::New("dx").ToLocalChecked()))
+        if (Nan::Has(options, Nan::New("dx").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> opt = options->Get(Nan::New("dx").ToLocalChecked());
+            v8::Local<v8::Value> opt = Nan::Get(options, Nan::New("dx").ToLocalChecked()).ToLocalChecked();
             if (!opt->IsNumber()) {
                 Nan::ThrowTypeError("dx must be an integer");
                 return;
             }
-            dx = opt->IntegerValue();
+            dx = opt->IntegerValue(Nan::GetCurrentContext()).ToChecked();
         }
 
-        if (options->Has(Nan::New("dy").ToLocalChecked()))
+        if (Nan::Has(options, Nan::New("dy").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> opt = options->Get(Nan::New("dy").ToLocalChecked());
+            v8::Local<v8::Value> opt = Nan::Get(options, Nan::New("dy").ToLocalChecked()).ToLocalChecked();
             if (!opt->IsNumber()) {
                 Nan::ThrowTypeError("dy must be an integer");
                 return;
             }
-            dy = opt->IntegerValue();
+            dy = opt->IntegerValue(Nan::GetCurrentContext()).ToChecked();
         }
 
-        if (options->Has(Nan::New("image_filters").ToLocalChecked()))
+        if (Nan::Has(options, Nan::New("image_filters").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> opt = options->Get(Nan::New("image_filters").ToLocalChecked());
+            v8::Local<v8::Value> opt = Nan::Get(options, Nan::New("image_filters").ToLocalChecked()).ToLocalChecked();
             if (!opt->IsString()) {
                 Nan::ThrowTypeError("image_filters argument must string of filter names");
                 return;
@@ -4175,8 +4279,8 @@ NAN_METHOD(Image::composite)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Composite, (uv_after_work_cb)EIO_AfterComposite);
-    closure->im1->Ref();
-    closure->im2->Ref();
+    closure->im1->_ref();
+    closure->im2->_ref();
     return;
 }
 
@@ -4205,23 +4309,24 @@ void Image::EIO_Composite(uv_work_t* req)
     }
 }
 
-void Image::EIO_AfterComposite(uv_work_t* req)
+void Image::EIO_AfterComposite(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
+	Nan::AsyncResource async_resource(__func__);
 
     composite_image_baton_t *closure = static_cast<composite_image_baton_t *>(req->data);
 
     if (closure->error)
     {
         v8::Local<v8::Value> argv[1] = { Nan::Error(closure->error_name.c_str()) };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     } else {
         v8::Local<v8::Value> argv[2] = { Nan::Null(), closure->im1->handle() };
-        Nan::MakeCallback(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
+        async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
 
-    closure->im1->Unref();
-    closure->im2->Unref();
+    closure->im1->_unref();
+    closure->im2->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -4247,7 +4352,7 @@ NAN_SETTER(Image::set_scaling)
     }
     else
     {
-        double val = value->NumberValue();
+        double val = value->NumberValue(Nan::GetCurrentContext()).ToChecked();
         if (val == 0.0)
         {
             Nan::ThrowError("Scaling value can not be zero");
@@ -4266,7 +4371,7 @@ NAN_SETTER(Image::set_offset)
     }
     else
     {
-        double val = value->NumberValue();
+        double val = value->NumberValue(Nan::GetCurrentContext()).ToChecked();
         im->this_->set_offset(val);
     }
 }
@@ -4288,3 +4393,45 @@ NAN_METHOD(Image::data)
     // TODO - make this zero copy
     info.GetReturnValue().Set(Nan::CopyBuffer(reinterpret_cast<const char *>(im->this_->bytes()), im->this_->size()).ToLocalChecked());
 }
+
+NAN_GETTER(Image::get_metrics_enabled)
+{
+#ifndef MAPNIK_METRICS
+    bool active = false;
+#else
+    Image* im = Nan::ObjectWrap::Unwrap<Image>(info.Holder());
+    bool active = im->this_->get_metrics().enabled_;
+#endif
+    info.GetReturnValue().Set(Nan::New<v8::Boolean>(active));
+}
+
+NAN_SETTER(Image::set_metrics_enabled)
+{
+#ifdef MAPNIK_METRICS
+    Image* im = Nan::ObjectWrap::Unwrap<Image>(info.Holder());
+    if (!value->IsBoolean())
+    {
+        Nan::ThrowError("Must provide a boolean");
+    }
+    else
+    {
+        bool val = value->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+        im->this_->get_metrics().enabled_ = val;
+    }
+#endif
+}
+
+NAN_METHOD(Image::get_metrics)
+{
+#ifdef MAPNIK_METRICS
+    Image* im = Nan::ObjectWrap::Unwrap<Image>(info.Holder());
+    auto result = node_mapnik::metrics_to_object(im->this_->get_metrics());
+    if (!result.IsEmpty())
+    {
+        info.GetReturnValue().Set(result.ToLocalChecked());
+        return;
+    }
+#endif
+    info.GetReturnValue().Set(Nan::New<v8::Object>());
+}
+
