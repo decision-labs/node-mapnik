@@ -1013,7 +1013,7 @@ NAN_METHOD(VectorTile::composite)
                 Nan::ThrowTypeError("option 'simplify_distance' must be an floating point number");
                 return;
             }
-            simplify_distance = param_val->NumberValue();
+            simplify_distance = param_val->NumberValue(Nan::GetCurrentContext()).ToChecked();
             if (simplify_distance < 0.0)
             {
                 Nan::ThrowTypeError("option 'simplify_distance' can not be negative");
@@ -2342,7 +2342,7 @@ struct geometry_array_visitor
     }
 
     template <typename T>
-    v8::Local<v8::Array> operator() (mapnik::geometry::polygon<T> const & poly)
+    v8::Local<v8::Array> operator() (mapnik::geometry::polygon<T> const & geom)
     {
         Nan::EscapableHandleScope scope;
         if (geom.exterior_ring.empty())
@@ -3261,7 +3261,7 @@ NAN_METHOD(VectorTile::addGeoJSON)
                 Nan::ThrowTypeError("option 'simplify_distance' must be an floating point number");
                 return;
             }
-            simplify_distance = param_val->NumberValue();
+            simplify_distance = param_val->NumberValue(Nan::GetCurrentContext()).ToChecked();
             if (simplify_distance < 0.0)
             {
                 Nan::ThrowTypeError("option 'simplify_distance' must be a positive number");
