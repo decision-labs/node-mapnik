@@ -67,9 +67,9 @@ NAN_METHOD(rgb2hsl) {
         return;
     }
     std::uint32_t r,g,b;
-    r = info[0]->IntegerValue();
-    g = info[1]->IntegerValue();
-    b = info[2]->IntegerValue();
+    r = info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+    g = info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+    b = info[2]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
     v8::Local<v8::Array> hsl = Nan::New<v8::Array>(3);
     double h,s,l;
     rgb_to_hsl(r,g,b,h,s,l);
@@ -667,7 +667,7 @@ NAN_METHOD(Blend) {
         if (node::Buffer::HasInstance(buffer)) {
             image->buffer.Reset(buffer.As<v8::Object>());
         } else if (buffer->IsObject()) {
-            v8::Local<v8::Object> props = buffer->ToObject();
+            v8::Local<v8::Object> props = buffer->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
             if (Nan::New(Image::constructor)->HasInstance(props)) {
                 Image * im = Nan::ObjectWrap::Unwrap<Image>(props);
                 if (im->get()->get_dtype() == mapnik::image_dtype_rgba8) {
@@ -677,7 +677,7 @@ NAN_METHOD(Blend) {
                     return;
                 }
             } else {
-                if (props->Has(Nan::New("buffer").ToLocalChecked())) {
+                if (Nan::Has(props, Nan::New("buffer").ToLocalChecked()).FromMaybe(false)) {
                     buffer = props->Get(Nan::New("buffer").ToLocalChecked());
                     if (node::Buffer::HasInstance(buffer)) {
                         image->buffer.Reset(buffer.As<v8::Object>());
@@ -694,12 +694,12 @@ NAN_METHOD(Blend) {
                         }
                     }
                 }
-                image->x = props->Get(Nan::New("x").ToLocalChecked())->Int32Value();
-                image->y = props->Get(Nan::New("y").ToLocalChecked())->Int32Value();
+                image->x = props->Get(Nan::New("x").ToLocalChecked())->Int32Value(Nan::GetCurrentContext()).ToChecked();
+                image->y = props->Get(Nan::New("y").ToLocalChecked())->Int32Value(Nan::GetCurrentContext()).ToChecked();
 
                 v8::Local<v8::Value> tint_val = props->Get(Nan::New("tint").ToLocalChecked());
                 if (!tint_val.IsEmpty() && tint_val->IsObject()) {
-                    v8::Local<v8::Object> tint = tint_val->ToObject();
+                    v8::Local<v8::Object> tint = tint_val->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
                     if (!tint.IsEmpty()) {
                         baton->reencode = true;
                         std::string msg;
@@ -730,7 +730,7 @@ NAN_METHOD(Blend) {
         }
     }
 
-    uv_queue_work(uv_default_loop(), &(baton.release())->request, Work_Blend, (uv_after_work_cb)Work_AfterBlend);
+    uv_queue_work(uv_default_loop(), &(baton.release())->request, Work_Blend, (uv_after_work_cb)EIO_AfterBlend);
 
     return;
 }

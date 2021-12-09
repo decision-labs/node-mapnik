@@ -1894,32 +1894,32 @@ NAN_METHOD(Image::resize)
             Nan::ThrowTypeError("optional arg 'offset_y' must be a number");
             return;
         }
-        offset_y = bind_opt->NumberValue();
+        offset_y = bind_opt->NumberValue(Nan::GetCurrentContext()).ToChecked();
     }
-    if (options->Has(Nan::New("offset_width").ToLocalChecked()))
+    if (Nan::Has(options, Nan::New("offset_width").ToLocalChecked()).FromMaybe(false))
     {
-        v8::Local<v8::Value> bind_opt = options->Get(Nan::New("offset_width").ToLocalChecked());
+        v8::Local<v8::Value> bind_opt = Nan::Get(options, Nan::New("offset_width").ToLocalChecked()).ToLocalChecked();
         if (!bind_opt->IsNumber())
         {
             Nan::ThrowTypeError("optional arg 'offset_width' must be a number");
             return;
         }
-        offset_width = bind_opt->NumberValue();
+        offset_width = bind_opt->NumberValue(Nan::GetCurrentContext()).ToChecked();
         if (offset_width <= 0.0)
         {
             Nan::ThrowTypeError("optional arg 'offset_width' must be a integer greater then zero");
             return;
         }
     }
-    if (options->Has(Nan::New("offset_height").ToLocalChecked()))
+    if (Nan::Has(options, Nan::New("offset_height").ToLocalChecked()).FromMaybe(false))
     {
-        v8::Local<v8::Value> bind_opt = options->Get(Nan::New("offset_height").ToLocalChecked());
+        v8::Local<v8::Value> bind_opt = Nan::Get(options, Nan::New("offset_height").ToLocalChecked()).ToLocalChecked();
         if (!bind_opt->IsNumber())
         {
             Nan::ThrowTypeError("optional arg 'offset_height' must be a number");
             return;
         }
-        offset_height = bind_opt->NumberValue();
+        offset_height = bind_opt->NumberValue(Nan::GetCurrentContext()).ToChecked();
         if (offset_height <= 0.0)
         {
             Nan::ThrowTypeError("optional arg 'offset_height' must be a integer greater then zero");
@@ -2257,7 +2257,7 @@ v8::Local<v8::Value> Image::_resizeSync(Nan::NAN_METHOD_ARGS_TYPE info)
             Nan::ThrowTypeError("optional arg 'offset_x' must be a number");
             return scope.Escape(Nan::Undefined());
         }
-        offset_x = bind_opt->NumberValue();
+        offset_x = bind_opt->NumberValue(Nan::GetCurrentContext()).ToChecked();
     }
     if (Nan::Has(options, Nan::New("offset_y").ToLocalChecked()).FromMaybe(false))
     {
@@ -2267,32 +2267,32 @@ v8::Local<v8::Value> Image::_resizeSync(Nan::NAN_METHOD_ARGS_TYPE info)
             Nan::ThrowTypeError("optional arg 'offset_y' must be a number");
             return scope.Escape(Nan::Undefined());
         }
-        offset_y = bind_opt->NumberValue();
+        offset_y = bind_opt->NumberValue(Nan::GetCurrentContext()).ToChecked();
     }
-    if (options->Has(Nan::New("offset_width").ToLocalChecked()))
+    if (Nan::Has(options, Nan::New("offset_width").ToLocalChecked()).FromMaybe(false))
     {
-        v8::Local<v8::Value> bind_opt = options->Get(Nan::New("offset_width").ToLocalChecked());
+        v8::Local<v8::Value> bind_opt = Nan::Get(options, Nan::New("offset_width").ToLocalChecked()).ToLocalChecked();
         if (!bind_opt->IsNumber())
         {
             Nan::ThrowTypeError("optional arg 'offset_width' must be a number");
             return scope.Escape(Nan::Undefined());
         }
-        offset_width = bind_opt->NumberValue();
+        offset_width = bind_opt->NumberValue(Nan::GetCurrentContext()).ToChecked();
         if (offset_width <= 0.0)
         {
             Nan::ThrowTypeError("optional arg 'offset_width' must be a integer greater then zero");
             return scope.Escape(Nan::Undefined());
         }
     }
-    if (options->Has(Nan::New("offset_height").ToLocalChecked()))
+    if (Nan::Has(options, Nan::New("offset_height").ToLocalChecked()).FromMaybe(false))
     {
-        v8::Local<v8::Value> bind_opt = options->Get(Nan::New("offset_height").ToLocalChecked());
+        v8::Local<v8::Value> bind_opt = Nan::Get(options, Nan::New("offset_height").ToLocalChecked()).ToLocalChecked();
         if (!bind_opt->IsNumber())
         {
             Nan::ThrowTypeError("optional arg 'offset_height' must be a number");
             return scope.Escape(Nan::Undefined());
         }
-        offset_height = bind_opt->NumberValue();
+        offset_height = bind_opt->NumberValue(Nan::GetCurrentContext()).ToChecked();
         if (offset_height <= 0.0)
         {
             Nan::ThrowTypeError("optional arg 'offset_height' must be a integer greater then zero");
