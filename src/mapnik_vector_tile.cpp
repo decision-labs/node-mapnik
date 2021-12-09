@@ -1006,10 +1006,13 @@ NAN_METHOD(VectorTile::composite)
             }
         }
         if (Nan::Has(options, Nan::New("simplify_distance").ToLocalChecked()).FromMaybe(false))
+            v8::Local<v8::Value> param_val = Nan::Get(options, Nan::New("simplify_distance").ToLocalChecked()).ToLocalChecked();
+            if (!param_val->IsNumber())
             {
+                Nan::ThrowTypeError("option 'simplify_distance' must be an floating point number");
                 return;
             }
-            simplify_distance = param_val->NumberValue(Nan::GetCurrentContext()).ToChecked();
+            simplify_distance = param_val->NumberValue();
             if (simplify_distance < 0.0)
             {
                 Nan::ThrowTypeError("option 'simplify_distance' can not be negative");
