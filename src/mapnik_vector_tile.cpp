@@ -4650,7 +4650,8 @@ void VectorTile::after_get_data(uv_work_t* req)
     }
     else if (!closure->data->empty())
     {
-        v8::Local<v8::Value> argv[2] = { Nan::Null(), Nan::CopyBuffer((char*)closure->data.data(),closure->data.size()).ToLocalChecked() };
+        v8::Local<v8::Value> argv[2] = { Nan::Null(), 
+                                         node_mapnik::NewBufferFrom(std::move(closure->data)).ToLocalChecked() };
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
     else
