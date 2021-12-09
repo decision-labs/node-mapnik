@@ -4,6 +4,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic ignored "-Wcast-function-type"
 #include <nan.h>
 #pragma GCC diagnostic pop
 
@@ -33,28 +34,28 @@ public:
     static NAN_METHOD(loadSync);
     static NAN_METHOD(load);
     static void EIO_Load(uv_work_t* req);
-    static void EIO_AfterLoad(uv_work_t* req);
+    static void EIO_AfterLoad(uv_work_t* req, int);
 
     static NAN_METHOD(fromStringSync);
     static NAN_METHOD(fromString);
     static void EIO_FromString(uv_work_t* req);
-    static void EIO_AfterFromString(uv_work_t* req);
+    static void EIO_AfterFromString(uv_work_t* req, int);
     static NAN_METHOD(clone);
 
     // async rendering
     static NAN_METHOD(render);
     static void EIO_RenderImage(uv_work_t* req);
-    static void EIO_AfterRenderImage(uv_work_t* req);
+    static void EIO_AfterRenderImage(uv_work_t* req, int);
 #if defined(GRID_RENDERER)
     static void EIO_RenderGrid(uv_work_t* req);
-    static void EIO_AfterRenderGrid(uv_work_t* req);
+    static void EIO_AfterRenderGrid(uv_work_t* req, int);
 #endif
     static void EIO_RenderVectorTile(uv_work_t* req);
-    static void EIO_AfterRenderVectorTile(uv_work_t* req);
+    static void EIO_AfterRenderVectorTile(uv_work_t* req, int);
 
     static NAN_METHOD(renderFile);
     static void EIO_RenderFile(uv_work_t* req);
-    static void EIO_AfterRenderFile(uv_work_t* req);
+    static void EIO_AfterRenderFile(uv_work_t* req, int);
 
     // sync rendering
     static NAN_METHOD(renderSync);
@@ -74,7 +75,7 @@ public:
     static NAN_METHOD(queryMapPoint);
     static v8::Local<v8::Value> abstractQueryPoint(Nan::NAN_METHOD_ARGS_TYPE info, bool geo_coords);
     static void EIO_QueryMap(uv_work_t* req);
-    static void EIO_AfterQueryMap(uv_work_t* req);
+    static void EIO_AfterQueryMap(uv_work_t* req, int);
 
     static NAN_METHOD(add_layer);
     static NAN_METHOD(get_layer);
