@@ -4437,14 +4437,7 @@ v8::Local<v8::Value> VectorTile::_getDataSync(Nan::NAN_METHOD_ARGS_TYPE info)
             }
             if (!compress)
             {
-                if (release)
-                {
-                    return scope.Escape(node_mapnik::NewBufferFrom(d->tile_->release_buffer()).ToLocalChecked());
-                }
-                else
-                {
-                    return scope.Escape(Nan::CopyBuffer((char*)d->tile_->data(),raw_size).ToLocalChecked());
-                }
+                return scope.Escape(Nan::CopyBuffer((char*)d->tile_->data(),raw_size).ToLocalChecked());
             }
             else
             {
