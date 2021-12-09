@@ -4543,17 +4543,7 @@ NAN_METHOD(VectorTile::getData)
             }
             compress = std::string("gzip") == (TOSTR(param_val->ToString(Nan::GetCurrentContext()).ToLocalChecked()));
         }
-        if (options->Has(Nan::New<v8::String>("release").ToLocalChecked()))
-        {
-            v8::Local<v8::Value> param_val = options->Get(Nan::New("release").ToLocalChecked());
-            if (!param_val->IsBoolean())
-            {
-                Nan::ThrowTypeError("option 'release' must be a boolean");
-                return;
-            }
-            release = param_val->BooleanValue();
-        }
-        if (options->Has(Nan::New("level").ToLocalChecked()))
+        if (Nan::Has(options, Nan::New("level").ToLocalChecked()))
         {
             v8::Local<v8::Value> param_val = Nan::Get(options, Nan::New("level").ToLocalChecked()).ToLocalChecked();
             if (!param_val->IsNumber())
