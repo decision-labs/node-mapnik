@@ -4364,17 +4364,7 @@ v8::Local<v8::Value> VectorTile::_getDataSync(Nan::NAN_METHOD_ARGS_TYPE info)
             }
             compress = std::string("gzip") == (TOSTR(param_val->ToString(Nan::GetCurrentContext()).ToLocalChecked()));
         }
-        if (options->Has(Nan::New<v8::String>("release").ToLocalChecked()))
-        {
-            v8::Local<v8::Value> param_val = options->Get(Nan::New("release").ToLocalChecked());
-            if (!param_val->IsBoolean())
-            {
-                Nan::ThrowError("option 'release' must be a boolean");
-                return scope.Escape(Nan::Undefined());
-            }
-            release = param_val->BooleanValue();
-        }
-        if (options->Has(Nan::New<v8::String>("level").ToLocalChecked()))
+        if (Nan::Has(options, Nan::New<v8::String>("level").ToLocalChecked()))
         {
             v8::Local<v8::Value> param_val = Nan::Get(options, Nan::New("level").ToLocalChecked()).ToLocalChecked();
             if (!param_val->IsNumber())
