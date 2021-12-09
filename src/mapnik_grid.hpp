@@ -6,6 +6,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic ignored "-Wcast-function-type"
 #include <nan.h>
 #pragma GCC diagnostic pop
 
@@ -25,7 +26,7 @@ public:
     static NAN_METHOD(encodeSync);
     static NAN_METHOD(encode);
     static void EIO_Encode(uv_work_t* req);
-    static void EIO_AfterEncode(uv_work_t* req);
+    static void EIO_AfterEncode(uv_work_t* req, int);
 
     static NAN_METHOD(addField);
     static NAN_METHOD(fields);
@@ -37,10 +38,15 @@ public:
     static NAN_METHOD(clearSync);
     static NAN_METHOD(clear);
     static void EIO_Clear(uv_work_t* req);
-    static void EIO_AfterClear(uv_work_t* req);
+    static void EIO_AfterClear(uv_work_t* req, int);
 
     static NAN_GETTER(get_key);
     static NAN_SETTER(set_key);
+
+    static NAN_GETTER(get_metrics_enabled); //false if MAPNIK_METRICS undefined
+    static NAN_SETTER(set_metrics_enabled);
+    static NAN_METHOD(get_metrics);
+
     void _ref() { Ref(); }
     void _unref() { Unref(); }
 
