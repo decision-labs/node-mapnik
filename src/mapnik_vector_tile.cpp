@@ -150,35 +150,51 @@ struct p2p_distance
         }
         return p2p;
     }
-    p2p_result operator() (mapnik::geometry::polygon<double> const& poly) const
+    p2p_result operator() (mapnik::geometry::polygon<double> const& geom) const
     {
+        auto const& exterior = geom.exterior_ring;
+        std::size_t num_points = exterior.num_points();
         p2p_result p2p;
-        std::size_t num_rings = poly.size();
-        bool inside = false;
-        for (std::size_t ring_index = 0; ring_index < num_rings; ++ring_index)
+        if (num_points < 4)
         {
-            auto const& ring = poly[ring_index];
-            auto num_points = ring.size();
-            if (num_points < 4)
+            return p2p;
+        }
+        bool inside = false;
+        for (std::size_t i = 1; i < num_points; ++i)
+        {
+            auto const& pt0 = exterior[i-1];
+            auto const& pt1 = exterior[i];
+            // todo - account for tolerance
+            if (mapnik::detail::pip(pt0.x,pt0.y,pt1.x,pt1.y,x_,y_))
             {
-                if (ring_index == 0) // exterior
-                    return p2p;
-                else // interior
-                    continue;
+                inside = !inside;
             }
-            for (std::size_t index = 1; index < num_points; ++index)
+        }
+        if (!inside)
+        {
+            return p2p;
+        }
+        for (auto const& ring :  geom.interior_rings)
+        {
+            std::size_t num_interior_points = ring.size();
+            if (num_interior_points < 4)
             {
-                auto const& pt0 = ring[index - 1];
-                auto const& pt1 = ring[index];
-                // todo - account for tolerance
-                if (mapnik::detail::pip(pt0.x, pt0.y, pt1.x, pt1.y, x_,y_))
+                continue;
+            }
+            for (std::size_t j = 1; j < num_interior_points; ++j)
+            {
+                auto const& pt0 = ring[j-1];
+                auto const& pt1 = ring[j];
+                if (mapnik::detail::pip(pt0.x,pt0.y,pt1.x,pt1.y,x_,y_))
                 {
-                    inside = !inside;
+                    inside=!inside;
                 }
             }
-            if (ring_index == 0 && !inside) return p2p;
         }
-        if (inside) p2p.distance = 0;
+        if (inside)
+        {
+            p2p.distance = 0;
+        }
         return p2p;
     }
 
