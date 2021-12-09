@@ -3254,6 +3254,7 @@ NAN_METHOD(VectorTile::addGeoJSON)
             }
         }
         if (Nan::Has(options, Nan::New("simplify_distance").ToLocalChecked()).FromMaybe(false))
+        {   
             v8::Local<v8::Value> param_val = Nan::Get(options, Nan::New("simplify_distance").ToLocalChecked()).ToLocalChecked();
             if (!param_val->IsNumber())
             {
