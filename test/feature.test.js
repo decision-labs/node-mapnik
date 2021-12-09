@@ -384,7 +384,7 @@ describe('mapnik.Feature ', function() {
                     coordinates: [[[1,1],[2,1],[2,2],[1,2],[1,1]]]
                 }
             };
-        var expected = new Buffer('01030000000100000005000000000000000000f03f000000000000f03f0000000000000040000000000000f03f00000000000000400000000000000040000000000000f03f0000000000000040000000000000f03f000000000000f03f', 'hex');
+        var expected = new Buffer.from('01030000000100000005000000000000000000f03f000000000000f03f0000000000000040000000000000f03f00000000000000400000000000000040000000000000f03f0000000000000040000000000000f03f000000000000f03f', 'hex');
         var ds = new mapnik.Datasource({type:'csv', 'inline': "geojson\n'" + JSON.stringify(feature.geometry) + "'"});
         var f = ds.featureset().next();
         assert.deepEqual(expected, f.geometry().toWKB());
