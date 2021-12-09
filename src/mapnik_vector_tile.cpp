@@ -23,13 +23,13 @@
 // mapnik
 #include <mapnik/agg_renderer.hpp>      // for agg_renderer
 #include <mapnik/datasource_cache.hpp>
-#include <mapnik/geometry/box2d.hpp>
+#include <mapnik/box2d.hpp>
 #include <mapnik/feature.hpp>
 #include <mapnik/featureset.hpp>
 #include <mapnik/feature_kv_iterator.hpp>
-#include <mapnik/geometry/is_simple.hpp>
-#include <mapnik/geometry/is_valid.hpp>
-#include <mapnik/geometry/reprojection.hpp>
+#include <mapnik/geometry_is_simple.hpp>
+#include <mapnik/geometry_is_valid.hpp>
+#include <mapnik/geometry_reprojection.hpp>
 #include <mapnik/geom_util.hpp>
 #include <mapnik/hit_test_filter.hpp>
 #include <mapnik/image_any.hpp>

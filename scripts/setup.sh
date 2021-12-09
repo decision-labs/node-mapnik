@@ -11,7 +11,7 @@ if [[ ${PLATFORM} == 'darwin' ]]; then
   PLATFORM="osx"
 fi
 
-MASON_URL="https://s3.amazonaws.com/mapnik-carto/${PLATFORM}-$(uname -m)"
+MASON_URL="https://s3.amazonaws.com/mason-binaries/${PLATFORM}-$(uname -m)"
 
 function run() {
     local config=${1}
