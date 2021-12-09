@@ -2,10 +2,10 @@
 
 Bindings to [Mapnik](http://mapnik.org) for [node](http://nodejs.org).
 
-[![NPM](https://nodei.co/npm/mapnik.png?downloads=true&downloadRank=true)](https://nodei.co/npm/mapnik/)
+[![NPM](https://nodei.co/npm/@carto/mapnik.png?mini=true)](https://nodei.co/npm/@carto/mapnik)
 
-[![Build Status](https://secure.travis-ci.org/mapnik/node-mapnik.png)](https://travis-ci.org/mapnik/node-mapnik)
-[![Coverage Status](https://coveralls.io/repos/mapnik/node-mapnik/badge.svg)](https://coveralls.io/r/mapnik/node-mapnik)
+[![Build Status](https://secure.travis-ci.org/CartoDB/node-mapnik.png)](https://travis-ci.org/CartoDB/node-mapnik)
+
 
 ## Usage
 
@@ -170,8 +170,16 @@ In this case you need to have a Mapnik version installed that is at least as rec
 And you need to have the `mapnik-config` program is available and on your `${PATH}`.
 
 Then run (within the cloned `node-mapnik` directory:
-
+>
     make release_base
+
+#### Note on SSE:
+
+By default node mapnik is built with SSE support. If you are building on a platform that is not `x86_64` you will need to disable feature by setting the environment variable `SSE_MATH=false`.
+
+```
+SSE_MATH=false make
+```
 
 #### Note on SSE:
 
