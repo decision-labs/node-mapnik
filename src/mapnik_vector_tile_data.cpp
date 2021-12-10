@@ -111,28 +111,7 @@ struct AsyncGetData : Napi::AsyncWorker
         }
         else
         {
-            if (release_)
-            {
-                std::unique_ptr<std::string> ptr = tile_->release_buffer();
-                std::string& data = *ptr;
-                auto buffer = Napi::Buffer<char>::New(
-                    Env(),
-                    &data[0],
-                    data.size(),
-                    [](Napi::Env env_, char* /*unused*/, std::string* str_ptr) {
-                        if (str_ptr != nullptr) {
-                            Napi::MemoryManagement::AdjustExternalMemory(env_, -static_cast<std::int64_t>(str_ptr->size()));
-                        }
-                        delete str_ptr;
-                    },
-                    ptr.release());
-                Napi::MemoryManagement::AdjustExternalMemory(env, static_cast<std::int64_t>(data.size()));
-                return {env.Undefined(), buffer};
-            }
-            else
-            {
-                return {env.Undefined(), Napi::Buffer<char>::Copy(env, (char*)tile_->data(), raw_size)};
-            }
+            return {env.Undefined(), Napi::Buffer<char>::Copy(env, (char*)tile_->data(), raw_size)};
         }
         return Base::GetResult(env);
     }
@@ -496,28 +475,7 @@ Napi::Value VectorTile::getDataSync(Napi::CallbackInfo const& info)
             */
             if (!compress)
             {
-                if (release)
-                {
-                    std::unique_ptr<std::string> ptr = tile_->release_buffer();
-                    std::string& data = *ptr;
-                    auto buffer = Napi::Buffer<char>::New(
-                        Env(),
-                        &data[0],
-                        data.size(),
-                        [](Napi::Env env_, char* /*unused*/, std::string* str_ptr) {
-                            if (str_ptr != nullptr) {
-                                Napi::MemoryManagement::AdjustExternalMemory(env_, -static_cast<std::int64_t>(str_ptr->size()));
-                            }
-                            delete str_ptr;
-                        },
-                        ptr.release());
-                    Napi::MemoryManagement::AdjustExternalMemory(env, static_cast<std::int64_t>(data.size()));
-                    return scope.Escape(buffer);
-                }
-                else
-                {
-                    return scope.Escape(Napi::Buffer<char>::Copy(env, (char*)tile_->data(), raw_size));
-                }
+                return scope.Escape(Napi::Buffer<char>::Copy(env, (char*)tile_->data(), raw_size));
             }
             else
             {

@@ -101,7 +101,7 @@ struct AsyncFromSVG : Napi::AsyncWorker
             // render the marker at the center of the marker box
             mtx.translate(0.5 * im.width(), 0.5 * im.height());
 
-            mapnik::svg::renderer_agg<mapnik::svg::svg_path_adapter,
+            mapnik::svg::svg_renderer_agg<mapnik::svg::svg_path_adapter,
                                       mapnik::svg_attribute_type,
                                       renderer_solid,
                                       agg::pixfmt_rgba32_pre > svg_renderer_this(svg_path,
@@ -220,7 +220,7 @@ struct AsyncFromSVGBytes : Napi::AsyncWorker
             // render the marker at the center of the marker box
             mtx.translate(0.5 * im.width(), 0.5 * im.height());
 
-            mapnik::svg::renderer_agg<mapnik::svg::svg_path_adapter,
+            mapnik::svg::svg_renderer_agg<mapnik::svg::svg_path_adapter,
                                       mapnik::svg_attribute_type,
                                       renderer_solid,
                                       agg::pixfmt_rgba32_pre > svg_renderer_this(svg_path,
@@ -422,7 +422,7 @@ Napi::Value Image::from_svg_sync_impl(Napi::CallbackInfo const& info, bool from_
         // render the marker at the center of the marker box
         mtx.translate(0.5 * im.width(), 0.5 * im.height());
 
-        mapnik::svg::renderer_agg<mapnik::svg::svg_path_adapter,
+        mapnik::svg::svg_renderer_agg<mapnik::svg::svg_path_adapter,
             mapnik::svg_attribute_type,
             renderer_solid,
             agg::pixfmt_rgba32_pre > svg_renderer_this(svg_path,

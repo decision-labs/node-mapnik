@@ -8,7 +8,7 @@
 #include <mapnik/map.hpp>
 #include <mapnik/layer.hpp>
 #include <mapnik/agg_renderer.hpp>      // for agg_renderer
-#include <mapnik/geometry/box2d.hpp>    // for box2d
+#include <mapnik/box2d.hpp>    // for box2d
 #include <mapnik/color.hpp>             // for color
 #include <mapnik/attribute.hpp>         // for attributes
 #include <mapnik/util/variant.hpp>      // for save_to_file, guess_type, etc
