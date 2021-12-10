@@ -26,6 +26,7 @@
 #include <mapnik/svg/svg_path_attributes.hpp>
 
 #include "mapnik_image.hpp"
+#include "std_unique.hpp"
 #include "mapnik_image_view.hpp"
 #include "mapnik_palette.hpp"
 #include "mapnik_color.hpp"
@@ -3978,7 +3979,7 @@ void Image::EIO_AfterEncode(uv_work_t* req, int)
     }
     else
     {
-        v8::Local<v8::Value> argv[2] = { Nan::Null(), Nan::CopyBuffer((char*)closure->result.data(), closure->result.size()).ToLocalChecked() };
+        v8::Local<v8::Value> argv[2] = { Nan::Null(), node_mapnik::NewBufferFrom(std::move(closure->result)).ToLocalChecked()};
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
 
