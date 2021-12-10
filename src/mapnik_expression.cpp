@@ -26,7 +26,7 @@ void Expression::Initialize(v8::Local<v8::Object> target) {
     Nan::SetPrototypeMethod(lcons, "toString", toString);
     Nan::SetPrototypeMethod(lcons, "evaluate", evaluate);
 
-    target->Set(Nan::New("Expression").ToLocalChecked(), lcons->GetFunction());
+    Nan::Set(target, Nan::New("Expression").ToLocalChecked(), Nan::GetFunction(lcons).ToLocalChecked());
     constructor.Reset(lcons);
 }
 
@@ -81,21 +81,14 @@ NAN_METHOD(Expression::evaluate)
         return;
     }
 
-    if (!info[0]->IsObject())
-    {
-        Nan::ThrowTypeError("first argument is invalid, must be a mapnik.Feature");
-        return;
-    }
-    v8::Local<v8::Object> obj = info[0].As<v8::Object>();
-    if (obj->IsNull() || obj->IsUndefined() || !Nan::New(Feature::constructor)->HasInstance(obj)) {
+	if (info[0]->IsNull() || info[0]->IsUndefined() || !Nan::New(Feature::constructor)->HasInstance(info[0])) {
         Nan::ThrowTypeError("first argument is invalid, must be a mapnik.Feature");
         return;
     }
 
-    Feature* f = Nan::ObjectWrap::Unwrap<Feature>(obj);
+    Feature* f = Nan::ObjectWrap::Unwrap<Feature>(info[0].As<v8::Object>());
 
     Expression* e = Nan::ObjectWrap::Unwrap<Expression>(info.Holder());
-    v8::Local<v8::Object> options = Nan::New<v8::Object>();
     mapnik::attributes vars;
     if (info.Length() > 1)
     {
@@ -104,17 +97,17 @@ NAN_METHOD(Expression::evaluate)
             Nan::ThrowTypeError("optional second argument must be an options object");
             return;
         }
-        options = info[1]->ToObject();
 
-        if (options->Has(Nan::New("variables").ToLocalChecked()))
+        v8::Local<v8::Object> options = info[1].As<v8::Object>();
+        if (Nan::Has(options, Nan::New("variables").ToLocalChecked()).FromMaybe(false))
         {
-            v8::Local<v8::Value> bind_opt = options->Get(Nan::New("variables").ToLocalChecked());
+            v8::Local<v8::Value> bind_opt = Nan::Get(options, Nan::New("variables").ToLocalChecked()).ToLocalChecked();
             if (!bind_opt->IsObject())
             {
                 Nan::ThrowTypeError("optional arg 'variables' must be an object");
                 return;
             }
-            object_to_container(vars,bind_opt->ToObject());
+            object_to_container(vars,bind_opt->ToObject(Nan::GetCurrentContext()).ToLocalChecked());
         }
     }
     mapnik::value value_obj = mapnik::util::apply_visitor(mapnik::evaluate<mapnik::feature_impl,mapnik::value,mapnik::attributes>(*(f->get()),vars),*(e->get()));
