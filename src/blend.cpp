@@ -21,6 +21,7 @@
 
 #include "mapnik_palette.hpp"
 #include "blend.hpp"
+#include "std_unique.hpp"
 #include "tint.hpp"
 #include "utils.hpp"
 
@@ -108,8 +109,8 @@ static void parseTintOps(v8::Local<v8::Object> const& tint, Tinter & tinter, std
         if (val_array->Length() != 2) {
             msg = "h array must be a pair of values";
         }
-        tinter.h0 = Nan::To<double>(Nan::Get(val_array, 0).ToLocalChecked()).FromJust();
-        tinter.h1 = Nan::To<double>(Nan::Get(val_array, 1).ToLocalChecked()).FromJust();
+        tinter.h0 = Nan::Get(val_array, 0).ToLocalChecked()->NumberValue(Nan::GetCurrentContext()).ToChecked();
+        tinter.h1 = Nan::Get(val_array, 1).ToLocalChecked()->NumberValue(Nan::GetCurrentContext()).ToChecked();
     }
     v8::Local<v8::Value> sat = Nan::Get(tint, Nan::New("s").ToLocalChecked()).ToLocalChecked();
     if (!sat.IsEmpty() && sat->IsArray()) {
@@ -441,7 +442,7 @@ void Work_Blend(uv_work_t* req)
     Blend_Encode(target, baton, alpha);
 }
 
-void Work_AfterBlend(uv_work_t* req) {
+void EIO_AfterBlend(uv_work_t* req, int) {
     Nan::HandleScope scope;
     BlendBaton* baton = static_cast<BlendBaton*>(req->data);
     Nan::AsyncResource async_resource(__func__);
@@ -633,6 +634,20 @@ NAN_METHOD(Blend) {
             Nan::AsyncResource async_resource(__func__);
             async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(baton->callback), 2, argv);
             return;
+        } else {
+            // Check whether the argument is a complex image with offsets etc.
+            // In that case, we don't throw but continue going through the blend
+            // process below.
+            bool valid = false;
+            if (buffer->IsObject()) {
+                v8::Local<v8::Object> props = buffer->ToObject(Nan::GetCurrentContext()).ToLocalChecked();
+                valid = Nan::Has(props, Nan::New("buffer").ToLocalChecked()).FromMaybe(false) &&
+                        node::Buffer::HasInstance(Nan::Get(props, Nan::New("buffer").ToLocalChecked()).ToLocalChecked());
+            }
+            if (!valid) {
+                Nan::ThrowTypeError("All elements must be Buffers or objects with a 'buffer' property.");
+                return;
+            }
         }
     }
 
@@ -715,7 +730,7 @@ NAN_METHOD(Blend) {
         }
     }
 
-    uv_queue_work(uv_default_loop(), &(baton.release())->request, Work_Blend, (uv_after_work_cb)Work_AfterBlend);
+    uv_queue_work(uv_default_loop(), &(baton.release())->request, Work_Blend, (uv_after_work_cb)EIO_AfterBlend);
 
     return;
 }

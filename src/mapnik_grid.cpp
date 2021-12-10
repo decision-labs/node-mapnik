@@ -16,7 +16,7 @@ Nan::Persistent<v8::FunctionTemplate> Grid::constructor;
 
 /**
  * **`mapnik.Grid`**
- * 
+ *
  * Generator for [UTFGrid](https://www.mapbox.com/guides/an-open-platform)
  * representations of data.
  *
@@ -45,8 +45,11 @@ void Grid::Initialize(v8::Local<v8::Object> target) {
     Nan::SetPrototypeMethod(lcons, "painted", painted);
     Nan::SetPrototypeMethod(lcons, "clear", clear);
     Nan::SetPrototypeMethod(lcons, "clearSync", clearSync);
+    Nan::SetPrototypeMethod(lcons, "get_metrics", get_metrics);
+
     // properties
     ATTR(lcons, "key", get_key, set_key);
+    ATTR(lcons, "metrics_enabled", get_metrics_enabled, set_metrics_enabled);
 
     Nan::Set(target, Nan::New("Grid").ToLocalChecked(), Nan::GetFunction(lcons).ToLocalChecked());
     NODE_MAPNIK_DEFINE_64_BIT_CONSTANT(Nan::GetFunction(lcons).ToLocalChecked(), "base_mask", mapnik::grid::base_mask);
@@ -92,7 +95,8 @@ NAN_METHOD(Grid::New)
             }
             v8::Local<v8::Object> options = info[2].As<v8::Object>();
 
-            if (Nan::Has(options, Nan::New("key").ToLocalChecked()).FromMaybe(false)) {
+            if (Nan::Has(options, Nan::New("key").ToLocalChecked()).FromMaybe(false))
+			{
                 v8::Local<v8::Value> bind_opt = Nan::Get(options, Nan::New("key").ToLocalChecked()).ToLocalChecked();
                 if (!bind_opt->IsString())
                 {
@@ -158,7 +162,7 @@ NAN_METHOD(Grid::clear)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Clear, (uv_after_work_cb)EIO_AfterClear);
-    g->Ref();
+    g->_ref();
     return;
 }
 
@@ -180,14 +184,14 @@ void Grid::EIO_Clear(uv_work_t* req)
     }
 }
 
-void Grid::EIO_AfterClear(uv_work_t* req)
+void Grid::EIO_AfterClear(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
     Nan::AsyncResource async_resource(__func__);
     clear_grid_baton_t *closure = static_cast<clear_grid_baton_t *>(req->data);
     if (closure->error)
     {
-        // There seems to be no possible way for the exception to be thrown in the previous 
+        // There seems to be no possible way for the exception to be thrown in the previous
         // process and therefore not possible to have an error here so removing it from code
         // coverage
         /* LCOV_EXCL_START */
@@ -200,7 +204,7 @@ void Grid::EIO_AfterClear(uv_work_t* req)
         v8::Local<v8::Value> argv[2] = { Nan::Null(), closure->g->handle() };
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
-    closure->g->Unref();
+    closure->g->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -518,7 +522,7 @@ NAN_METHOD(Grid::encode)
     closure->cb.Reset(callback.As<v8::Function>());
     // todo - reserve lines size?
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Encode, (uv_after_work_cb)EIO_AfterEncode);
-    g->Ref();
+    g->_ref();
     return;
 }
 
@@ -544,14 +548,14 @@ void Grid::EIO_Encode(uv_work_t* req)
     }
 }
 
-void Grid::EIO_AfterEncode(uv_work_t* req)
+void Grid::EIO_AfterEncode(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
     Nan::AsyncResource async_resource(__func__);
     encode_grid_baton_t *closure = static_cast<encode_grid_baton_t *>(req->data);
 
 
-    if (closure->error) 
+    if (closure->error)
     {
         // There is no known ways to throw errors in the processing prior
         // so simply removing the following from coverage
@@ -559,8 +563,8 @@ void Grid::EIO_AfterEncode(uv_work_t* req)
         v8::Local<v8::Value> argv[1] = { Nan::Error(closure->error_name.c_str()) };
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
         /* LCOV_EXCL_STOP */
-    } 
-    else 
+    }
+    else
     {
 
         // convert key order to proper javascript array
@@ -598,9 +602,50 @@ void Grid::EIO_AfterEncode(uv_work_t* req)
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
 
-    closure->g->Unref();
+    closure->g->_unref();
     closure->cb.Reset();
     delete closure;
 }
 
+NAN_GETTER(Grid::get_metrics_enabled)
+{
+#ifndef MAPNIK_METRICS
+    bool active = false;
+#else
+    Grid* g = Nan::ObjectWrap::Unwrap<Grid>(info.Holder());
+    bool active = g->this_->metrics_.enabled_;
 #endif
+    info.GetReturnValue().Set(Nan::New<v8::Boolean>(active));
+}
+
+NAN_SETTER(Grid::set_metrics_enabled)
+{
+#ifdef MAPNIK_METRICS
+    Grid* g = Nan::ObjectWrap::Unwrap<Grid>(info.Holder());
+    if (!value->IsBoolean())
+    {
+        Nan::ThrowError("Must provide a boolean");
+    }
+    else
+    {
+        bool val = value->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+        g->this_->metrics_.enabled_ = val;
+    }
+#endif
+}
+
+NAN_METHOD(Grid::get_metrics)
+{
+#ifdef MAPNIK_METRICS
+    Grid* g = Nan::ObjectWrap::Unwrap<Grid>(info.Holder());
+    auto result = node_mapnik::metrics_to_object(g->this_->metrics_);
+    if (!result.IsEmpty())
+    {
+        info.GetReturnValue().Set(result.ToLocalChecked());
+        return;
+    }
+#endif
+    info.GetReturnValue().Set(Nan::New<v8::Object>());
+}
+
+#endif //Grid renderer
