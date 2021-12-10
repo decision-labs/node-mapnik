@@ -3,6 +3,17 @@
 #include <napi.h>
 #include "mapnik_palette.hpp"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic ignored "-Wcast-function-type"
+#include <nan.h>
+#pragma GCC diagnostic pop
+
+#include <memory>
+
+
+
 namespace mapnik {
     struct image_any;
     enum image_dtype : std::uint8_t;
@@ -64,6 +75,10 @@ public:
     Napi::Value resize(Napi::CallbackInfo const& info);
     Napi::Value resizeSync(Napi::CallbackInfo const& info);
 
+    // static NAN_GETTER(get_metrics_enabled); //false if MAPNIK_METRICS undefined
+    // static NAN_SETTER(set_metrics_enabled);
+    // static NAN_METHOD(get_metrics);
+    
     // accessors
     Napi::Value scaling(Napi::CallbackInfo const& info);
     void scaling(Napi::CallbackInfo const& info, Napi::Value const& value);

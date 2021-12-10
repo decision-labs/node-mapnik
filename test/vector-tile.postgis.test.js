@@ -81,4 +81,5 @@ test('passes variables to replace tokens in query', (assert) => {
         assert.end();
       });
     });
+
 });

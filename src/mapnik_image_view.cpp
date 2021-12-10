@@ -9,6 +9,7 @@
 #include "mapnik_color.hpp"
 #include "mapnik_palette.hpp"
 #include "pixel_utils.hpp"
+#include "std_unique.hpp"
 
 namespace {
 

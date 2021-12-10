@@ -1,5 +1,19 @@
 language: node_js
 
+sudo: false
+
+# build options and AWS keys for publishing binaries
+# note: you'll need to generate your own keys for publishing a separate project
+env:
+  global:
+   - secure: "bvbvxQe4GXZoU1zxm6KylaUSuQuhUZKe1V4+iYM0Sde6hj6RtAUccCWT7mNacCe2I6uGVHHjVfd7wLovT5y7lyT5pzY3UtypxFwuvGxDHotH4hhTg4m8/7APdB4bf5YgBf5IC6pMUPpUloh6TsTIwYzEaJdp/52b31Qfx80FooqOGOrEqntiyvidWsdUmlrxWnpxCVndkZgwvD15Uc08DWyD8Hklor6cKW6d/3zVIFmy81uAvTQp5W5xXC47S/BYYIwz3GU0zx+CMWM1oFObSbkVMG3LXDurqyvzWf9+09ZtBlC2JW0AOt9atk7vnD115Ia1KaEWalMhb3AGwJx4M4hqonooWOx20NL5P0sqEUe94GBUwvvb295vFTbw9guSGYXL3cOeWTlh2Ol466vJUwBvfr4OQ6Qu401nb1sIIv4SoIT9xXSHbopoderRVQurrcl/wesR19hgzrQC9ytJ6QCS1xnnzKogflfMQDDayrCMwpiZ5gvMGheGNbAh661wL03YXiviMwG307+iwFk8zyw05g4nW5/v3S+OYq3QatUgk+ZDpX2JS2zX4D6Aj2QLzKtCrx9pNpngl8pN+drmac1nklUeQLANxyv8hQjJvs1a4utj7ed9CY7QEWkvfrUl7rZqXvzacKmGEWoTkZKru19pa0enLTThKQV6AOei3e4="
+
+# enable c++11/14 builds
+addons:
+  apt:
+    sources: [ 'ubuntu-toolchain-r-test' ]
+    packages: [ 'libstdc++-5-dev' ]
+
 install:
   # set up the environment by installing mason and clang++
   - ./scripts/setup.sh --config local.env
@@ -18,10 +32,13 @@ install:
 # we use before_script rather than script to ensure fast failure (the script section continues even after an error)
 # https://docs.travis-ci.com/user/customizing-the-build#Breaking-the-Build
 before_script:
+  # - ./scripts/check_glibcxx.sh
   - source scripts/postgis/setup_and_run.sh
   - npm test
-  # after successful tests, publish binaries if specified in commit message
-  - ./scripts/publish.sh --toolset=${TOOLSET:-} --debug=$([ "${BUILDTYPE}" == 'debug' ] && echo "true" || echo "false")
+  # after successful tests, publish binaries if specified in commit message (with and without symbols)
+  # NOTE: RELEASE includes symbols, so we publish first as debug, then strip the symbols of the libraries and republish as debug
+  - ./scripts/publish.sh --debug="true"
+  - if [[ "${BUILDTYPE}" == 'release' ]]; then make strip && ./scripts/publish.sh --debug="false"; fi;
 
 # override script default (npm test) to do nothing (we test in before_script)
 script:
@@ -29,6 +46,7 @@ script:
 
 # the matrix allows you to specify different operating systems and environments to
 # run your tests and build binaries
+# Using BUILDTYPE=release will publish both debug and release (with and without symbols)
 matrix:
   include:
     # linux publishable Release
@@ -74,6 +92,30 @@ matrix:
         - unset LD_PRELOAD
         # after successful tests, publish binaries if specified in commit message
         - ./scripts/publish.sh --toolset=${TOOLSET:-} --debug=$([ "${BUILDTYPE}" == 'debug' ] && echo "true" || echo "false")
+    # Sanitizer build osx node v4/Debug
+    - os: osx
+      osx_image: xcode8.3
+      env: BUILDTYPE=debug TOOLSET=-asan
+      node_js: 4
+      # Overrides `install` to set up custom asan flags
+      install:
+        - ./scripts/setup.sh --config local.env
+        # put mason and clang++ on PATH
+        - source local.env
+        # Note: to build without stopping on errors remove the -fno-sanitize-recover=all flag
+        # You might want to do this if there are multiple errors and you want to see them all before fixing
+        - export CXXFLAGS="${MASON_SANITIZE_CXXFLAGS} -fno-sanitize-recover=all"
+        - export LDFLAGS="${MASON_SANITIZE_LDFLAGS}"
+        - make ${BUILDTYPE}
+      # Overrides `script` to disable asan LD_PRELOAD before publishing
+      before_script:
+        - export DYLD_INSERT_LIBRARIES=${MASON_LLVM_RT_PRELOAD}
+        # TODO: re-enable detect_leaks=0 once we can build and test against an asan sanitized libc++
+        - export ASAN_OPTIONS=fast_unwind_on_malloc=0:detect_leaks=0:${ASAN_OPTIONS}
+        - node ./node_modules/.bin/_mocha test/  --timeout 100000
+        - unset DYLD_INSERT_LIBRARIES
+        # after successful tests, publish binaries if specified in commit message
+        - ./scripts/publish.sh --toolset=${TOOLSET:-} --debug=$([ "${BUILDTYPE}" == 'debug' ] && echo "true" || echo "false")
     # g++ build (default builds all use clang++)
     - os: linux
       env: BUILDTYPE=debug CXX="g++-6" CC="gcc-6"
@@ -101,6 +143,13 @@ matrix:
       env: BUILDTYPE=release SSE_MATH=false
       node_js: 12
       # Overrides `before_script` to disable publishing
+      before_script:
+        - npm test
+    # test building with out SSE_MATH enabled
+    - os: linux
+      env: BUILDTYPE=release SSE_MATH=false
+      node_js: 4
+      # Overrides `script` to disable publishing
       before_script:
         - npm test
     # Coverage build

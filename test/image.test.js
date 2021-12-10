@@ -359,28 +359,6 @@ test('should support setting and getting gray16 pixel', (assert) => {
   assert.end();
 });
 
-test('should support setting and getting gray16s pixel', (assert) => {
-  var gray = new mapnik.Image(256, 256, {type: mapnik.imageType.gray16s});
-  gray.setPixel(0,0,-1);
-  gray.setPixel(1,0,0);
-  gray.setPixel(2,0,1);
-  assert.equal(gray.getPixel(0,0), -1);
-  assert.equal(gray.getPixel(1,0), 0);
-  assert.equal(gray.getPixel(2,0), 1);
-  assert.end();
-});
-
-test('should support setting and getting gray32 pixel', (assert) => {
-  var gray = new mapnik.Image(256, 256, {type: mapnik.imageType.gray32});
-  gray.setPixel(0,0,-1);
-  gray.setPixel(1,0,0);
-  gray.setPixel(2,0,1);
-  assert.equal(gray.getPixel(0,0), 0);
-  assert.equal(gray.getPixel(1,0), 0);
-  assert.equal(gray.getPixel(2,0), 1);
-  assert.end();
-});
-
 test('should support setting and getting gray32s pixel', (assert) => {
   var gray = new mapnik.Image(256, 256, {type: mapnik.imageType.gray32s});
   gray.setPixel(0,0,-1);

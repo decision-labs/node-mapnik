@@ -21,6 +21,7 @@
 
 #include "mapnik_palette.hpp"
 #include "blend.hpp"
+#include "std_unique.hpp"
 #include "tint.hpp"
 #include "utils.hpp"
 

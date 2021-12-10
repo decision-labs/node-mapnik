@@ -4,6 +4,7 @@
 #include <mapnik/image_any.hpp>         // for image_any
 #include <mapnik/image_util.hpp>        // for save_to_string, guess_type, etc
 #include "mapnik_image.hpp"
+#include "std_unique.hpp"
 #include "mapnik_image_view.hpp"
 #include "mapnik_palette.hpp"
 #include "mapnik_color.hpp"
@@ -733,3 +734,45 @@ Napi::Value Image::buffer(Napi::CallbackInfo const& info)
     if (image_) return Napi::Buffer<char>::New(env, reinterpret_cast<char*>(image_->bytes()), image_->size());
     return info.Env().Null();
 }
+
+// NAN_GETTER(Image::get_metrics_enabled)
+// {
+// #ifndef MAPNIK_METRICS
+//     bool active = false;
+// #else
+//     Image* im = Nan::ObjectWrap::Unwrap<Image>(info.Holder());
+//     bool active = im->this_->get_metrics().enabled_;
+// #endif
+//     info.GetReturnValue().Set(Nan::New<v8::Boolean>(active));
+// }
+
+// NAN_SETTER(Image::set_metrics_enabled)
+// {
+// #ifdef MAPNIK_METRICS
+//     Image* im = Nan::ObjectWrap::Unwrap<Image>(info.Holder());
+//     if (!value->IsBoolean())
+//     {
+//         Nan::ThrowError("Must provide a boolean");
+//     }
+//     else
+//     {
+//         bool val = value->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+//         im->this_->get_metrics().enabled_ = val;
+//     }
+// #endif
+// }
+
+// NAN_METHOD(Image::get_metrics)
+// {
+// #ifdef MAPNIK_METRICS
+//     Image* im = Nan::ObjectWrap::Unwrap<Image>(info.Holder());
+//     auto result = node_mapnik::metrics_to_object(im->this_->get_metrics());
+//     if (!result.IsEmpty())
+//     {
+//         info.GetReturnValue().Set(result.ToLocalChecked());
+//         return;
+//     }
+// #endif
+//     info.GetReturnValue().Set(Nan::New<v8::Object>());
+// }
+

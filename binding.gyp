@@ -2,7 +2,7 @@
   'includes': [ 'common.gypi' ],
   'variables': {
       'ENABLE_GLIBC_WORKAROUND%':'false', # can be overriden by a command line variable because of the % sign
-      'enable_sse%':'true'
+      'enable_sse%':'true' 
   },
   'targets': [
     {

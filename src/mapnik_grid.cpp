@@ -530,4 +530,45 @@ Napi::Value Grid::encode(Napi::CallbackInfo const& info)
     return env.Undefined();
 }
 
-#endif
+// NAN_GETTER(Grid::get_metrics_enabled)
+// {
+// #ifndef MAPNIK_METRICS
+//     bool active = false;
+// #else
+//     Grid* g = Nan::ObjectWrap::Unwrap<Grid>(info.Holder());
+//     bool active = g->this_->metrics_.enabled_;
+// #endif
+//     info.GetReturnValue().Set(Nan::New<v8::Boolean>(active));
+// }
+
+// NAN_SETTER(Grid::set_metrics_enabled)
+// {
+// #ifdef MAPNIK_METRICS
+//     Grid* g = Nan::ObjectWrap::Unwrap<Grid>(info.Holder());
+//     if (!value->IsBoolean())
+//     {
+//         Nan::ThrowError("Must provide a boolean");
+//     }
+//     else
+//     {
+//         bool val = value->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+//         g->this_->metrics_.enabled_ = val;
+//     }
+// #endif
+// }
+
+// NAN_METHOD(Grid::get_metrics)
+// {
+// #ifdef MAPNIK_METRICS
+//     Grid* g = Nan::ObjectWrap::Unwrap<Grid>(info.Holder());
+//     auto result = node_mapnik::metrics_to_object(g->this_->metrics_);
+//     if (!result.IsEmpty())
+//     {
+//         info.GetReturnValue().Set(result.ToLocalChecked());
+//         return;
+//     }
+// #endif
+//     info.GetReturnValue().Set(Nan::New<v8::Object>());
+// }
+
+#endif //Grid renderer

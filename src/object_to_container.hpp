@@ -3,7 +3,7 @@
 #include <mapnik/version.hpp>
 #include <mapnik/attribute.hpp>
 #include <mapnik/unicode.hpp>
-#include <mapnik/value/types.hpp>
+#include <mapnik/value_types.hpp>
 
 static inline void object_to_container(mapnik::attributes & cont, Napi::Object const& vars)
 {

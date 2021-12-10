@@ -11,11 +11,7 @@ var overwrite_expected_data = false;
 var zlib = require('zlib');
 var boost_version = mapnik.versions.boost.split('.');
 
-var hasBoostSimple = false;
-if (boost_version[0] > 1 || (boost_version[0] == 1 && boost_version[1] >= 58))
-{
-    hasBoostSimple = true;
-}
+var hasBoostSimple = true;
 
 mapnik.register_datasource(path.join(mapnik.settings.paths.input_plugins,'geojson.input'));
 
@@ -1161,62 +1157,7 @@ test('should be able to getData with a FIXED', (assert) => {
   gzip.write(uncompressed);
   gzip.end();
 });
-
-test('should be able to getData with a DEFAULT_STRATEGY', (assert) => {
-  var vtile = new mapnik.VectorTile(9,112,195);
-  var data = fs.readFileSync("./test/data/vector_tile/tile1.vector.pbf");
-  vtile.setData(data);
-  var uncompressed = vtile.getData();
-  var gzip = zlib.createGzip({
-    strategy: zlib.Z_DEFAULT_STRATEGY
-  }), buffers=[], nread=0;
-
-  gzip.on('error', function(err) {
-    gzip.removeAllListeners();
-    gzip=null;
-  });
-
-  gzip.on('data', function(chunk) {
-    buffers.push(chunk);
-    nread += chunk.length;
-  });
-
-  gzip.on('end', function() {
-    var buffer;
-    switch (buffers.length) {
-    case 0: // no data.  return empty buffer
-      buffer = Buffer.alloc(0);
-      break;
-    case 1: // only one chunk of data.  return it.
-      buffer = buffers[0];
-      break;
-    default: // concatenate the chunks of data into a single buffer.
-      buffer = Buffer.alloc(nread);
-      var n = 0;
-      buffers.forEach(function(b) {
-        var l = b.length;
-        b.copy(buffer, n, 0, l);
-        n += l;
-      });
-      break;
-    }
-
-    gzip.removeAllListeners();
-    gzip=null;
-    var compressed = vtile.getData({compression:'gzip', strategy:'DEFAULT'});
-    // Substring used to remove gzip header
-    assert.equal(buffer.toString('hex').substring(20), compressed.toString('hex').substring(20));
-    vtile.getData({compression:'gzip', strategy:'DEFAULT'}, function (err, compressed) {
-      // Substring used to remove gzip header
-      assert.equal(buffer.toString('hex').substring(20), compressed.toString('hex').substring(20));
-      assert.end();
-    });
-  });
-
-  gzip.write(uncompressed);
-  gzip.end();
-});
-
+  
 test('should be able to getData with release', (assert) => {
   var vtile1 = new mapnik.VectorTile(9,112,195);
   var vtile2 = new mapnik.VectorTile(9,112,195);
