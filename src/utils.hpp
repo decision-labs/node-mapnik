@@ -1,22 +1,26 @@
 #ifndef __NODE_MAPNIK_UTILS_H__
 #define __NODE_MAPNIK_UTILS_H__
 
+// core types
+#ifdef MAPNIK_METRICS
+#include <mapnik/metrics.hpp>
+#endif
+#include <mapnik/params.hpp>
+#include <mapnik/unicode.hpp>
+#include <mapnik/value_types.hpp>
+#include <mapnik/value.hpp>
+#include <mapnik/version.hpp>
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic ignored "-Wcast-function-type"
 #include <nan.h>
 #pragma GCC diagnostic pop
 
 // stl
 #include <string>
 #include <memory>
-
-// core types
-#include <mapnik/unicode.hpp>
-#include <mapnik/value/types.hpp>
-#include <mapnik/value.hpp>
-#include <mapnik/version.hpp>
-#include <mapnik/params.hpp>
 
 #define TOSTR(obj) (*Nan::Utf8String(obj))
 
@@ -99,6 +103,14 @@ inline Nan::MaybeLocal<v8::Object> NewBufferFrom(std::unique_ptr<std::string> &&
     }
     return res;
 }
+#ifdef MAPNIK_METRICS
+inline Nan::MaybeLocal<v8::Value> metrics_to_object(mapnik::metrics &metrics)
+{
+    v8::Local<v8::String> json_string = Nan::New(metrics.to_string()).ToLocalChecked();
+    Nan::JSON NanJSON;
+    return NanJSON.Parse(json_string);
+}
+#endif
 
 } // end ns
 #endif

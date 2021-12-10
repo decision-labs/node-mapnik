@@ -23,13 +23,13 @@
 // mapnik
 #include <mapnik/agg_renderer.hpp>      // for agg_renderer
 #include <mapnik/datasource_cache.hpp>
-#include <mapnik/geometry/box2d.hpp>
+#include <mapnik/box2d.hpp>
 #include <mapnik/feature.hpp>
 #include <mapnik/featureset.hpp>
 #include <mapnik/feature_kv_iterator.hpp>
-#include <mapnik/geometry/is_simple.hpp>
-#include <mapnik/geometry/is_valid.hpp>
-#include <mapnik/geometry/reprojection.hpp>
+#include <mapnik/geometry_is_simple.hpp>
+#include <mapnik/geometry_is_valid.hpp>
+#include <mapnik/geometry_reprojection.hpp>
 #include <mapnik/geom_util.hpp>
 #include <mapnik/hit_test_filter.hpp>
 #include <mapnik/image_any.hpp>
@@ -150,35 +150,51 @@ struct p2p_distance
         }
         return p2p;
     }
-    p2p_result operator() (mapnik::geometry::polygon<double> const& poly) const
+    p2p_result operator() (mapnik::geometry::polygon<double> const& geom) const
     {
+        auto const& exterior = geom.exterior_ring;
+        std::size_t num_points = exterior.num_points();
         p2p_result p2p;
-        std::size_t num_rings = poly.size();
-        bool inside = false;
-        for (std::size_t ring_index = 0; ring_index < num_rings; ++ring_index)
+        if (num_points < 4)
         {
-            auto const& ring = poly[ring_index];
-            auto num_points = ring.size();
-            if (num_points < 4)
+            return p2p;
+        }
+        bool inside = false;
+        for (std::size_t i = 1; i < num_points; ++i)
+        {
+            auto const& pt0 = exterior[i-1];
+            auto const& pt1 = exterior[i];
+            // todo - account for tolerance
+            if (mapnik::detail::pip(pt0.x,pt0.y,pt1.x,pt1.y,x_,y_))
             {
-                if (ring_index == 0) // exterior
-                    return p2p;
-                else // interior
-                    continue;
+                inside = !inside;
             }
-            for (std::size_t index = 1; index < num_points; ++index)
+        }
+        if (!inside)
+        {
+            return p2p;
+        }
+        for (auto const& ring :  geom.interior_rings)
+        {
+            std::size_t num_interior_points = ring.size();
+            if (num_interior_points < 4)
             {
-                auto const& pt0 = ring[index - 1];
-                auto const& pt1 = ring[index];
-                // todo - account for tolerance
-                if (mapnik::detail::pip(pt0.x, pt0.y, pt1.x, pt1.y, x_,y_))
+                continue;
+            }
+            for (std::size_t j = 1; j < num_interior_points; ++j)
+            {
+                auto const& pt0 = ring[j-1];
+                auto const& pt1 = ring[j];
+                if (mapnik::detail::pip(pt0.x,pt0.y,pt1.x,pt1.y,x_,y_))
                 {
-                    inside = !inside;
+                    inside=!inside;
                 }
             }
-            if (ring_index == 0 && !inside) return p2p;
         }
-        if (inside) p2p.distance = 0;
+        if (inside)
+        {
+            p2p.distance = 0;
+        }
         return p2p;
     }
 
@@ -299,7 +315,6 @@ void VectorTile::Initialize(v8::Local<v8::Object> target)
     ATTR(lcons, "z", get_tile_z, set_tile_z);
     ATTR(lcons, "tileSize", get_tile_size, set_tile_size);
     ATTR(lcons, "bufferSize", get_buffer_size, set_buffer_size);
-
     Nan::SetMethod(Nan::GetFunction(lcons).ToLocalChecked().As<v8::Object>(), "info", info);
     
     Nan::Set(target, Nan::New("VectorTile").ToLocalChecked(), Nan::GetFunction(lcons).ToLocalChecked());
@@ -1185,10 +1200,10 @@ NAN_METHOD(VectorTile::composite)
             return;
         }
         VectorTile* vt = Nan::ObjectWrap::Unwrap<VectorTile>(tile_obj);
-        vt->Ref();
+        vt->_ref();
         closure->vtiles.push_back(vt);
     }
-    closure->d->Ref();
+    closure->d->_ref();
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Composite, (uv_after_work_cb)EIO_AfterComposite);
     return;
@@ -1224,7 +1239,7 @@ void VectorTile::EIO_Composite(uv_work_t* req)
     }
 }
 
-void VectorTile::EIO_AfterComposite(uv_work_t* req)
+void VectorTile::EIO_AfterComposite(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
     Nan::AsyncResource async_resource(__func__);
@@ -1242,9 +1257,9 @@ void VectorTile::EIO_AfterComposite(uv_work_t* req)
     }
     for (VectorTile* vt : closure->vtiles)
     {
-        vt->Unref();
+        vt->_unref();
     }
-    closure->d->Unref();
+    closure->d->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -1617,7 +1632,7 @@ NAN_METHOD(VectorTile::query)
         closure->error = false;
         closure->cb.Reset(callback.As<v8::Function>());
         uv_queue_work(uv_default_loop(), &closure->request, EIO_Query, (uv_after_work_cb)EIO_AfterQuery);
-        d->Ref();
+        d->_ref();
         return;
     }
 }
@@ -1636,7 +1651,7 @@ void VectorTile::EIO_Query(uv_work_t* req)
     }
 }
 
-void VectorTile::EIO_AfterQuery(uv_work_t* req)
+void VectorTile::EIO_AfterQuery(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
     Nan::AsyncResource async_resource(__func__);
@@ -1654,7 +1669,7 @@ void VectorTile::EIO_AfterQuery(uv_work_t* req)
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
 
-    closure->d->Unref();
+    closure->d->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -1962,7 +1977,7 @@ NAN_METHOD(VectorTile::queryMany)
         closure->request.data = closure;
         closure->cb.Reset(callback.As<v8::Function>());
         uv_queue_work(uv_default_loop(), &closure->request, EIO_QueryMany, (uv_after_work_cb)EIO_AfterQueryMany);
-        d->Ref();
+        d->_ref();
         return;
     }
 }
@@ -2145,7 +2160,7 @@ void VectorTile::EIO_QueryMany(uv_work_t* req)
     }
 }
 
-void VectorTile::EIO_AfterQueryMany(uv_work_t* req)
+void VectorTile::EIO_AfterQueryMany(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
     Nan::AsyncResource async_resource(__func__);
@@ -2163,7 +2178,7 @@ void VectorTile::EIO_AfterQueryMany(uv_work_t* req)
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
 
-    closure->d->Unref();
+    closure->d->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -2341,15 +2356,23 @@ struct geometry_array_visitor
     }
 
     template <typename T>
-    v8::Local<v8::Array> operator() (mapnik::geometry::polygon<T> const & poly)
+    v8::Local<v8::Array> operator() (mapnik::geometry::polygon<T> const & geom)
     {
         Nan::EscapableHandleScope scope;
-        v8::Local<v8::Array> arr = Nan::New<v8::Array>(poly.size());
-        std::uint32_t index = 0;
-
-        for (auto const & ring : poly)
+        if (geom.exterior_ring.empty())
         {
-            Nan::Set(arr, index++, (*this)(ring));
+            // Removed as it should be a bug if a vector tile has reached this point
+            // therefore no known tests reach this point
+            // LCOV_EXCL_START
+            return scope.Escape(Nan::New<v8::Array>());
+            // LCOV_EXCL_STOP
+        }
+        v8::Local<v8::Array> arr = Nan::New<v8::Array>(1 + geom.interior_rings.size());
+        std::uint32_t c = 0;
+        Nan::Set(arr, c++, (*this)(geom.exterior_ring));
+        for (auto const & pt : geom.interior_rings)
+        {
+            Nan::Set(arr, c++, (*this)(pt));
         }
         return scope.Escape(arr);
     }
@@ -3067,7 +3090,7 @@ NAN_METHOD(VectorTile::toGeoJSON)
     v8::Local<v8::Value> callback = info[info.Length()-1];
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, to_geojson, (uv_after_work_cb)after_to_geojson);
-    closure->v->Ref();
+    closure->v->_ref();
     return;
 }
 
@@ -3123,7 +3146,7 @@ void VectorTile::after_to_geojson(uv_work_t* req)
         v8::Local<v8::Value> argv[2] = { Nan::Null(), Nan::New<v8::String>(closure->result).ToLocalChecked() };
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
-    closure->v->Unref();
+    closure->v->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -3598,7 +3621,7 @@ void VectorTile::EIO_AddImage(uv_work_t* req)
     }
 }
 
-void VectorTile::EIO_AfterAddImage(uv_work_t* req)
+void VectorTile::EIO_AfterAddImage(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
     Nan::AsyncResource async_resource(__func__);
@@ -3762,7 +3785,7 @@ NAN_METHOD(VectorTile::addImageBuffer)
     closure->data = node::Buffer::Data(obj);
     closure->dataLength = node::Buffer::Length(obj);
     uv_queue_work(uv_default_loop(), &closure->request, EIO_AddImageBuffer, (uv_after_work_cb)EIO_AfterAddImageBuffer);
-    d->Ref();
+    d->_ref();
     return;
 }
 
@@ -3783,7 +3806,7 @@ void VectorTile::EIO_AddImageBuffer(uv_work_t* req)
     }
 }
 
-void VectorTile::EIO_AfterAddImageBuffer(uv_work_t* req)
+void VectorTile::EIO_AfterAddImageBuffer(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
     Nan::AsyncResource async_resource(__func__);
@@ -3801,7 +3824,7 @@ void VectorTile::EIO_AfterAddImageBuffer(uv_work_t* req)
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
 
-    closure->d->Unref();
+    closure->d->_unref();
     closure->cb.Reset();
     closure->buffer.Reset();
     delete closure;
@@ -3997,7 +4020,7 @@ NAN_METHOD(VectorTile::addData)
     closure->data = node::Buffer::Data(obj);
     closure->dataLength = node::Buffer::Length(obj);
     uv_queue_work(uv_default_loop(), &closure->request, EIO_AddData, (uv_after_work_cb)EIO_AfterAddData);
-    d->Ref();
+    d->_ref();
     return;
 }
 
@@ -4022,7 +4045,7 @@ void VectorTile::EIO_AddData(uv_work_t* req)
     }
 }
 
-void VectorTile::EIO_AfterAddData(uv_work_t* req)
+void VectorTile::EIO_AfterAddData(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
     Nan::AsyncResource async_resource(__func__);
@@ -4038,7 +4061,7 @@ void VectorTile::EIO_AfterAddData(uv_work_t* req)
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
 
-    closure->d->Unref();
+    closure->d->_unref();
     closure->cb.Reset();
     closure->buffer.Reset();
     delete closure;
@@ -4234,7 +4257,7 @@ NAN_METHOD(VectorTile::setData)
     closure->data = node::Buffer::Data(obj);
     closure->dataLength = node::Buffer::Length(obj);
     uv_queue_work(uv_default_loop(), &closure->request, EIO_SetData, (uv_after_work_cb)EIO_AfterSetData);
-    d->Ref();
+    d->_ref();
     return;
 }
 
@@ -4261,7 +4284,7 @@ void VectorTile::EIO_SetData(uv_work_t* req)
     }
 }
 
-void VectorTile::EIO_AfterSetData(uv_work_t* req)
+void VectorTile::EIO_AfterSetData(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
     Nan::AsyncResource async_resource(__func__);
@@ -4277,7 +4300,7 @@ void VectorTile::EIO_AfterSetData(uv_work_t* req)
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
 
-    closure->d->Unref();
+    closure->d->_unref();
     closure->cb.Reset();
     closure->buffer.Reset();
     delete closure;
@@ -4422,14 +4445,7 @@ v8::Local<v8::Value> VectorTile::_getDataSync(Nan::NAN_METHOD_ARGS_TYPE info)
             }
             if (!compress)
             {
-                if (release)
-                {
-                    return scope.Escape(node_mapnik::NewBufferFrom(d->tile_->release_buffer()).ToLocalChecked());
-                }
-                else
-                {
-                    return scope.Escape(Nan::CopyBuffer((char*)d->tile_->data(),raw_size).ToLocalChecked());
-                }
+                return scope.Escape(Nan::CopyBuffer((char*)d->tile_->data(),raw_size).ToLocalChecked());
             }
             else
             {
@@ -4601,7 +4617,7 @@ NAN_METHOD(VectorTile::getData)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, get_data, (uv_after_work_cb)after_get_data);
-    d->Ref();
+    d->_ref();
     return;
 }
 
@@ -4645,11 +4661,6 @@ void VectorTile::after_get_data(uv_work_t* req)
     }
     else if (!closure->data->empty())
     {
-        if (closure->release)
-        {
-            // To keep the same behaviour as a non compression release, we want to clear the VT buffer
-            closure->d->tile_->clear();
-        }
         v8::Local<v8::Value> argv[2] = { Nan::Null(), 
                                          node_mapnik::NewBufferFrom(std::move(closure->data)).ToLocalChecked() };
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
@@ -4676,21 +4687,12 @@ void VectorTile::after_get_data(uv_work_t* req)
         }
         else
         {
-            if (closure->release)
-            {
-                v8::Local<v8::Value> argv[2] = { Nan::Null(), 
-                                                 node_mapnik::NewBufferFrom(closure->d->tile_->release_buffer()).ToLocalChecked() };
-                async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
-            }
-            else
-            {
-                v8::Local<v8::Value> argv[2] = { Nan::Null(), Nan::CopyBuffer((char*)closure->d->tile_->data(),raw_size).ToLocalChecked() };
-                async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
-            }
+            v8::Local<v8::Value> argv[2] = { Nan::Null(), Nan::CopyBuffer((char*)closure->d->tile_->data(),raw_size).ToLocalChecked() };
+            async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
         }
     }
 
-    closure->d->Unref();
+    closure->d->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -5192,8 +5194,8 @@ void VectorTile::EIO_RenderTile(uv_work_t* req)
         if (closure->zxy_override)
         {
             map_extent = mapnik::vector_tile_impl::tile_mercator_bbox(closure->x,closure->y,closure->z);
-        }
-        else
+        } 
+        else 
         {
             map_extent = mapnik::vector_tile_impl::tile_mercator_bbox(closure->d->get_tile()->x(),
                                                                       closure->d->get_tile()->y(),
@@ -5340,7 +5342,7 @@ void VectorTile::EIO_RenderTile(uv_work_t* req)
     }
 }
 
-void VectorTile::EIO_AfterRenderTile(uv_work_t* req)
+void VectorTile::EIO_AfterRenderTile(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
     Nan::AsyncResource async_resource(__func__);
@@ -5445,7 +5447,7 @@ NAN_METHOD(VectorTile::clear)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Clear, (uv_after_work_cb)EIO_AfterClear);
-    d->Ref();
+    d->_ref();
     return;
 }
 
@@ -5466,7 +5468,7 @@ void VectorTile::EIO_Clear(uv_work_t* req)
     }
 }
 
-void VectorTile::EIO_AfterClear(uv_work_t* req)
+void VectorTile::EIO_AfterClear(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
     Nan::AsyncResource async_resource(__func__);
@@ -5484,7 +5486,7 @@ void VectorTile::EIO_AfterClear(uv_work_t* req)
         v8::Local<v8::Value> argv[1] = { Nan::Null() };
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 1, argv);
     }
-    closure->d->Unref();
+    closure->d->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -6194,7 +6196,7 @@ NAN_METHOD(VectorTile::reportGeometrySimplicity)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_ReportGeometrySimplicity, (uv_after_work_cb)EIO_AfterReportGeometrySimplicity);
-    closure->v->Ref();
+    closure->v->_ref();
     return;
 }
 
@@ -6214,7 +6216,7 @@ void VectorTile::EIO_ReportGeometrySimplicity(uv_work_t* req)
     }
 }
 
-void VectorTile::EIO_AfterReportGeometrySimplicity(uv_work_t* req)
+void VectorTile::EIO_AfterReportGeometrySimplicity(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
     Nan::AsyncResource async_resource(__func__);
@@ -6232,7 +6234,7 @@ void VectorTile::EIO_AfterReportGeometrySimplicity(uv_work_t* req)
         v8::Local<v8::Value> argv[2] = { Nan::Null(), array };
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
-    closure->v->Unref();
+    closure->v->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -6326,7 +6328,7 @@ NAN_METHOD(VectorTile::reportGeometryValidity)
     closure->web_merc = web_merc;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_ReportGeometryValidity, (uv_after_work_cb)EIO_AfterReportGeometryValidity);
-    closure->v->Ref();
+    closure->v->_ref();
     return;
 }
 
@@ -6346,7 +6348,7 @@ void VectorTile::EIO_ReportGeometryValidity(uv_work_t* req)
     }
 }
 
-void VectorTile::EIO_AfterReportGeometryValidity(uv_work_t* req)
+void VectorTile::EIO_AfterReportGeometryValidity(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
     Nan::AsyncResource async_resource(__func__);
@@ -6364,7 +6366,7 @@ void VectorTile::EIO_AfterReportGeometryValidity(uv_work_t* req)
         v8::Local<v8::Value> argv[2] = { Nan::Null(), array };
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
-    closure->v->Unref();
+    closure->v->_unref();
     closure->cb.Reset();
     delete closure;
 }

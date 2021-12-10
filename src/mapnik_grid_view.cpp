@@ -152,7 +152,7 @@ NAN_METHOD(GridView::isSolid)
     closure->error = false;
     closure->cb.Reset(callback.As<v8::Function>());
     uv_queue_work(uv_default_loop(), &closure->request, EIO_IsSolid, (uv_after_work_cb)EIO_AfterIsSolid);
-    g->Ref();
+    g->_ref();
     return;
 }
 void GridView::EIO_IsSolid(uv_work_t* req)
@@ -183,7 +183,7 @@ void GridView::EIO_IsSolid(uv_work_t* req)
     }
 }
 
-void GridView::EIO_AfterIsSolid(uv_work_t* req)
+void GridView::EIO_AfterIsSolid(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
     Nan::AsyncResource async_resource(__func__);
@@ -210,7 +210,7 @@ void GridView::EIO_AfterIsSolid(uv_work_t* req)
             async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
         }
     }
-    closure->g->Unref();
+    closure->g->_unref();
     closure->cb.Reset();
     delete closure;
 }
@@ -455,7 +455,7 @@ NAN_METHOD(GridView::encode)
     closure->add_features = add_features;
     closure->cb.Reset(callback);
     uv_queue_work(uv_default_loop(), &closure->request, EIO_Encode, (uv_after_work_cb)EIO_AfterEncode);
-    g->Ref();
+    g->_ref();
     return;
 }
 
@@ -482,7 +482,7 @@ void GridView::EIO_Encode(uv_work_t* req)
     }
 }
 
-void GridView::EIO_AfterEncode(uv_work_t* req)
+void GridView::EIO_AfterEncode(uv_work_t* req, int)
 {
     Nan::HandleScope scope;
     Nan::AsyncResource async_resource(__func__);
@@ -534,7 +534,7 @@ void GridView::EIO_AfterEncode(uv_work_t* req)
         async_resource.runInAsyncScope(Nan::GetCurrentContext()->Global(), Nan::New(closure->cb), 2, argv);
     }
 
-    closure->g->Unref();
+    closure->g->_unref();
     closure->cb.Reset();
     delete closure;
 }
