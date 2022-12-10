@@ -321,7 +321,7 @@ NAN_METHOD(GridView::encodeSync)
                 return;
             }
 
-            add_features = bind_opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            add_features = bind_opt->BooleanValue(v8::Isolate::GetCurrent());
         }
     }
 
@@ -435,7 +435,7 @@ NAN_METHOD(GridView::encode)
                 return;
             }
 
-            add_features = bind_opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            add_features = bind_opt->BooleanValue(v8::Isolate::GetCurrent());
         }
     }
 

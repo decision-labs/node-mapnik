@@ -91,7 +91,7 @@ NAN_METHOD(MemoryDatasource::New)
         }
         else if (value->IsBoolean())
         {
-            params[TOSTR(name)] = value->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            params[TOSTR(name)] = value->BooleanValue(v8::Isolate::GetCurrent());
         }
         else
         {

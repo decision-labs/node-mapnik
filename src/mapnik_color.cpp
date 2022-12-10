@@ -90,7 +90,7 @@ NAN_METHOD(Color::New)
                  info[0]->IsString() &&
                  info[1]->IsBoolean())
         {
-            c_p = std::make_shared<mapnik::color>(TOSTR(info[0]),info[1]->BooleanValue(Nan::GetCurrentContext()).ToChecked());
+            c_p = std::make_shared<mapnik::color>(TOSTR(info[0]),info[1]->BooleanValue(v8::Isolate::GetCurrent()));
         }
         else if (info.Length() == 3 &&
                  info[0]->IsNumber() &&
@@ -121,7 +121,7 @@ NAN_METHOD(Color::New)
                 Nan::ThrowTypeError("color value out of range");
                 return;
             }
-            c_p = std::make_shared<mapnik::color>(r,g,b,255,info[3]->BooleanValue(Nan::GetCurrentContext()).ToChecked());
+            c_p = std::make_shared<mapnik::color>(r,g,b,255,info[3]->BooleanValue(v8::Isolate::GetCurrent()));
         }
         else if (info.Length() == 4 &&
                  info[0]->IsNumber() &&
@@ -156,7 +156,7 @@ NAN_METHOD(Color::New)
                 Nan::ThrowTypeError("color value out of range");
                 return;
             }
-            c_p = std::make_shared<mapnik::color>(r,g,b,a,info[4]->BooleanValue(Nan::GetCurrentContext()).ToChecked());
+            c_p = std::make_shared<mapnik::color>(r,g,b,a,info[4]->BooleanValue(v8::Isolate::GetCurrent()));
         }
         else
         {
@@ -264,7 +264,7 @@ NAN_SETTER(Color::set_premultiplied)
         Nan::ThrowTypeError("Value set to premultiplied must be a boolean");
         return;
     }
-    c->get()->set_premultiplied(value->BooleanValue(Nan::GetCurrentContext()).ToChecked());
+    c->get()->set_premultiplied(value->BooleanValue(v8::Isolate::GetCurrent()));
 }
 
 /**

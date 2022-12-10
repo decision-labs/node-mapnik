@@ -227,7 +227,7 @@ NAN_METHOD(Image::New)
                     v8::Local<v8::Value> init_val = Nan::Get(options, Nan::New("initialize").ToLocalChecked()).ToLocalChecked();
                     if (!init_val.IsEmpty() && init_val->IsBoolean())
                     {
-                        initialize = init_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+                        initialize = init_val->BooleanValue(v8::Isolate::GetCurrent());
                     }
                     else
                     {
@@ -241,7 +241,7 @@ NAN_METHOD(Image::New)
                     v8::Local<v8::Value> pre_val = Nan::Get(options, Nan::New("premultiplied").ToLocalChecked()).ToLocalChecked();
                     if (!pre_val.IsEmpty() && pre_val->IsBoolean())
                     {
-                        premultiplied = pre_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+                        premultiplied = pre_val->BooleanValue(v8::Isolate::GetCurrent());
                     }
                     else
                     {
@@ -255,7 +255,7 @@ NAN_METHOD(Image::New)
                     v8::Local<v8::Value> painted_val = Nan::Get(options, Nan::New("painted").ToLocalChecked()).ToLocalChecked();
                     if (!painted_val.IsEmpty() && painted_val->IsBoolean())
                     {
-                        painted = painted_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+                        painted = painted_val->BooleanValue(v8::Isolate::GetCurrent());
                     }
                     else
                     {
@@ -459,7 +459,7 @@ NAN_METHOD(Image::getPixel)
                 Nan::ThrowTypeError("optional arg 'color' must be a boolean");
                 return;
             }
-            get_color = bind_opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            get_color = bind_opt->BooleanValue(v8::Isolate::GetCurrent());
         }
 
     }
@@ -640,7 +640,7 @@ NAN_METHOD(Image::compare)
                 Nan::ThrowTypeError("optional arg 'alpha' must be a boolean");
                 return;
             }
-            alpha = bind_opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            alpha = bind_opt->BooleanValue(v8::Isolate::GetCurrent());
         }
 
     }
@@ -2675,7 +2675,7 @@ v8::Local<v8::Value> Image::_fromSVGSync(bool fromFile, Nan::NAN_METHOD_ARGS_TYP
                 Nan::ThrowTypeError("'strict' must be a boolean value");
                 return scope.Escape(Nan::Undefined());
             }
-            strict = opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            strict = opt->BooleanValue(v8::Isolate::GetCurrent());
         }
         if (Nan::Has(options, Nan::New("throw_on_unhandled_elements").ToLocalChecked()).FromMaybe(false))
         {
@@ -2685,7 +2685,7 @@ v8::Local<v8::Value> Image::_fromSVGSync(bool fromFile, Nan::NAN_METHOD_ARGS_TYP
                 Nan::ThrowTypeError("'throw_on_unhandled_elements' must be a boolean value");
                 return scope.Escape(Nan::Undefined());
             }
-            throw_on_unhandled_elements = opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            throw_on_unhandled_elements = opt->BooleanValue(v8::Isolate::GetCurrent());
         }
     }
 
@@ -2922,7 +2922,7 @@ NAN_METHOD(Image::fromSVG)
                 Nan::ThrowTypeError("'strict' must be a boolean value");
                 return;
             }
-            strict = opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            strict = opt->BooleanValue(v8::Isolate::GetCurrent());
         }
         if (Nan::Has(options, Nan::New("throw_on_unhandled_elements").ToLocalChecked()).FromMaybe(false))
         {
@@ -2932,7 +2932,7 @@ NAN_METHOD(Image::fromSVG)
                 Nan::ThrowTypeError("'throw_on_unhandled_elements' must be a boolean value");
                 return;
             }
-            throw_on_unhandled_elements = opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            throw_on_unhandled_elements = opt->BooleanValue(v8::Isolate::GetCurrent());
         }
     }
 
@@ -3168,7 +3168,7 @@ NAN_METHOD(Image::fromSVGBytes)
                 Nan::ThrowTypeError("'strict' must be a boolean value");
                 return;
             }
-            strict = opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            strict = opt->BooleanValue(v8::Isolate::GetCurrent());
         }
         if (Nan::Has(options, Nan::New("throw_on_unhandled_elements").ToLocalChecked()).FromMaybe(false))
         {
@@ -3178,7 +3178,7 @@ NAN_METHOD(Image::fromSVGBytes)
                 Nan::ThrowTypeError("'throw_on_unhandled_elements' must be a boolean value");
                 return;
             }
-            throw_on_unhandled_elements = opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            throw_on_unhandled_elements = opt->BooleanValue(v8::Isolate::GetCurrent());
         }
     }
 
@@ -3396,7 +3396,7 @@ v8::Local<v8::Value> Image::_fromBufferSync(Nan::NAN_METHOD_ARGS_TYPE info)
                 v8::Local<v8::Value> pre_val = Nan::Get(options, Nan::New("premultiplied").ToLocalChecked()).ToLocalChecked();
                 if (!pre_val.IsEmpty() && pre_val->IsBoolean())
                 {
-                    premultiplied = pre_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+                    premultiplied = pre_val->BooleanValue(v8::Isolate::GetCurrent());
                 }
                 else
                 {
@@ -3410,7 +3410,7 @@ v8::Local<v8::Value> Image::_fromBufferSync(Nan::NAN_METHOD_ARGS_TYPE info)
                 v8::Local<v8::Value> painted_val = Nan::Get(options, Nan::New("painted").ToLocalChecked()).ToLocalChecked();
                 if (!painted_val.IsEmpty() && painted_val->IsBoolean())
                 {
-                    painted = painted_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+                    painted = painted_val->BooleanValue(v8::Isolate::GetCurrent());
                 }
                 else
                 {
@@ -3567,7 +3567,7 @@ NAN_METHOD(Image::fromBytes)
                 v8::Local<v8::Value> opt = Nan::Get(options, Nan::New("premultiply").ToLocalChecked()).ToLocalChecked();
                 if (!opt.IsEmpty() && opt->IsBoolean())
                 {
-                    premultiply = opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+                    premultiply = opt->BooleanValue(v8::Isolate::GetCurrent());
                 }
                 else
                 {
@@ -4415,7 +4415,7 @@ NAN_SETTER(Image::set_metrics_enabled)
     }
     else
     {
-        bool val = value->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+        bool val = value->BooleanValue(v8::Isolate::GetCurrent());
         im->this_->get_metrics().enabled_ = val;
     }
 #endif

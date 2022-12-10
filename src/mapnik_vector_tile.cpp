@@ -602,7 +602,7 @@ v8::Local<v8::Value> VectorTile::_compositeSync(Nan::NAN_METHOD_ARGS_TYPE info)
                 Nan::ThrowTypeError("option 'strictly_simple' must be a boolean");
                 return scope.Escape(Nan::Undefined());
             }
-            strictly_simple = strict_simp->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            strictly_simple = strict_simp->BooleanValue(v8::Isolate::GetCurrent());
         }
         if (Nan::Has(options, Nan::New("multi_polygon_union").ToLocalChecked()).FromMaybe(false))
         {
@@ -612,7 +612,7 @@ v8::Local<v8::Value> VectorTile::_compositeSync(Nan::NAN_METHOD_ARGS_TYPE info)
                 Nan::ThrowTypeError("option 'multi_polygon_union' must be a boolean");
                 return scope.Escape(Nan::Undefined());
             }
-            multi_polygon_union = mpu->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            multi_polygon_union = mpu->BooleanValue(v8::Isolate::GetCurrent());
         }
         if (Nan::Has(options, Nan::New("fill_type").ToLocalChecked()).FromMaybe(false))
         {
@@ -704,7 +704,7 @@ v8::Local<v8::Value> VectorTile::_compositeSync(Nan::NAN_METHOD_ARGS_TYPE info)
                 Nan::ThrowTypeError("reencode value must be a boolean");
                 return scope.Escape(Nan::Undefined());
             }
-            reencode = reencode_opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            reencode = reencode_opt->BooleanValue(v8::Isolate::GetCurrent());
         }
         if (Nan::Has(options, Nan::New("max_extent").ToLocalChecked()).FromMaybe(false))
         {
@@ -741,7 +741,7 @@ v8::Local<v8::Value> VectorTile::_compositeSync(Nan::NAN_METHOD_ARGS_TYPE info)
                 Nan::ThrowTypeError("option 'process_all_rings' must be a boolean");
                 return scope.Escape(Nan::Undefined());
             }
-            process_all_rings = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            process_all_rings = param_val->BooleanValue(v8::Isolate::GetCurrent());
         }
 
         if (Nan::Has(options, Nan::New("image_scaling").ToLocalChecked()).FromMaybe(false))
@@ -976,7 +976,7 @@ NAN_METHOD(VectorTile::composite)
                 Nan::ThrowTypeError("strictly_simple value must be a boolean");
                 return;
             }
-            strictly_simple = strict_simp->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            strictly_simple = strict_simp->BooleanValue(v8::Isolate::GetCurrent());
         }
         if (Nan::Has(options, Nan::New("multi_polygon_union").ToLocalChecked()).FromMaybe(false))
         {
@@ -986,7 +986,7 @@ NAN_METHOD(VectorTile::composite)
                 Nan::ThrowTypeError("multi_polygon_union value must be a boolean");
                 return;
             }
-            multi_polygon_union = mpu->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            multi_polygon_union = mpu->BooleanValue(v8::Isolate::GetCurrent());
         }
         if (Nan::Has(options, Nan::New("fill_type").ToLocalChecked()).FromMaybe(false))
         {
@@ -1093,7 +1093,7 @@ NAN_METHOD(VectorTile::composite)
                 Nan::ThrowTypeError("reencode value must be a boolean");
                 return;
             }
-            reencode = reencode_opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            reencode = reencode_opt->BooleanValue(v8::Isolate::GetCurrent());
         }
         if (Nan::Has(options, Nan::New("max_extent").ToLocalChecked()).FromMaybe(false))
         {
@@ -1129,7 +1129,7 @@ NAN_METHOD(VectorTile::composite)
                 Nan::ThrowTypeError("option 'process_all_rings' must be a boolean");
                 return;
             }
-            process_all_rings = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            process_all_rings = param_val->BooleanValue(v8::Isolate::GetCurrent());
         }
 
         if (Nan::Has(options, Nan::New("image_scaling").ToLocalChecked()).FromMaybe(false))
@@ -2526,7 +2526,7 @@ NAN_METHOD(VectorTile::toJSON)
                 Nan::ThrowError("option 'decode_geometry' must be a boolean");
                 return;
             }
-            decode_geometry = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            decode_geometry = param_val->BooleanValue(v8::Isolate::GetCurrent());
         }
     }
 
@@ -3241,7 +3241,7 @@ NAN_METHOD(VectorTile::addGeoJSON)
                 Nan::ThrowError("option 'strictly_simple' must be a boolean");
                 return;
             }
-            strictly_simple = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            strictly_simple = param_val->BooleanValue(v8::Isolate::GetCurrent());
         }
         if (Nan::Has(options, Nan::New("multi_polygon_union").ToLocalChecked()).FromMaybe(false))
         {
@@ -3251,7 +3251,7 @@ NAN_METHOD(VectorTile::addGeoJSON)
                 Nan::ThrowTypeError("multi_polygon_union value must be a boolean");
                 return;
             }
-            multi_polygon_union = mpu->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            multi_polygon_union = mpu->BooleanValue(v8::Isolate::GetCurrent());
         }
         if (Nan::Has(options, Nan::New("fill_type").ToLocalChecked()).FromMaybe(false))
         {
@@ -3291,7 +3291,7 @@ NAN_METHOD(VectorTile::addGeoJSON)
                 Nan::ThrowTypeError("option 'process_all_rings' must be a boolean");
                 return;
             }
-            process_all_rings = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            process_all_rings = param_val->BooleanValue(v8::Isolate::GetCurrent());
         }
     }
 
@@ -3893,7 +3893,7 @@ v8::Local<v8::Value> VectorTile::_addDataSync(Nan::NAN_METHOD_ARGS_TYPE info)
                 Nan::ThrowTypeError("option 'validate' must be a boolean");
                 return scope.Escape(Nan::Undefined());
             }
-            validate = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            validate = param_val->BooleanValue(v8::Isolate::GetCurrent());
         }
         if (Nan::Has(options, Nan::New<v8::String>("upgrade").ToLocalChecked()).FromMaybe(false))
         {
@@ -3903,7 +3903,7 @@ v8::Local<v8::Value> VectorTile::_addDataSync(Nan::NAN_METHOD_ARGS_TYPE info)
                 Nan::ThrowTypeError("option 'upgrade' must be a boolean");
                 return scope.Escape(Nan::Undefined());
             }
-            upgrade = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            upgrade = param_val->BooleanValue(v8::Isolate::GetCurrent());
         }
     }
     try
@@ -3994,7 +3994,7 @@ NAN_METHOD(VectorTile::addData)
                 Nan::ThrowTypeError("option 'validate' must be a boolean");
                 return;
             }
-            validate = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            validate = param_val->BooleanValue(v8::Isolate::GetCurrent());
         }
         if (Nan::Has(options, Nan::New<v8::String>("upgrade").ToLocalChecked()).FromMaybe(false))
         {
@@ -4004,7 +4004,7 @@ NAN_METHOD(VectorTile::addData)
                 Nan::ThrowTypeError("option 'upgrade' must be a boolean");
                 return;
             }
-            upgrade = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            upgrade = param_val->BooleanValue(v8::Isolate::GetCurrent());
         }
     }
 
@@ -4130,7 +4130,7 @@ v8::Local<v8::Value> VectorTile::_setDataSync(Nan::NAN_METHOD_ARGS_TYPE info)
                 Nan::ThrowTypeError("option 'validate' must be a boolean");
                 return scope.Escape(Nan::Undefined());
             }
-            validate = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            validate = param_val->BooleanValue(v8::Isolate::GetCurrent());
         }
         if (Nan::Has(options, Nan::New<v8::String>("upgrade").ToLocalChecked()).FromMaybe(false))
         {
@@ -4140,7 +4140,7 @@ v8::Local<v8::Value> VectorTile::_setDataSync(Nan::NAN_METHOD_ARGS_TYPE info)
                 Nan::ThrowTypeError("option 'upgrade' must be a boolean");
                 return scope.Escape(Nan::Undefined());
             }
-            upgrade = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            upgrade = param_val->BooleanValue(v8::Isolate::GetCurrent());
         }
     }
     try
@@ -4231,7 +4231,7 @@ NAN_METHOD(VectorTile::setData)
                 Nan::ThrowTypeError("option 'validate' must be a boolean");
                 return;
             }
-            validate = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            validate = param_val->BooleanValue(v8::Isolate::GetCurrent());
         }
         if (Nan::Has(options, Nan::New<v8::String>("upgrade").ToLocalChecked()).FromMaybe(false))
         {
@@ -4241,7 +4241,7 @@ NAN_METHOD(VectorTile::setData)
                 Nan::ThrowTypeError("option 'upgrade' must be a boolean");
                 return;
             }
-            upgrade = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            upgrade = param_val->BooleanValue(v8::Isolate::GetCurrent());
         }
     }
 
@@ -6088,7 +6088,7 @@ v8::Local<v8::Value> VectorTile::_reportGeometryValiditySync(Nan::NAN_METHOD_ARG
                 Nan::ThrowError("option 'split_multi_features' must be a boolean");
                 return scope.Escape(Nan::Undefined());
             }
-            split_multi_features = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            split_multi_features = param_val->BooleanValue(v8::Isolate::GetCurrent());
         }
 
         if (Nan::Has(options, Nan::New("lat_lon").ToLocalChecked()).FromMaybe(false))
@@ -6099,7 +6099,7 @@ v8::Local<v8::Value> VectorTile::_reportGeometryValiditySync(Nan::NAN_METHOD_ARG
                 Nan::ThrowError("option 'lat_lon' must be a boolean");
                 return scope.Escape(Nan::Undefined());
             }
-            lat_lon = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            lat_lon = param_val->BooleanValue(v8::Isolate::GetCurrent());
         }
 
         if (Nan::Has(options, Nan::New("web_merc").ToLocalChecked()).FromMaybe(false))
@@ -6110,7 +6110,7 @@ v8::Local<v8::Value> VectorTile::_reportGeometryValiditySync(Nan::NAN_METHOD_ARG
                 Nan::ThrowError("option 'web_merc' must be a boolean");
                 return scope.Escape(Nan::Undefined());
             }
-            web_merc = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            web_merc = param_val->BooleanValue(v8::Isolate::GetCurrent());
         }
     }
     VectorTile* d = Nan::ObjectWrap::Unwrap<VectorTile>(info.Holder());
@@ -6256,7 +6256,7 @@ NAN_METHOD(VectorTile::reportGeometryValidity)
                 Nan::ThrowError("option 'split_multi_features' must be a boolean");
                 return;
             }
-            split_multi_features = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            split_multi_features = param_val->BooleanValue(v8::Isolate::GetCurrent());
         }
 
         if (Nan::Has(options, Nan::New("lat_lon").ToLocalChecked()).FromMaybe(false))
@@ -6267,7 +6267,7 @@ NAN_METHOD(VectorTile::reportGeometryValidity)
                 Nan::ThrowError("option 'lat_lon' must be a boolean");
                 return;
             }
-            lat_lon = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            lat_lon = param_val->BooleanValue(v8::Isolate::GetCurrent());
         }
 
         if (Nan::Has(options, Nan::New("web_merc").ToLocalChecked()).FromMaybe(false))
@@ -6278,7 +6278,7 @@ NAN_METHOD(VectorTile::reportGeometryValidity)
                 Nan::ThrowError("option 'web_merc' must be a boolean");
                 return;
             }
-            web_merc = param_val->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            web_merc = param_val->BooleanValue(v8::Isolate::GetCurrent());
         }
     }
     // ensure callback is a function

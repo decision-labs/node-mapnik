@@ -259,7 +259,7 @@ NAN_SETTER(Layer::set_prop)
             Nan::ThrowTypeError("Must provide a boolean");
             return;
         }
-        l->layer_->set_queryable(value->BooleanValue(Nan::GetCurrentContext()).ToChecked());
+        l->layer_->set_queryable(value->BooleanValue(v8::Isolate::GetCurrent()));
     }
     else if (a == "clear_label_cache")
     {
@@ -267,7 +267,7 @@ NAN_SETTER(Layer::set_prop)
             Nan::ThrowTypeError("Must provide a boolean");
             return;
         }
-        l->layer_->set_clear_label_cache(value->BooleanValue(Nan::GetCurrentContext()).ToChecked());
+        l->layer_->set_clear_label_cache(value->BooleanValue(v8::Isolate::GetCurrent()));
     }
     else if (a == "active")
     {
@@ -275,7 +275,7 @@ NAN_SETTER(Layer::set_prop)
             Nan::ThrowTypeError("Must provide a boolean");
             return;
         }
-        l->layer_->set_active(value->BooleanValue(Nan::GetCurrentContext()).ToChecked());
+        l->layer_->set_active(value->BooleanValue(v8::Isolate::GetCurrent()));
     }
 }
 
