@@ -10,7 +10,7 @@
   "binary": {
     "module_name": "mapnik",
     "module_path": "./lib/binding/",
-    "host": "https://mapnik-carto.s3.amazonaws.com",
+    "host": "https://mapnik-geodb.s3.eu-central-1.amazonaws.com",
     "remote_path": "./{module_name}/v{version}/",
     "package_name": "{node_abi}-{platform}-{arch}-{configuration}{toolset}.tar.gz"
   },
