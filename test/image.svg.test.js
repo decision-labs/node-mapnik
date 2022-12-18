@@ -24,11 +24,11 @@ describe('mapnik.Image SVG', function() {
           new mapnik.Image.fromSVGBytes({}, function(err, svg) {});
         }, /first argument is invalid, must be a Buffer/);
         assert.throws(function() {
-          new mapnik.Image.fromSVGBytesSync(new Buffer('asdfasdf'));
-        }, /SVG parse error:\s+Unable to parse 'asdfasdf'/);
+          new mapnik.Image.fromSVGBytesSync(new Buffer.from('asdfasdf'));
+        }, /SVG error: unable to parse "asdfasdf"/);
         assert.throws(function() {
           mapnik.Image.fromSVGSync('./test/data/SVG_DOES_NOT_EXIST.svg');
-        }, /SVG parse error:\s+Unable to open '.\/test\/data\/SVG_DOES_NOT_EXIST.svg'/);
+        }, /SVG error: unable to open "\.\/test\/data\/SVG_DOES_NOT_EXIST\.svg"/);
         assert.throws(function() {
           mapnik.Image.fromSVGSync('./test/data/vector_tile/tile0.expected-svg.svg', 256);
         }, /optional second arg must be an options object/);
@@ -36,13 +36,13 @@ describe('mapnik.Image SVG', function() {
           mapnik.Image.fromSVG('./test/data/vector_tile/tile0.expected-svg.svg', 256);
         }, /last argument must be a callback function/);
         assert.throws(function() {
-          mapnik.Image.fromSVGBytes(new Buffer('asdfasdf'), 256);
+          mapnik.Image.fromSVGBytes(new Buffer.from('asdfasdf'), 256);
         }, /last argument must be a callback function/);
         assert.throws(function() {
           mapnik.Image.fromSVG('./test/data/vector_tile/tile0.expected-svg.svg', 256, function(err, res) {});
         }, /optional second arg must be an options object/);
         assert.throws(function() {
-          mapnik.Image.fromSVGBytes(new Buffer('asdfasdf'), 256, function(err, res) {});
+          mapnik.Image.fromSVGBytes(new Buffer.from('asdfasdf'), 256, function(err, res) {});
         }, /optional second arg must be an options object/);
         assert.throws(function() {
           mapnik.Image.fromSVGSync('./test/data/vector_tile/tile0.expected-svg.svg', { scale: 'foo' });
@@ -51,7 +51,7 @@ describe('mapnik.Image SVG', function() {
           mapnik.Image.fromSVG('./test/data/vector_tile/tile0.expected-svg.svg', { scale: 'foo' }, function(err, res) {});
         }, /'scale' must be a number/);
         assert.throws(function() {
-          mapnik.Image.fromSVGBytes(new Buffer('asdf'), { scale: 'foo' }, function(err, res) {});
+          mapnik.Image.fromSVGBytes(new Buffer.from('asdf'), { scale: 'foo' }, function(err, res) {});
         }, /'scale' must be a number/);
         assert.throws(function() {
           mapnik.Image.fromSVGBytes(undefined, { scale: 1 }, function(err, res) {});
@@ -66,21 +66,21 @@ describe('mapnik.Image SVG', function() {
           mapnik.Image.fromSVG('./test/data/vector_tile/tile0.expected-svg.svg', { scale: -1 }, function(err, res) {});
         }, /'scale' must be a positive non zero number/);
         assert.throws(function() {
-          mapnik.Image.fromSVGBytes(new Buffer('asdf'), { scale: -1 }, function(err, res) {});
+          mapnik.Image.fromSVGBytes(new Buffer.from('asdf'), { scale: -1 }, function(err, res) {});
         }, /'scale' must be a positive non zero number/);
         assert.throws(function() {
           mapnik.Image.fromSVGSync('./test/data/vector_tile/tile0.corrupt-svg.svg');
         }, /image created from svg must have a width and height greater then zero/);
-        mapnik.Image.fromSVGBytes(new Buffer('a'), { scale: 1 }, function(err, res) {
+        mapnik.Image.fromSVGBytes(new Buffer.from('a'), { scale: 1 }, function(err, res) {
             assert.ok(err);
-            assert.ok(err.message.match(/Unable to parse 'a'/));
+            assert.ok(err.message.match(/SVG error: unable to parse "a"/));
             var svgdata = "<svg width='1000000000000' height='1000000000000'><g id='a'><ellipse fill='#FFFFFF' stroke='#000000' stroke-width='4' cx='50' cy='50' rx='25' ry='25'/></g></svg>";
-            var buffer = new Buffer(svgdata);
+            var buffer = new Buffer.from(svgdata);
             mapnik.Image.fromSVGBytes(buffer, { scale: 1 }, function(err, img) {
                 assert.ok(err);
                 assert.ok(err.message.match(/image created from svg must be 2048 pixels or fewer on each side/));
                 var svgdata2 = "<svg width='100' height='100'><g id='a'><ellipse fill='#FFFFFF' stroke='#000000' stroke-width='4' cx='50' cy='50' rx='25' ry='25'/></g></svg>";
-                var buffer2 = new Buffer(svgdata2);
+                var buffer2 = new Buffer.from(svgdata2);
                 mapnik.Image.fromSVGBytes(buffer2, { scale: 1000000 }, function(err, img) {
                     assert.ok(err);
                     assert.ok(err.message.match(/image created from svg must be 2048 pixels or fewer on each side/));
@@ -94,7 +94,7 @@ describe('mapnik.Image SVG', function() {
     it('blocks allocating a very large image', function(done) {
         // 65535 is the max width/height in mapnik
         var svgdata = "<svg width='65535' height='65535'><g id='a'><ellipse fill='#FFFFFF' stroke='#000000' stroke-width='4' cx='50' cy='50' rx='25' ry='25'/></g></svg>";
-        var buffer = new Buffer(svgdata);
+        var buffer = new Buffer.from(svgdata);
         mapnik.Image.fromSVGBytes(buffer, function(err, img) {
             assert.ok(err);
             assert.ok(err.message.match(/image created from svg must be 2048 pixels or fewer on each side/));
@@ -105,7 +105,7 @@ describe('mapnik.Image SVG', function() {
     it('customized the max image size to block', function(done) {
         // 65535 is the max width/height in mapnik
         var svgdata = "<svg width='65535' height='65535'><g id='a'><ellipse fill='#FFFFFF' stroke='#000000' stroke-width='4' cx='50' cy='50' rx='25' ry='25'/></g></svg>";
-        var buffer = new Buffer(svgdata);
+        var buffer = new Buffer.from(svgdata);
         mapnik.Image.fromSVGBytes(buffer, {max_size:2049}, function(err, img) {
             assert.ok(err);
             assert.ok(err.message.match(/image created from svg must be 2049 pixels or fewer on each side/));
@@ -116,7 +116,7 @@ describe('mapnik.Image SVG', function() {
     it('max image size blocks dimension*scale', function(done) {
         // 65535 is the max width/height in mapnik
         var svgdata = "<svg width='5000' height='5000'><g id='a'><ellipse fill='#FFFFFF' stroke='#000000' stroke-width='4' cx='50' cy='50' rx='25' ry='25'/></g></svg>";
-        var buffer = new Buffer(svgdata);
+        var buffer = new Buffer.from(svgdata);
         mapnik.Image.fromSVGBytes(buffer, {scale: 2, max_size:10000-1}, function(err, img) {
             assert.ok(err);
             assert.ok(err.message.match(/image created from svg must be 9999 pixels or fewer on each side/));
@@ -131,7 +131,7 @@ describe('mapnik.Image SVG', function() {
         it('allocates very large image', function(done) {
             // 65535 is the max width/height in mapnik
             var svgdata = "<svg width='5000' height='5000'><g id='a'><ellipse fill='#FFFFFF' stroke='#000000' stroke-width='4' cx='50' cy='50' rx='25' ry='25'/></g></svg>";
-            var buffer = new Buffer(svgdata);
+            var buffer = new Buffer.from(svgdata);
             mapnik.Image.fromSVGBytes(buffer, {scale: 2, max_size:10000}, function(err, img) {
                 if (err) throw err;
                 assert.equal(img.width(),10000);
@@ -149,10 +149,10 @@ describe('mapnik.Image SVG', function() {
         done();
       });
     });
-    
+
     it('should err with async file w/o width or height as Bytes', function(done) {
         var svgdata = "<svg width='0' height='0'><g id='a'><ellipse fill='#FFFFFF' stroke='#000000' stroke-width='4' cx='50' cy='50' rx='25' ry='25'/></g></svg>";
-        var buffer = new Buffer(svgdata);
+        var buffer = new Buffer.from(svgdata);
         mapnik.Image.fromSVGBytes(buffer, function(err, img) {
             assert.ok(err);
             assert.ok(err.message.match(/image created from svg must have a width and height greater then zero/));
@@ -162,9 +162,9 @@ describe('mapnik.Image SVG', function() {
     });
 
     it('should err with async invalid buffer', function(done) {
-      mapnik.Image.fromSVGBytes(new Buffer('asdfasdf'), function(err, svg) {
+      mapnik.Image.fromSVGBytes(new Buffer.from('asdfasdf'), function(err, svg) {
         assert.ok(err);
-        assert.ok(err.message.match(/SVG parse error:\s+Unable to parse 'asdfasdf'/));
+        assert.ok(err.message.match(/SVG error: unable to parse "asdfasdf"/));
         assert.equal(svg, undefined);
         done();
       });
@@ -173,19 +173,94 @@ describe('mapnik.Image SVG', function() {
     it('should err with async non-existent file', function(done) {
       mapnik.Image.fromSVG('./test/data/SVG_DOES_NOT_EXIST.svg', function(err, svg) {
         assert.ok(err);
-        assert.ok(err.message.match(/SVG parse error:\s+Unable to open '.\/test\/data\/SVG_DOES_NOT_EXIST.svg'/));
+        assert.ok(err.message.match(/SVG error: unable to open "\.\/test\/data\/SVG_DOES_NOT_EXIST\.svg"/));
         assert.equal(svg, undefined);
         done();
       });
     });
 
-    it('should error with async file full of errors', function(done) {
-      mapnik.Image.fromSVG('./test/data/vector_tile/errors.svg', function(err, svg) {
+    it('should not error with async in non-strict mode on svg with validation and parse errors', function(done) {
+      mapnik.Image.fromSVG('./test/data/vector_tile/errors.svg', {strict:false}, function(err, svg) {
+        assert.ok(!err);
+        assert.ok(svg);
+        done();
+      });
+    });
+
+    it('should not error with sync in non-strict mode on svg with validation and parse errors', function(done) {
+      try {
+        var img = mapnik.Image.fromSVGSync('./test/data/vector_tile/errors.svg', {strict:false});
+        assert.ok(img);
+      } catch (err) {
+          console.log(err);
+          assert.ok(!err);
+      }
+      done();
+    });
+
+    it('should error with async in strict mode on svg with validation and parse errors', function(done) {
+      mapnik.Image.fromSVG('./test/data/vector_tile/errors.svg', {strict:true}, function(err, svg) {
         assert.ok(err);
-        assert.ok(err.message.match(/SVG parse error:/));
+        assert.ok(err.message.match(/SVG validation error:/));
         assert.equal(svg, undefined);
         done();
       });
+    });
+
+    it('should not error on svg with unhandled elements in non-strict mode', function() {
+        var svgdata = "<svg width='100' height='100'><g id='a'><text></text><ellipse fill='#FFFFFF' stroke='#000000' stroke-width='4' cx='50' cy='50' rx='25' ry='25'/></g></svg>";
+        var buffer = new Buffer.from(svgdata);
+        var img = mapnik.Image.fromSVGBytesSync(buffer,{strict:false});
+        assert.ok(img);
+        assert.ok(img instanceof mapnik.Image);
+        assert.equal(img.width(), 100);
+        assert.equal(img.height(), 100);
+        assert.equal(img.encodeSync("png").length, 1270);
+    });
+
+
+    function svg_error(svgdata) {
+            var buffer = new Buffer.from(svgdata);
+            var error = false;
+            try {
+                var img = mapnik.Image.fromSVGBytesSync(buffer,{strict:true});
+            } catch (err) {
+                error = err;
+            }
+
+            return error;
+    }
+
+
+    //  test the mapnik core known unsupported elements: https://github.com/mapnik/mapnik/blob/634928fcbe780e8a5a355ddb3cd075ce2450adb4/src/svg/svg_parser.cpp#L106-L114
+    it('should error on svg with unhandled elements in strict mode', function() {
+        var error = svg_error("<svg width='100' height='100'><g id='a'><unsupported></unsupported><text></text><symbol></symbol><image></image><marker></marker><view></view><switch></switch><a></a><ellipse fill='#FFFFFF' stroke='#000000' stroke-width='4' cx='50' cy='50' rx='25' ry='25'/></g></svg>");
+        assert.ok(error);
+        assert.ok(error.message.match(/<text> element is not supported/));
+
+        error = svg_error("<svg width='100' height='100'><g id='a'><unsupported></unsupported><symbol></symbol><image></image><marker></marker><view></view><switch></switch><a></a><ellipse fill='#FFFFFF' stroke='#000000' stroke-width='4' cx='50' cy='50' rx='25' ry='25'/></g></svg>");
+        assert.ok(error);
+        assert.ok(error.message.match(/<symbol> element is not supported/));
+
+        error = svg_error("<svg width='100' height='100'><g id='a'><unsupported></unsupported><switch></switch><a></a><ellipse fill='#FFFFFF' stroke='#000000' stroke-width='4' cx='50' cy='50' rx='25' ry='25'/></g></svg>");
+        assert.ok(error);
+        assert.ok(error.message.match(/<switch> element is not supported/));
+
+        error = svg_error("<svg width='100' height='100'><g id='a'><unsupported></unsupported><marker></marker><view></view><switch></switch><a></a><ellipse fill='#FFFFFF' stroke='#000000' stroke-width='4' cx='50' cy='50' rx='25' ry='25'/></g></svg>");
+        assert.ok(error);
+        assert.ok(error.message.match(/<marker> element is not supported/));
+
+        error = svg_error("<svg width='100' height='100'><g id='a'><unsupported></unsupported><view></view><switch></switch><a></a><ellipse fill='#FFFFFF' stroke='#000000' stroke-width='4' cx='50' cy='50' rx='25' ry='25'/></g></svg>");
+        assert.ok(error);
+        assert.ok(error.message.match(/<view> element is not supported/));
+
+        error = svg_error("<svg width='100' height='100'><g id='a'><unsupported></unsupported><a></a><ellipse fill='#FFFFFF' stroke='#000000' stroke-width='4' cx='50' cy='50' rx='25' ry='25'/></g></svg>");
+        assert.ok(error);
+        assert.ok(error.message.match(/<a> element is not supported/));
+
+        error = svg_error("<svg width='100' height='100'><g id='a'><unsupported></unsupported><image></image><marker></marker><view></view><switch></switch><a></a><ellipse fill='#FFFFFF' stroke='#000000' stroke-width='4' cx='50' cy='50' rx='25' ry='25'/></g></svg>");
+        assert.ok(error);
+        assert.ok(error.message.match(/<image> element is not supported/));
     });
 
     it('#fromSVGSync load from SVG file', function() {
@@ -196,7 +271,7 @@ describe('mapnik.Image SVG', function() {
         assert.equal(img.height(), 256);
         assert.equal(img.encodeSync('png32').length, 17571);
     });
-    
+
     it('#fromSVGSync load from SVG file - 2', function() {
         var img = mapnik.Image.fromSVG('./test/data/vector_tile/tile0.expected-svg.svg');
         assert.ok(img);
@@ -220,7 +295,7 @@ describe('mapnik.Image SVG', function() {
 
     it('#fromSVGBytesSync load from SVG buffer', function() {
         var svgdata = "<svg width='100' height='100'><g id='a'><ellipse fill='#FFFFFF' stroke='#000000' stroke-width='4' cx='50' cy='50' rx='25' ry='25'/></g></svg>";
-        var buffer = new Buffer(svgdata);
+        var buffer = new Buffer.from(svgdata);
         var img = mapnik.Image.fromSVGBytesSync(buffer);
         assert.ok(img);
         assert.ok(img instanceof mapnik.Image);
@@ -231,7 +306,7 @@ describe('mapnik.Image SVG', function() {
 
     it('#fromSVGBytesSync load from SVG buffer - 2', function() {
         var svgdata = "<svg width='100' height='100'><g id='a'><ellipse fill='#FFFFFF' stroke='#000000' stroke-width='4' cx='50' cy='50' rx='25' ry='25'/></g></svg>";
-        var buffer = new Buffer(svgdata);
+        var buffer = new Buffer.from(svgdata);
         var img = mapnik.Image.fromSVGBytes(buffer);
         assert.ok(img);
         assert.ok(img instanceof mapnik.Image);
@@ -242,7 +317,7 @@ describe('mapnik.Image SVG', function() {
 
     it('#fromSVGBytes load from SVG buffer', function(done) {
         var svgdata = "<svg width='100' height='100'><g id='a'><ellipse fill='#FFFFFF' stroke='#000000' stroke-width='4' cx='50' cy='50' rx='25' ry='25'/></g></svg>";
-        var buffer = new Buffer(svgdata);
+        var buffer = new Buffer.from(svgdata);
         mapnik.Image.fromSVGBytes(buffer, function(err, img) {
             assert.ok(img);
             assert.ok(img instanceof mapnik.Image);
@@ -256,7 +331,7 @@ describe('mapnik.Image SVG', function() {
 
     it('svg scaling', function() {
         var svgdata = "<svg width='100' height='100'><g id='a'><ellipse fill='#FFFFFF' stroke='#000000' stroke-width='4' cx='50' cy='50' rx='25' ry='25'/></g></svg>";
-        var buffer = new Buffer(svgdata);
+        var buffer = new Buffer.from(svgdata);
         var img = mapnik.Image.fromSVGBytesSync(buffer, { scale: 0.5});
         assert.ok(img);
         assert.ok(img instanceof mapnik.Image);

@@ -13,7 +13,7 @@ Nan::Persistent<v8::FunctionTemplate> Color::constructor;
 /**
  * **`mapnik.Color`**
  *
- * A `mapnik.Color` object used for handling and converting colors 
+ * A `mapnik.Color` object used for handling and converting colors
  *
  * @class Color
  * @param {string|number} value either an array of [r, g, b, a],
@@ -48,7 +48,7 @@ void Color::Initialize(v8::Local<v8::Object> target) {
     ATTR(lcons, "a", get_prop, set_prop);
     ATTR(lcons, "premultiplied", get_premultiplied, set_premultiplied);
 
-    target->Set(Nan::New("Color").ToLocalChecked(), lcons->GetFunction());
+    Nan::Set(target, Nan::New("Color").ToLocalChecked(), Nan::GetFunction(lcons).ToLocalChecked());
     constructor.Reset(lcons);
 }
 
@@ -81,84 +81,84 @@ NAN_METHOD(Color::New)
     color_ptr c_p;
     try
     {
-        if (info.Length() == 1 && 
+        if (info.Length() == 1 &&
             info[0]->IsString())
         {
             c_p = std::make_shared<mapnik::color>(TOSTR(info[0]));
         }
-        else if (info.Length() == 2 && 
+        else if (info.Length() == 2 &&
                  info[0]->IsString() &&
                  info[1]->IsBoolean())
         {
-            c_p = std::make_shared<mapnik::color>(TOSTR(info[0]),info[1]->BooleanValue());
+            c_p = std::make_shared<mapnik::color>(TOSTR(info[0]),info[1]->BooleanValue(v8::Isolate::GetCurrent()));
         }
         else if (info.Length() == 3 &&
                  info[0]->IsNumber() &&
                  info[1]->IsNumber() &&
-                 info[2]->IsNumber()) 
+                 info[2]->IsNumber())
         {
-            int r = info[0]->IntegerValue();
-            int g = info[1]->IntegerValue();
-            int b = info[2]->IntegerValue();
+            int r = info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+            int g = info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+            int b = info[2]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255)
             {
                 Nan::ThrowTypeError("color value out of range");
                 return;
             }
             c_p = std::make_shared<mapnik::color>(r,g,b);
-        } 
+        }
         else if (info.Length() == 4 &&
                  info[0]->IsNumber() &&
                  info[1]->IsNumber() &&
                  info[2]->IsNumber() &&
-                 info[3]->IsBoolean()) 
+                 info[3]->IsBoolean())
         {
-            int r = info[0]->IntegerValue();
-            int g = info[1]->IntegerValue();
-            int b = info[2]->IntegerValue();
+            int r = info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+            int g = info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+            int b = info[2]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255)
             {
                 Nan::ThrowTypeError("color value out of range");
                 return;
             }
-            c_p = std::make_shared<mapnik::color>(r,g,b,255,info[3]->BooleanValue());
-        } 
+            c_p = std::make_shared<mapnik::color>(r,g,b,255,info[3]->BooleanValue(v8::Isolate::GetCurrent()));
+        }
         else if (info.Length() == 4 &&
                  info[0]->IsNumber() &&
                  info[1]->IsNumber() &&
                  info[2]->IsNumber() &&
-                 info[3]->IsNumber()) 
+                 info[3]->IsNumber())
         {
-            int r = info[0]->IntegerValue();
-            int g = info[1]->IntegerValue();
-            int b = info[2]->IntegerValue();
-            int a = info[3]->IntegerValue();
+            int r = info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+            int g = info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+            int b = info[2]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+            int a = info[3]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255 || a < 0 || a > 255)
             {
                 Nan::ThrowTypeError("color value out of range");
                 return;
             }
             c_p = std::make_shared<mapnik::color>(r,g,b,a);
-        } 
+        }
         else if (info.Length() == 5 &&
                  info[0]->IsNumber() &&
                  info[1]->IsNumber() &&
                  info[2]->IsNumber() &&
                  info[3]->IsNumber() &&
-                 info[4]->IsBoolean()) 
+                 info[4]->IsBoolean())
         {
-            int r = info[0]->IntegerValue();
-            int g = info[1]->IntegerValue();
-            int b = info[2]->IntegerValue();
-            int a = info[3]->IntegerValue();
+            int r = info[0]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+            int g = info[1]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+            int b = info[2]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
+            int a = info[3]->IntegerValue(Nan::GetCurrentContext()).ToChecked();
             if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255 || a < 0 || a > 255)
             {
                 Nan::ThrowTypeError("color value out of range");
                 return;
             }
-            c_p = std::make_shared<mapnik::color>(r,g,b,a,info[4]->BooleanValue());
-        } 
-        else 
+            c_p = std::make_shared<mapnik::color>(r,g,b,a,info[4]->BooleanValue(v8::Isolate::GetCurrent()));
+        }
+        else
         {
             Nan::ThrowTypeError("invalid arguments: colors can be created from a string, integer r,g,b values, or integer r,g,b,a values");
             return;
@@ -183,9 +183,10 @@ v8::Local<v8::Value> Color::NewInstance(mapnik::color const& color) {
     Color* c = new Color();
     c->this_ = std::make_shared<mapnik::color>(color);
     v8::Local<v8::Value> ext = Nan::New<v8::External>(c);
-    return scope.Escape(Nan::New(constructor)->GetFunction()->NewInstance(1, &ext));
+    Nan::MaybeLocal<v8::Object> maybe_local = Nan::NewInstance(Nan::GetFunction(Nan::New(constructor)).ToLocalChecked(), 1, &ext);
+    if (maybe_local.IsEmpty()) Nan::ThrowError("Could not create new Color instance");
+    return scope.Escape(maybe_local.ToLocalChecked());
 }
-
 
 NAN_GETTER(Color::get_prop)
 {
@@ -210,7 +211,7 @@ NAN_SETTER(Color::set_prop)
         Nan::ThrowTypeError("color channel value must be an integer");
         return;
     }
-    int val = value->IntegerValue();
+    int val = value->IntegerValue(Nan::GetCurrentContext()).ToChecked();
     if (val < 0 || val > 255)
     {
         Nan::ThrowTypeError("Value out of range for color channel");
@@ -263,7 +264,7 @@ NAN_SETTER(Color::set_premultiplied)
         Nan::ThrowTypeError("Value set to premultiplied must be a boolean");
         return;
     }
-    c->get()->set_premultiplied(value->BooleanValue());
+    c->get()->set_premultiplied(value->BooleanValue(v8::Isolate::GetCurrent()));
 }
 
 /**
