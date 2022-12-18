@@ -390,7 +390,7 @@ NAN_METHOD(Grid::encodeSync)
                 return;
             }
 
-            add_features = bind_opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            add_features = bind_opt->BooleanValue(v8::Isolate::GetCurrent());
         }
     }
 
@@ -501,7 +501,7 @@ NAN_METHOD(Grid::encode)
                 return;
             }
 
-            add_features = bind_opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            add_features = bind_opt->BooleanValue(v8::Isolate::GetCurrent());
         }
     }
 
@@ -628,7 +628,7 @@ NAN_SETTER(Grid::set_metrics_enabled)
     }
     else
     {
-        bool val = value->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+        bool val = value->BooleanValue(v8::Isolate::GetCurrent());
         g->this_->metrics_.enabled_ = val;
     }
 #endif

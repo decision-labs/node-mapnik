@@ -524,7 +524,7 @@ NAN_METHOD(Blend) {
             }
         }
 
-        baton->reencode = Nan::Get(options, Nan::New("reencode").ToLocalChecked()).ToLocalChecked()->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+        baton->reencode = Nan::Get(options, Nan::New("reencode").ToLocalChecked()).ToLocalChecked()->BooleanValue(v8::Isolate::GetCurrent());
         baton->width = Nan::Get(options, Nan::New("width").ToLocalChecked()).ToLocalChecked()->Int32Value(Nan::GetCurrentContext()).ToChecked();
         baton->height = Nan::Get(options, Nan::New("height").ToLocalChecked()).ToLocalChecked()->Int32Value(Nan::GetCurrentContext()).ToChecked();
 

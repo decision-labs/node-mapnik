@@ -16,7 +16,7 @@ static inline void object_to_container(mapnik::attributes & cont, v8::Local<v8::
         v8::Local<v8::Value> name = Nan::Get(names, i).ToLocalChecked()->ToString(Nan::GetCurrentContext()).ToLocalChecked();
         v8::Local<v8::Value> value = Nan::Get(vars, name).ToLocalChecked();
         if (value->IsBoolean()) {
-            cont[TOSTR(name)] = value->ToBoolean(Nan::GetCurrentContext()).ToLocalChecked()->Value();
+            cont[TOSTR(name)] = value->BooleanValue(v8::Isolate::GetCurrent());
         } else if (value->IsString()) {
             cont[TOSTR(name)] = tr.transcode(TOSTR(value));
         } else if (value->IsNumber()) {

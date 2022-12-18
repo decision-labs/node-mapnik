@@ -324,7 +324,7 @@ NAN_METHOD(ImageView::getPixel)
                 Nan::ThrowTypeError("optional arg 'color' must be a boolean");
                 return;
             }
-            get_color = bind_opt->BooleanValue(Nan::GetCurrentContext()).ToChecked();
+            get_color = bind_opt->BooleanValue(v8::Isolate::GetCurrent());
         }
 
     }
